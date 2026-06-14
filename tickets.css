@@ -90,7 +90,7 @@ body, .topbar, .sidemenu, .filterbar, .tickets thead th,
   overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0;
 }
 
-.app { display: flex; flex-direction: column; height: 100vh; }
+.app { display: flex; flex-direction: column; min-height: 100vh; }
 
 /* ===================== TOP BAR ===================== */
 .topbar {
@@ -175,14 +175,11 @@ body, .topbar, .sidemenu, .filterbar, .tickets thead th,
 
 /* main */
 .main {
-  flex: 1; min-width: 0; min-height: 0;
-  overflow: hidden;
+  flex: 1; min-width: 0;
   padding: 18px 22px;
-  display: flex; flex-direction: column;
 }
 
 .page-head {
-  flex: none;
   display: flex; align-items: center; justify-content: space-between;
   margin-bottom: 16px;
 }
@@ -225,11 +222,10 @@ body, .topbar, .sidemenu, .filterbar, .tickets thead th,
 
 /* ===================== TABLE ===================== */
 .tablewrap {
-  flex: 1; min-height: 0;
-  overflow: auto;
   background: var(--bg-panel);
   border: 1px solid var(--line);
   border-radius: var(--radius);
+  overflow: hidden;
 }
 .tickets { width: 100%; border-collapse: collapse; font-size: 13px; }
 .tickets thead th {
