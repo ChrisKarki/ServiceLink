@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tickets &middot; ServiceLink</title>
+  <link rel="stylesheet" href="tickets.css">
+</head>
+<body>
+  <div class="app">
+
+    <!-- ============ TOP BAR (RAD 3.1.1: profile + global search) ============ -->
+    <header class="topbar">
+      <div class="brand">ServiceLink</div>
+      <div class="topbar__search">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 4a6 6 0 1 0 3.7 10.7l4.3 4.3 1.4-1.4-4.3-4.3A6 6 0 0 0 10 4zm0 2a4 4 0 1 1 0 8 4 4 0 0 1 0-8z"/></svg>
+        <input type="search" id="ticketSearch" placeholder="Search tickets" aria-label="Search tickets">
+      </div>
+      <div class="topbar__user">
+        <button class="iconbtn" id="themeToggle" title="Switch theme" aria-label="Switch to light theme" aria-pressed="false">
+          <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+          <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 17a5 5 0 1 1 0-10 5 5 0 0 1 0 10zm0-13V1m0 22v-3M4.2 4.2 2.1 2.1m19.8 19.8-2.1-2.1M4 12H1m22 0h-3M4.2 19.8 2.1 21.9M21.9 2.1 19.8 4.2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
+        <button class="profile" id="profileBtn" title="Jordan Okafor (Technician)" aria-label="Account: Jordan Okafor">
+          <span class="profile__avatar">JO</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- ============ BODY: sidebar + content ============ -->
+    <div class="body">
+
+      <!-- Side menu (Appendix C wireframe: Dashboard / Tickets / Resources / KB) -->
+      <nav class="sidemenu" aria-label="Primary">
+        <a class="sidemenu__item" href="#">Dashboard</a>
+        <a class="sidemenu__item is-active" href="#" aria-current="page">Tickets</a>
+        <a class="sidemenu__item" href="#">Resources</a>
+        <a class="sidemenu__item" href="#">KB</a>
+      </nav>
+
+      <!-- Main content -->
+      <main class="main">
+        <div class="page-head">
+          <h1>Tickets</h1>
+          <button class="btn btn--primary">+ New ticket</button>
+        </div>
+
+        <!-- Inline filter row (mirrors Resource List wireframe) -->
+        <div class="filterbar">
+          <span class="filterbar__label">Filters:</span>
+
+          <label class="filterbar__field">
+            <span>Status</span>
+            <select id="fState">
+              <option value="all">All Unresolved</option>
+              <option value="New">New</option>
+              <option value="Assigned">Assigned</option>
+              <option value="In Progress">In Progress</option>
+              <option value="Waiting on User">Waiting on User</option>
+              <option value="Resolved">Resolved</option>
+              <option value="Closed">Closed</option>
+            </select>
+          </label>
+
+          <label class="filterbar__field">
+            <span>Priority</span>
+            <select id="fPriority">
+              <option value="all">All</option>
+              <option value="Critical">Critical</option>
+              <option value="High">High</option>
+              <option value="Medium">Medium</option>
+              <option value="Low">Low</option>
+            </select>
+          </label>
+
+          <label class="filterbar__field">
+            <span>Agent</span>
+            <select id="fAgent">
+              <option value="all">All agents</option>
+              <option value="me">Me (J. Okafor)</option>
+              <option value="unassigned">Unassigned</option>
+              <option value="P. Mehta">P. Mehta</option>
+              <option value="L. Tran">L. Tran</option>
+              <option value="S. Okeke">S. Okeke</option>
+            </select>
+          </label>
+
+          <button class="btn btn--ghost" id="resetFilters">Reset</button>
+          <button class="btn btn--primary" id="applyFilters">Apply</button>
+        </div>
+
+        <!-- Ticket table -->
+        <section class="tablewrap" aria-label="Ticket list">
+          <table class="tickets">
+            <thead>
+              <tr>
+                <th class="col-id" data-sort="id">Ticket ID</th>
+                <th class="col-subject" data-sort="subject">Subject</th>
+                <th class="col-requester" data-sort="requester">Requester</th>
+                <th class="col-priority" data-sort="priority">Priority</th>
+                <th class="col-sla" data-sort="sla">SLA</th>
+                <th class="col-status" data-sort="status">Status</th>
+              </tr>
+            </thead>
+            <tbody id="ticketBody"></tbody>
+          </table>
+          <div class="empty" id="emptyState" hidden>
+            <p>No tickets match these filters.</p>
+            <button class="btn btn--ghost" id="clearFromEmpty">Reset filters</button>
+          </div>
+        </section>
+
+        <!-- Pagination (mirrors "Showing 1-4 of 150" + Prev/Next) -->
+        <div class="pager">
+          <span class="pager__count" id="pagerCount">&mdash;</span>
+          <div class="pager__controls">
+            <button class="btn btn--ghost" id="prevPage">Prev</button>
+            <button class="btn btn--ghost" id="nextPage">Next</button>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="tickets.js"></script>
+</body>
+</html>
