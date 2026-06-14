@@ -1,0 +1,1302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ServiceLink — UI Screens (Arshdeep)</title>
+<style>
+  /* ── TOKENS ─────────────────────────────────────────────── */
+  :root {
+    --navy:    #1A2B4A;
+    --blue:    #2563EB;
+    --blue-lt: #EFF4FF;
+    --teal:    #0D9488;
+    --slate:   #475569;
+    --mist:    #F1F5F9;
+    --white:   #FFFFFF;
+    --border:  #CBD5E1;
+    --red:     #DC2626;
+    --red-lt:  #FEF2F2;
+    --amber:   #D97706;
+    --amber-lt:#FFFBEB;
+    --green:   #16A34A;
+    --green-lt:#F0FDF4;
+    --text:    #0F172A;
+    --sub:     #64748B;
+    --radius:  6px;
+    --shadow:  0 1px 4px rgba(0,0,0,.10);
+    --shadow-md: 0 4px 16px rgba(0,0,0,.12);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; font-size: 14px; background: #E8EDF4; color: var(--text); }
+
+  /* ── SCREEN SWITCHER ─────────────────────────────────────── */
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  /* ── NAV TABS (top) ──────────────────────────────────────── */
+  .tab-bar {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 999;
+    background: var(--navy); display: flex; gap: 2px; padding: 10px 16px 0;
+    box-shadow: 0 2px 8px rgba(0,0,0,.3);
+  }
+  .tab-bar span {
+    font-size: 11px; font-weight: 600; letter-spacing: .4px; text-transform: uppercase;
+    color: rgba(255,255,255,.55); padding: 8px 14px; border-radius: 4px 4px 0 0;
+    cursor: pointer; transition: all .15s;
+  }
+  .tab-bar span:hover { color: #fff; background: rgba(255,255,255,.08); }
+  .tab-bar span.active { color: #fff; background: var(--blue); }
+  .tab-bar .tab-label { font-size: 10px; color: rgba(255,255,255,.3); padding: 8px 14px; align-self: center; }
+
+  .screen-wrap { padding-top: 44px; min-height: 100vh; }
+
+  /* ─────────────────────────────────────────────────────────
+     SCREEN 1: LOGIN
+  ───────────────────────────────────────────────────────── */
+  .login-page {
+    min-height: 100vh; display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(135deg, #1A2B4A 0%, #1e3a6e 60%, #0D9488 100%);
+    padding: 32px 16px;
+  }
+  .login-card {
+    background: var(--white); border-radius: 12px; box-shadow: var(--shadow-md);
+    width: 100%; max-width: 420px; overflow: hidden;
+  }
+  .login-header {
+    background: var(--navy); padding: 32px 36px 28px;
+    display: flex; flex-direction: column; align-items: flex-start; gap: 4px;
+  }
+  .login-logo { font-size: 24px; font-weight: 800; color: #fff; letter-spacing: -.5px; }
+  .login-logo span { color: var(--teal); }
+  .login-tagline { font-size: 12px; color: rgba(255,255,255,.5); font-weight: 400; }
+  .login-body { padding: 32px 36px; }
+  .login-body h2 { font-size: 18px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+  .login-body p { font-size: 13px; color: var(--sub); margin-bottom: 24px; }
+  .field { margin-bottom: 18px; }
+  .field label { display: block; font-size: 12px; font-weight: 600; color: var(--slate); margin-bottom: 6px; text-transform: uppercase; letter-spacing: .4px; }
+  .field input {
+    width: 100%; border: 1.5px solid var(--border); border-radius: var(--radius);
+    padding: 10px 13px; font-size: 14px; color: var(--text); background: var(--mist);
+    outline: none; transition: border-color .15s;
+  }
+  .field input:focus { border-color: var(--blue); background: #fff; }
+  .field-hint { font-size: 11px; color: var(--sub); margin-top: 4px; }
+  .mfa-row {
+    display: flex; align-items: center; gap: 10px; padding: 12px 14px;
+    background: var(--blue-lt); border: 1px solid #BFDBFE; border-radius: var(--radius);
+    margin-bottom: 20px;
+  }
+  .mfa-row input[type="checkbox"] { width: 15px; height: 15px; accent-color: var(--blue); }
+  .mfa-row label { font-size: 13px; color: var(--navy); font-weight: 500; cursor: pointer; }
+  .btn-primary {
+    width: 100%; padding: 12px; background: var(--blue); color: #fff;
+    border: none; border-radius: var(--radius); font-size: 14px; font-weight: 700;
+    cursor: pointer; letter-spacing: .2px; transition: background .15s;
+  }
+  .btn-primary:hover { background: #1D4ED8; }
+  .login-links { display: flex; justify-content: space-between; margin-top: 16px; }
+  .login-links a { font-size: 12px; color: var(--blue); text-decoration: none; }
+  .login-links a:hover { text-decoration: underline; }
+  .login-divider { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
+  .register-note { text-align: center; font-size: 12px; color: var(--sub); }
+  .register-note a { color: var(--blue); text-decoration: none; font-weight: 600; }
+  .session-note {
+    display: flex; align-items: center; gap: 6px; margin-top: 20px; padding: 10px 12px;
+    background: #F8FAFC; border: 1px solid var(--border); border-radius: var(--radius);
+    font-size: 11px; color: var(--sub);
+  }
+  .session-note::before { content: "🔒"; font-size: 13px; }
+
+  /* ─────────────────────────────────────────────────────────
+     SHARED LAYOUT (sidebar + topbar)
+  ───────────────────────────────────────────────────────── */
+  .app-layout { display: flex; min-height: calc(100vh - 44px); }
+  .sidebar {
+    width: 220px; background: var(--navy); flex-shrink: 0;
+    display: flex; flex-direction: column; padding: 0;
+    position: sticky; top: 44px; height: calc(100vh - 44px); overflow-y: auto;
+  }
+  .sidebar-logo {
+    padding: 20px 20px 16px; border-bottom: 1px solid rgba(255,255,255,.08);
+    font-size: 18px; font-weight: 800; color: #fff; letter-spacing: -.3px;
+  }
+  .sidebar-logo span { color: var(--teal); }
+  .sidebar-user {
+    padding: 12px 20px; border-bottom: 1px solid rgba(255,255,255,.08);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .avatar {
+    width: 32px; height: 32px; border-radius: 50%; background: var(--blue);
+    color: #fff; font-size: 12px; font-weight: 700; display: flex;
+    align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .sidebar-user-info { overflow: hidden; }
+  .sidebar-user-name { font-size: 13px; font-weight: 600; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .sidebar-user-role { font-size: 10px; color: rgba(255,255,255,.4); text-transform: uppercase; letter-spacing: .5px; }
+  .sidebar-section { padding: 14px 12px 4px; font-size: 9px; font-weight: 700; color: rgba(255,255,255,.3); text-transform: uppercase; letter-spacing: 1px; }
+  .nav-item {
+    display: flex; align-items: center; gap: 10px; padding: 9px 20px;
+    font-size: 13px; color: rgba(255,255,255,.6); cursor: pointer;
+    border-left: 3px solid transparent; transition: all .12s;
+  }
+  .nav-item:hover { background: rgba(255,255,255,.06); color: #fff; }
+  .nav-item.active { background: rgba(37,99,235,.25); color: #fff; border-left-color: var(--blue); font-weight: 600; }
+  .nav-icon { font-size: 15px; width: 18px; text-align: center; }
+  .nav-badge {
+    margin-left: auto; background: var(--red); color: #fff;
+    font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 10px;
+  }
+  .sidebar-bottom { margin-top: auto; padding: 12px 20px; border-top: 1px solid rgba(255,255,255,.08); }
+  .sidebar-bottom a { font-size: 12px; color: rgba(255,255,255,.4); text-decoration: none; display: block; padding: 4px 0; }
+  .sidebar-bottom a:hover { color: rgba(255,255,255,.7); }
+
+  .main-content { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+  .topbar {
+    background: var(--white); border-bottom: 1px solid var(--border);
+    padding: 0 28px; height: 56px; display: flex; align-items: center; gap: 16px;
+    position: sticky; top: 44px; z-index: 10;
+  }
+  .topbar-title { font-size: 16px; font-weight: 700; color: var(--text); }
+  .topbar-sub { font-size: 12px; color: var(--sub); }
+  .topbar-search {
+    margin-left: auto; display: flex; align-items: center; gap: 8px;
+    background: var(--mist); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 6px 12px; width: 220px;
+  }
+  .topbar-search input { border: none; background: transparent; font-size: 13px; color: var(--text); outline: none; width: 100%; }
+  .topbar-search::before { content: "🔍"; font-size: 12px; }
+  .topbar-actions { display: flex; align-items: center; gap: 10px; }
+  .icon-btn {
+    width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center;
+    justify-content: center; font-size: 16px; background: var(--mist);
+    border: 1px solid var(--border); cursor: pointer; position: relative;
+  }
+  .icon-btn .dot {
+    position: absolute; top: 5px; right: 5px; width: 7px; height: 7px;
+    background: var(--red); border-radius: 50%; border: 1.5px solid #fff;
+  }
+  .page-body { padding: 28px; flex: 1; }
+
+  /* ─────────────────────────────────────────────────────────
+     SCREEN 2: DASHBOARD (Manager view)
+  ───────────────────────────────────────────────────────── */
+  .role-badge {
+    display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px;
+    border-radius: 12px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .4px;
+  }
+  .role-manager { background: #EDE9FE; color: #6D28D9; }
+  .role-tech { background: #DBEAFE; color: #1D4ED8; }
+  .role-user { background: #D1FAE5; color: #065F46; }
+  .role-admin { background: #FEF3C7; color: #92400E; }
+
+  .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+  .stat-card {
+    background: var(--white); border: 1px solid var(--border); border-radius: 8px;
+    padding: 20px; display: flex; flex-direction: column; gap: 6px;
+  }
+  .stat-card .stat-label { font-size: 11px; font-weight: 600; color: var(--sub); text-transform: uppercase; letter-spacing: .5px; }
+  .stat-card .stat-value { font-size: 28px; font-weight: 800; color: var(--text); line-height: 1; }
+  .stat-card .stat-delta { font-size: 12px; color: var(--sub); }
+  .stat-card.urgent .stat-value { color: var(--red); }
+  .stat-card.ok .stat-value { color: var(--green); }
+  .stat-card .stat-bar { height: 4px; border-radius: 2px; background: var(--border); margin-top: 4px; overflow: hidden; }
+  .stat-card .stat-fill { height: 100%; border-radius: 2px; background: var(--blue); }
+  .stat-card.urgent .stat-fill { background: var(--red); }
+  .stat-card.ok .stat-fill { background: var(--green); }
+
+  .dash-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 20px; }
+  .dash-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+
+  .panel {
+    background: var(--white); border: 1px solid var(--border); border-radius: 8px; overflow: hidden;
+  }
+  .panel-header {
+    padding: 16px 20px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .panel-title { font-size: 13px; font-weight: 700; color: var(--text); }
+  .panel-action { font-size: 12px; color: var(--blue); cursor: pointer; }
+  .panel-body { padding: 16px 20px; }
+
+  .ticket-row {
+    display: grid; grid-template-columns: 60px 1fr 90px 80px 70px;
+    gap: 12px; align-items: center; padding: 10px 0;
+    border-bottom: 1px solid var(--mist); font-size: 13px;
+  }
+  .ticket-row:last-child { border-bottom: none; }
+  .ticket-row:hover { background: var(--mist); margin: 0 -20px; padding: 10px 20px; cursor: pointer; }
+  .ticket-id { font-size: 11px; font-weight: 700; color: var(--blue); font-family: monospace; }
+  .ticket-title { font-weight: 500; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .ticket-sub { font-size: 11px; color: var(--sub); }
+
+  .badge {
+    display: inline-block; padding: 2px 8px; border-radius: 10px;
+    font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .3px;
+  }
+  .badge-new      { background: #E0F2FE; color: #0369A1; }
+  .badge-assigned { background: #EDE9FE; color: #6D28D9; }
+  .badge-progress { background: #DBEAFE; color: #1E40AF; }
+  .badge-waiting  { background: #FEF3C7; color: #92400E; }
+  .badge-resolved { background: #D1FAE5; color: #065F46; }
+  .badge-closed   { background: #F1F5F9; color: #475569; }
+  .badge-critical { background: #FEE2E2; color: #991B1B; }
+  .badge-high     { background: #FEF3C7; color: #92400E; }
+  .badge-medium   { background: #DBEAFE; color: #1E40AF; }
+  .badge-low      { background: #D1FAE5; color: #065F46; }
+  .badge-breach   { background: var(--red); color: #fff; }
+
+  .sla-row { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--mist); }
+  .sla-row:last-child { border-bottom: none; }
+  .sla-label { font-size: 12px; font-weight: 600; width: 70px; color: var(--text); }
+  .sla-bar-wrap { flex: 1; height: 8px; background: var(--mist); border-radius: 4px; overflow: hidden; }
+  .sla-bar { height: 100%; border-radius: 4px; }
+  .sla-pct { font-size: 12px; font-weight: 700; width: 38px; text-align: right; }
+
+  .workload-row { display: flex; align-items: center; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--mist); }
+  .workload-row:last-child { border-bottom: none; }
+  .workload-name { font-size: 13px; font-weight: 500; width: 100px; color: var(--text); }
+  .workload-bar-wrap { flex: 1; height: 8px; background: var(--mist); border-radius: 4px; overflow: hidden; }
+  .workload-bar { height: 100%; border-radius: 4px; background: var(--blue); }
+  .workload-count { font-size: 12px; color: var(--sub); width: 28px; text-align: right; }
+  .workload-breach { font-size: 10px; font-weight: 700; color: var(--red); width: 28px; text-align: right; }
+
+  .filter-row {
+    display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; align-items: center;
+  }
+  .filter-label { font-size: 12px; color: var(--sub); font-weight: 600; }
+  .filter-select {
+    border: 1px solid var(--border); border-radius: var(--radius); padding: 6px 10px;
+    font-size: 12px; color: var(--text); background: var(--white); cursor: pointer;
+  }
+  .btn-sm {
+    padding: 6px 14px; border-radius: var(--radius); font-size: 12px; font-weight: 600;
+    cursor: pointer; border: none; transition: all .12s;
+  }
+  .btn-blue { background: var(--blue); color: #fff; }
+  .btn-blue:hover { background: #1D4ED8; }
+  .btn-outline { background: var(--white); color: var(--slate); border: 1px solid var(--border) !important; }
+  .btn-outline:hover { border-color: var(--blue) !important; color: var(--blue); }
+
+  /* ─────────────────────────────────────────────────────────
+     SCREEN 3: CREATE TICKET
+  ───────────────────────────────────────────────────────── */
+  .form-card {
+    background: var(--white); border: 1px solid var(--border); border-radius: 8px;
+    max-width: 760px;
+  }
+  .form-header { padding: 20px 28px; border-bottom: 1px solid var(--border); }
+  .form-header h2 { font-size: 16px; font-weight: 700; color: var(--text); }
+  .form-header p { font-size: 12px; color: var(--sub); margin-top: 3px; }
+  .form-body { padding: 24px 28px; display: flex; flex-direction: column; gap: 20px; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  .form-field label { display: block; font-size: 11px; font-weight: 700; color: var(--slate); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 6px; }
+  .form-field label .req { color: var(--red); margin-left: 2px; }
+  .form-field input, .form-field select, .form-field textarea {
+    width: 100%; border: 1.5px solid var(--border); border-radius: var(--radius);
+    padding: 9px 12px; font-size: 14px; color: var(--text); background: var(--white);
+    outline: none; font-family: inherit; transition: border-color .12s;
+  }
+  .form-field input:focus, .form-field select:focus, .form-field textarea:focus {
+    border-color: var(--blue); box-shadow: 0 0 0 3px rgba(37,99,235,.08);
+  }
+  .form-field textarea { resize: vertical; min-height: 100px; }
+  .form-field .hint { font-size: 11px; color: var(--sub); margin-top: 4px; }
+  .form-field.full { grid-column: 1 / -1; }
+  .priority-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  .priority-opt {
+    border: 1.5px solid var(--border); border-radius: var(--radius); padding: 10px 12px;
+    cursor: pointer; text-align: center; transition: all .12s;
+  }
+  .priority-opt .p-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .4px; }
+  .priority-opt .p-desc { font-size: 10px; color: var(--sub); margin-top: 2px; }
+  .priority-opt.p-low  { border-color: #86EFAC; }
+  .priority-opt.p-low.sel  { background: #F0FDF4; border-color: var(--green); }
+  .priority-opt.p-low .p-label { color: var(--green); }
+  .priority-opt.p-med  { border-color: #93C5FD; }
+  .priority-opt.p-med.sel  { background: #EFF4FF; border-color: var(--blue); }
+  .priority-opt.p-med .p-label { color: var(--blue); }
+  .priority-opt.p-high { border-color: #FCD34D; }
+  .priority-opt.p-high.sel { background: #FFFBEB; border-color: var(--amber); }
+  .priority-opt.p-high .p-label { color: var(--amber); }
+  .priority-opt.p-crit { border-color: #FCA5A5; }
+  .priority-opt.p-crit.sel { background: #FEF2F2; border-color: var(--red); }
+  .priority-opt.p-crit .p-label { color: var(--red); }
+
+  .attach-zone {
+    border: 2px dashed var(--border); border-radius: var(--radius); padding: 24px;
+    text-align: center; background: var(--mist); cursor: pointer; transition: all .12s;
+  }
+  .attach-zone:hover { border-color: var(--blue); background: var(--blue-lt); }
+  .attach-zone .attach-icon { font-size: 28px; margin-bottom: 6px; }
+  .attach-zone p { font-size: 13px; color: var(--sub); }
+  .attach-zone span { font-size: 11px; color: var(--blue); font-weight: 600; }
+
+  .form-footer {
+    padding: 18px 28px; border-top: 1px solid var(--border);
+    display: flex; justify-content: flex-end; gap: 10px; align-items: center;
+  }
+  .form-footer .save-note { font-size: 11px; color: var(--sub); margin-right: auto; }
+  .btn-lg {
+    padding: 10px 22px; border-radius: var(--radius); font-size: 14px; font-weight: 700;
+    cursor: pointer; border: none; transition: all .12s;
+  }
+  .btn-lg.primary { background: var(--blue); color: #fff; }
+  .btn-lg.primary:hover { background: #1D4ED8; }
+  .btn-lg.ghost { background: transparent; color: var(--slate); border: 1.5px solid var(--border); }
+  .btn-lg.ghost:hover { border-color: var(--blue); color: var(--blue); }
+
+  .sla-info {
+    background: var(--blue-lt); border: 1px solid #BFDBFE; border-radius: var(--radius);
+    padding: 12px 16px; display: flex; gap: 14px; align-items: flex-start;
+  }
+  .sla-info::before { content: "ℹ️"; font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+  .sla-info-text { font-size: 12px; color: #1E40AF; }
+  .sla-info-text strong { font-weight: 700; }
+
+  /* ─────────────────────────────────────────────────────────
+     SCREEN 4: RESOURCE MANAGEMENT
+  ───────────────────────────────────────────────────────── */
+  .resource-toolbar {
+    display: flex; align-items: center; gap: 12px; margin-bottom: 20px; flex-wrap: wrap;
+  }
+  .resource-toolbar .spacer { flex: 1; }
+  .table-wrap { background: var(--white); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  table { width: 100%; border-collapse: collapse; }
+  thead { background: var(--mist); }
+  th {
+    padding: 11px 16px; text-align: left; font-size: 11px; font-weight: 700;
+    color: var(--sub); text-transform: uppercase; letter-spacing: .5px;
+    border-bottom: 1px solid var(--border);
+  }
+  td { padding: 11px 16px; font-size: 13px; color: var(--text); border-bottom: 1px solid var(--mist); vertical-align: middle; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #FAFBFD; }
+  .tag-mono { font-family: monospace; font-size: 12px; font-weight: 700; color: var(--navy); }
+  .status-dot { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 600; }
+  .dot-in-use   { color: var(--green); }
+  .dot-stock    { color: var(--blue); }
+  .dot-disposed { color: var(--slate); }
+  .dot-missing  { color: var(--red); }
+  .dot-in-use::before   { content: "●"; font-size: 8px; }
+  .dot-stock::before    { content: "●"; font-size: 8px; }
+  .dot-disposed::before { content: "●"; font-size: 8px; }
+  .dot-missing::before  { content: "●"; font-size: 8px; }
+  .action-link { color: var(--blue); font-size: 12px; cursor: pointer; font-weight: 600; text-decoration: none; }
+  .action-link:hover { text-decoration: underline; }
+  .table-footer {
+    padding: 12px 16px; border-top: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: 12px; color: var(--sub); background: var(--white);
+  }
+  .page-btns { display: flex; gap: 6px; }
+  .page-btn {
+    padding: 4px 10px; border: 1px solid var(--border); border-radius: 4px;
+    font-size: 12px; cursor: pointer; background: var(--white); color: var(--text);
+  }
+  .page-btn.active { background: var(--blue); color: #fff; border-color: var(--blue); }
+  .search-box {
+    display: flex; align-items: center; border: 1.5px solid var(--border);
+    border-radius: var(--radius); padding: 6px 12px; gap: 8px; background: var(--white);
+  }
+  .search-box input { border: none; outline: none; font-size: 13px; width: 200px; }
+  .search-box::before { content: "🔍"; font-size: 11px; }
+
+  .resource-summary { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; margin-bottom: 20px; }
+  .res-stat {
+    background: var(--white); border: 1px solid var(--border); border-radius: 8px;
+    padding: 16px 18px; display: flex; align-items: center; gap: 14px;
+  }
+  .res-icon { font-size: 24px; }
+  .res-num { font-size: 22px; font-weight: 800; color: var(--text); line-height: 1; }
+  .res-lbl { font-size: 11px; color: var(--sub); font-weight: 600; text-transform: uppercase; letter-spacing: .4px; }
+
+  /* ─────────────────────────────────────────────────────────
+     SCREEN 5: REPORTS / DASHBOARD (Manager analytics)
+  ───────────────────────────────────────────────────────── */
+  .chart-placeholder {
+    background: var(--mist); border-radius: 6px; display: flex;
+    align-items: center; justify-content: center;
+    font-size: 12px; color: var(--sub); font-style: italic;
+  }
+  .bar-chart { display: flex; align-items: flex-end; gap: 8px; height: 120px; padding: 0 4px; }
+  .bar-col { display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 1; }
+  .bar { width: 100%; border-radius: 4px 4px 0 0; transition: opacity .15s; cursor: pointer; }
+  .bar:hover { opacity: .8; }
+  .bar-label { font-size: 10px; color: var(--sub); }
+  .bar-val { font-size: 10px; font-weight: 700; color: var(--text); }
+
+  .donut-wrap { display: flex; align-items: center; gap: 20px; }
+  .donut-svg { flex-shrink: 0; }
+  .donut-legend { display: flex; flex-direction: column; gap: 8px; }
+  .legend-item { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text); }
+  .legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
+  .metric-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .metric-item { background: var(--mist); border-radius: 6px; padding: 14px; }
+  .metric-item .m-label { font-size: 11px; font-weight: 600; color: var(--sub); text-transform: uppercase; letter-spacing: .4px; margin-bottom: 4px; }
+  .metric-item .m-val { font-size: 20px; font-weight: 800; color: var(--text); }
+  .metric-item .m-sub { font-size: 11px; color: var(--sub); margin-top: 2px; }
+
+  .tech-perf-row {
+    display: grid; grid-template-columns: 120px 1fr 60px 60px 70px;
+    gap: 12px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--mist);
+    font-size: 12px;
+  }
+  .tech-perf-row:last-child { border-bottom: none; }
+  .perf-bar-wrap { height: 6px; background: var(--mist); border-radius: 3px; overflow: hidden; }
+  .perf-bar { height: 100%; border-radius: 3px; background: var(--blue); }
+
+  .alert-item {
+    display: flex; align-items: flex-start; gap: 10px; padding: 10px 14px;
+    border-radius: var(--radius); margin-bottom: 8px;
+  }
+  .alert-item:last-child { margin-bottom: 0; }
+  .alert-breach { background: var(--red-lt); border: 1px solid #FECACA; }
+  .alert-warn   { background: var(--amber-lt); border: 1px solid #FDE68A; }
+  .alert-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+  .alert-text { font-size: 12px; color: var(--text); }
+  .alert-text strong { font-weight: 700; }
+  .alert-time { font-size: 10px; color: var(--sub); margin-top: 2px; }
+</style>
+</head>
+<body>
+
+<!-- ── TAB NAV ────────────────────────────────────────────── -->
+<div class="tab-bar">
+  <span class="tab-label">Arshdeep — Phase 3 Screens:</span>
+  <span class="active" onclick="show('s1',this)">1 · Login</span>
+  <span onclick="show('s2',this)">2 · Dashboard</span>
+  <span onclick="show('s3',this)">3 · Create Ticket</span>
+  <span onclick="show('s4',this)">4 · Resources</span>
+  <span onclick="show('s5',this)">5 · Reports</span>
+</div>
+
+<div class="screen-wrap">
+
+<!-- ════════════════════════════════════════════════════════
+     SCREEN 1 — LOGIN / AUTHENTICATION
+════════════════════════════════════════════════════════ -->
+<div id="s1" class="screen active">
+<div class="login-page">
+  <div class="login-card">
+    <div class="login-header">
+      <div class="login-logo">Service<span>Link</span></div>
+      <div class="login-tagline">IT Service Desk Platform</div>
+    </div>
+    <div class="login-body">
+      <h2>Sign in to your account</h2>
+      <p>Enter your registered email and password to continue.</p>
+
+      <div class="field">
+        <label>Email address</label>
+        <input type="email" placeholder="you@organization.com" value="arshdeep.mutti@company.com">
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <input type="password" placeholder="••••••••" value="••••••••••">
+        <div class="field-hint">Minimum 8 characters — at least one letter and one number (NFR-S2)</div>
+      </div>
+
+      <div class="mfa-row">
+        <input type="checkbox" id="mfa" checked>
+        <label for="mfa">Use authenticator code (TOTP multi-factor authentication)</label>
+      </div>
+
+      <button class="btn-primary">Sign in</button>
+
+      <div class="login-links">
+        <a href="#">Forgot password?</a>
+        <a href="#">Request access</a>
+      </div>
+
+      <hr class="login-divider">
+      <div class="register-note">
+        New to ServiceLink? <a href="#">Register for access</a> — Administrator approval required.
+      </div>
+      <div class="session-note">
+        Sessions expire automatically after 8 hours for security (FR-1.1)
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════
+     SCREEN 2 — DASHBOARD (Manager role-scoped view)
+════════════════════════════════════════════════════════ -->
+<div id="s2" class="screen">
+<div class="app-layout">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-logo">Service<span>Link</span></div>
+    <div class="sidebar-user">
+      <div class="avatar">AM</div>
+      <div class="sidebar-user-info">
+        <div class="sidebar-user-name">Arshdeep Mutti</div>
+        <div class="sidebar-user-role">Manager</div>
+      </div>
+    </div>
+    <div class="sidebar-section">Main</div>
+    <div class="nav-item active"><span class="nav-icon">📊</span> Dashboard</div>
+    <div class="nav-item"><span class="nav-icon">🎫</span> Tickets <span class="nav-badge">7</span></div>
+    <div class="nav-item"><span class="nav-icon">💻</span> Resources</div>
+    <div class="nav-item"><span class="nav-icon">📚</span> Knowledge Base</div>
+    <div class="sidebar-section">Management</div>
+    <div class="nav-item"><span class="nav-icon">📈</span> Reports</div>
+    <div class="nav-item"><span class="nav-icon">👥</span> Team</div>
+    <div class="sidebar-bottom">
+      <a href="#">⚙ Settings</a>
+      <a href="#">← Sign out</a>
+    </div>
+  </div>
+  <!-- MAIN -->
+  <div class="main-content">
+    <div class="topbar">
+      <div>
+        <div class="topbar-title">Dashboard</div>
+        <div class="topbar-sub">Last 30 days · Manager view</div>
+      </div>
+      <div class="topbar-search"><input placeholder="Search tickets, resources, KB…"></div>
+      <div class="topbar-actions">
+        <div class="icon-btn">🔔<span class="dot"></span></div>
+        <div class="icon-btn">👤</div>
+      </div>
+    </div>
+    <div class="page-body">
+      <!-- Role badge + filter row -->
+      <div class="filter-row" style="margin-bottom:18px;">
+        <span class="role-badge role-manager">● Manager View</span>
+        <span style="font-size:12px;color:var(--sub);">Showing:</span>
+        <select class="filter-select"><option>Last 30 days</option><option>Last 7 days</option><option>This month</option></select>
+        <select class="filter-select"><option>All Technicians</option><option>J. Smith</option><option>P. Hansen</option></select>
+        <select class="filter-select"><option>All Priorities</option><option>Critical</option><option>High</option></select>
+        <button class="btn-sm btn-blue">Apply</button>
+      </div>
+
+      <!-- Stats -->
+      <div class="stat-grid">
+        <div class="stat-card urgent">
+          <div class="stat-label">Open Tickets</div>
+          <div class="stat-value">34</div>
+          <div class="stat-delta">↑ 6 from last week</div>
+          <div class="stat-bar"><div class="stat-fill" style="width:68%"></div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">SLA Compliance</div>
+          <div class="stat-value" style="color:var(--amber)">81%</div>
+          <div class="stat-delta">Target: 95%</div>
+          <div class="stat-bar"><div class="stat-fill" style="width:81%;background:var(--amber)"></div></div>
+        </div>
+        <div class="stat-card ok">
+          <div class="stat-label">Resolved (30d)</div>
+          <div class="stat-value">112</div>
+          <div class="stat-delta">↑ 14% vs prior period</div>
+          <div class="stat-bar"><div class="stat-fill" style="width:78%"></div></div>
+        </div>
+        <div class="stat-card urgent">
+          <div class="stat-label">SLA Breaches</div>
+          <div class="stat-value">7</div>
+          <div class="stat-delta">3 Critical · 4 High</div>
+          <div class="stat-bar"><div class="stat-fill" style="width:22%"></div></div>
+        </div>
+      </div>
+
+      <div class="dash-grid">
+        <!-- Recent tickets -->
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">Recent Tickets</div>
+            <div class="panel-action">View all →</div>
+          </div>
+          <div class="panel-body">
+            <div class="ticket-row" style="font-size:11px;font-weight:700;color:var(--sub);padding-bottom:6px;">
+              <span>ID</span><span>Title</span><span>Status</span><span>Priority</span><span>Age</span>
+            </div>
+            <div class="ticket-row">
+              <span class="ticket-id">INC-1087</span>
+              <div><div class="ticket-title">VPN connectivity failure</div><div class="ticket-sub">J. Smith</div></div>
+              <span class="badge badge-breach">⚠ Breach</span>
+              <span class="badge badge-critical">Critical</span>
+              <span style="font-size:11px;color:var(--red);font-weight:600;">8h 22m</span>
+            </div>
+            <div class="ticket-row">
+              <span class="ticket-id">INC-1086</span>
+              <div><div class="ticket-title">Printer offline — 3rd floor</div><div class="ticket-sub">P. Hansen</div></div>
+              <span class="badge badge-progress">In Progress</span>
+              <span class="badge badge-high">High</span>
+              <span style="font-size:11px;color:var(--sub);">3h 10m</span>
+            </div>
+            <div class="ticket-row">
+              <span class="ticket-id">INC-1085</span>
+              <div><div class="ticket-title">MS Teams login error</div><div class="ticket-sub">R. Chen</div></div>
+              <span class="badge badge-waiting">Waiting</span>
+              <span class="badge badge-medium">Medium</span>
+              <span style="font-size:11px;color:var(--sub);">1h 45m</span>
+            </div>
+            <div class="ticket-row">
+              <span class="ticket-id">INC-1084</span>
+              <div><div class="ticket-title">New laptop setup request</div><div class="ticket-sub">J. Smith</div></div>
+              <span class="badge badge-resolved">Resolved</span>
+              <span class="badge badge-low">Low</span>
+              <span style="font-size:11px;color:var(--sub);">22m</span>
+            </div>
+            <div class="ticket-row">
+              <span class="ticket-id">INC-1083</span>
+              <div><div class="ticket-title">Email attachment limit issue</div><div class="ticket-sub">L. Davis</div></div>
+              <span class="badge badge-assigned">Assigned</span>
+              <span class="badge badge-medium">Medium</span>
+              <span style="font-size:11px;color:var(--sub);">5h 01m</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- SLA compliance by priority -->
+        <div class="panel">
+          <div class="panel-header"><div class="panel-title">SLA Compliance by Priority</div></div>
+          <div class="panel-body">
+            <div class="sla-row">
+              <div class="sla-label"><span class="badge badge-critical">Critical</span></div>
+              <div class="sla-bar-wrap"><div class="sla-bar" style="width:65%;background:var(--red)"></div></div>
+              <div class="sla-pct" style="color:var(--red)">65%</div>
+            </div>
+            <div class="sla-row">
+              <div class="sla-label"><span class="badge badge-high">High</span></div>
+              <div class="sla-bar-wrap"><div class="sla-bar" style="width:78%;background:var(--amber)"></div></div>
+              <div class="sla-pct" style="color:var(--amber)">78%</div>
+            </div>
+            <div class="sla-row">
+              <div class="sla-label"><span class="badge badge-medium">Medium</span></div>
+              <div class="sla-bar-wrap"><div class="sla-bar" style="width:91%;background:var(--blue)"></div></div>
+              <div class="sla-pct" style="color:var(--blue)">91%</div>
+            </div>
+            <div class="sla-row">
+              <div class="sla-label"><span class="badge badge-low">Low</span></div>
+              <div class="sla-bar-wrap"><div class="sla-bar" style="width:97%;background:var(--green)"></div></div>
+              <div class="sla-pct" style="color:var(--green)">97%</div>
+            </div>
+            <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border);">
+              <div style="font-size:11px;color:var(--sub);margin-bottom:8px;font-weight:600;">ACTIVE ALERTS</div>
+              <div class="alert-item alert-breach">
+                <span class="alert-icon">🚨</span>
+                <div class="alert-text">
+                  <strong>INC-1087</strong> has breached Critical SLA (response target: 1h)
+                  <div class="alert-time">8 hours 22 minutes ago</div>
+                </div>
+              </div>
+              <div class="alert-item alert-warn">
+                <span class="alert-icon">⚠️</span>
+                <div class="alert-text">
+                  <strong>INC-1086</strong> approaching High SLA deadline in 47 min
+                  <div class="alert-time">Priority: High · Assigned: P. Hansen</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Technician workload -->
+      <div class="panel" style="margin-top:20px;">
+        <div class="panel-header">
+          <div class="panel-title">Technician Workload</div>
+          <div class="panel-action">Reassign tickets →</div>
+        </div>
+        <div class="panel-body">
+          <div style="display:grid;grid-template-columns:140px 1fr 80px 80px 80px 80px;gap:12px;font-size:11px;font-weight:700;color:var(--sub);padding-bottom:8px;text-transform:uppercase;letter-spacing:.4px;">
+            <span>Technician</span><span>Open Tickets</span><span>Open</span><span>Avg. Res.</span><span>Breaches</span><span>Status</span>
+          </div>
+          <div class="workload-row" style="display:grid;grid-template-columns:140px 1fr 80px 80px 80px 80px;gap:12px;">
+            <span style="font-size:13px;font-weight:600;">J. Smith</span>
+            <div class="workload-bar-wrap"><div class="workload-bar" style="width:85%"></div></div>
+            <span style="font-size:13px;font-weight:700;color:var(--red);">17</span>
+            <span style="font-size:12px;color:var(--sub);">2.4h</span>
+            <span style="font-size:13px;font-weight:700;color:var(--red);">3</span>
+            <span class="badge badge-breach">Overloaded</span>
+          </div>
+          <div class="workload-row" style="display:grid;grid-template-columns:140px 1fr 80px 80px 80px 80px;gap:12px;">
+            <span style="font-size:13px;font-weight:600;">P. Hansen</span>
+            <div class="workload-bar-wrap"><div class="workload-bar" style="width:55%"></div></div>
+            <span style="font-size:13px;font-weight:700;">11</span>
+            <span style="font-size:12px;color:var(--sub);">1.8h</span>
+            <span style="font-size:13px;font-weight:700;color:var(--amber);">2</span>
+            <span class="badge badge-high">Moderate</span>
+          </div>
+          <div class="workload-row" style="display:grid;grid-template-columns:140px 1fr 80px 80px 80px 80px;gap:12px;">
+            <span style="font-size:13px;font-weight:600;">R. Chen</span>
+            <div class="workload-bar-wrap"><div class="workload-bar" style="width:30%"></div></div>
+            <span style="font-size:13px;font-weight:700;">6</span>
+            <span style="font-size:12px;color:var(--sub);">1.2h</span>
+            <span style="font-size:13px;font-weight:700;color:var(--green);">0</span>
+            <span class="badge badge-resolved">Available</span>
+          </div>
+          <div class="workload-row" style="display:grid;grid-template-columns:140px 1fr 80px 80px 80px 80px;gap:12px;border-bottom:none;">
+            <span style="font-size:13px;font-weight:600;">L. Davis</span>
+            <div class="workload-bar-wrap"><div class="workload-bar" style="width:20%"></div></div>
+            <span style="font-size:13px;font-weight:700;">4</span>
+            <span style="font-size:12px;color:var(--sub);">0.9h</span>
+            <span style="font-size:13px;font-weight:700;color:var(--green);">0</span>
+            <span class="badge badge-resolved">Available</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════
+     SCREEN 3 — CREATE TICKET (End User)
+════════════════════════════════════════════════════════ -->
+<div id="s3" class="screen">
+<div class="app-layout">
+  <div class="sidebar">
+    <div class="sidebar-logo">Service<span>Link</span></div>
+    <div class="sidebar-user">
+      <div class="avatar" style="background:var(--green)">EU</div>
+      <div class="sidebar-user-info">
+        <div class="sidebar-user-name">End User</div>
+        <div class="sidebar-user-role">End User</div>
+      </div>
+    </div>
+    <div class="sidebar-section">Main</div>
+    <div class="nav-item"><span class="nav-icon">🏠</span> My Dashboard</div>
+    <div class="nav-item active"><span class="nav-icon">➕</span> Submit Request</div>
+    <div class="nav-item"><span class="nav-icon">🎫</span> My Tickets <span class="nav-badge">2</span></div>
+    <div class="nav-item"><span class="nav-icon">📚</span> Knowledge Base</div>
+    <div class="sidebar-bottom">
+      <a href="#">⚙ Settings</a>
+      <a href="#">← Sign out</a>
+    </div>
+  </div>
+  <div class="main-content">
+    <div class="topbar">
+      <div>
+        <div class="topbar-title">Submit a Support Request</div>
+        <div class="topbar-sub">Describe your issue — we'll assign it to the right technician</div>
+      </div>
+      <div class="topbar-actions">
+        <div class="icon-btn">🔔</div>
+        <div class="icon-btn">👤</div>
+      </div>
+    </div>
+    <div class="page-body">
+      <div class="form-card">
+        <div class="form-header">
+          <h2>New IT Support Request</h2>
+          <p>Fields marked <span style="color:var(--red)">*</span> are required. Your request will be auto-assigned to an available technician (FR-2.3).</p>
+        </div>
+        <div class="form-body">
+
+          <!-- Title -->
+          <div class="form-field">
+            <label>Summary <span class="req">*</span></label>
+            <input type="text" placeholder="Briefly describe the issue (e.g. VPN not connecting from home)">
+            <div class="hint">Keep it to one line — the description below is for details.</div>
+          </div>
+
+          <!-- Category + Priority row -->
+          <div class="form-row">
+            <div class="form-field">
+              <label>Category <span class="req">*</span></label>
+              <select>
+                <option value="">— Select a category —</option>
+                <option selected>Hardware</option>
+                <option>Software</option>
+                <option>Network / Connectivity</option>
+                <option>Account / Access</option>
+                <option>Email</option>
+                <option>Other</option>
+              </select>
+              <div class="hint">Category determines which technician is auto-assigned.</div>
+            </div>
+            <div class="form-field">
+              <label>Affected Resource (optional)</label>
+              <input type="text" placeholder="Search resource tag or name…">
+              <div class="hint">Link a resource from inventory to this ticket.</div>
+            </div>
+          </div>
+
+          <!-- Priority selector -->
+          <div class="form-field">
+            <label>Priority <span class="req">*</span></label>
+            <div class="priority-grid">
+              <div class="priority-opt p-low">
+                <div class="p-label">Low</div>
+                <div class="p-desc">Minor / cosmetic issue, no urgency</div>
+              </div>
+              <div class="priority-opt p-med sel">
+                <div class="p-label">Medium</div>
+                <div class="p-desc">Affecting work but workaround exists</div>
+              </div>
+              <div class="priority-opt p-high">
+                <div class="p-label">High</div>
+                <div class="p-desc">Significant impact, no workaround</div>
+              </div>
+              <div class="priority-opt p-crit">
+                <div class="p-label">Critical</div>
+                <div class="p-desc">Complete outage or data risk</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- SLA info banner -->
+          <div class="sla-info">
+            <div class="sla-info-text">
+              <strong>SLA for Medium priority:</strong> First response within 8 hours · Resolution within 2 business days.
+              You'll receive an email confirmation and status updates automatically (FR-2.5).
+            </div>
+          </div>
+
+          <!-- Description -->
+          <div class="form-field">
+            <label>Description <span class="req">*</span></label>
+            <textarea placeholder="Describe the issue in detail. Include:&#10;• What were you doing when it happened?&#10;• What error messages did you see?&#10;• What steps have you already tried?&#10;• How many people are affected?" style="min-height:130px;"></textarea>
+          </div>
+
+          <!-- Attachments -->
+          <div class="form-field">
+            <label>Attachments (optional)</label>
+            <div class="attach-zone">
+              <div class="attach-icon">📎</div>
+              <p>Drag and drop files here, or <span>click to browse</span></p>
+              <p style="font-size:11px;margin-top:4px;">Screenshots, logs, or any relevant files · Max 10 MB per file</p>
+            </div>
+          </div>
+
+        </div>
+        <div class="form-footer">
+          <span class="save-note">💾 Your draft is saved automatically</span>
+          <button class="btn-lg ghost">Save Draft</button>
+          <button class="btn-lg primary">Submit Request →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════
+     SCREEN 4 — RESOURCE MANAGEMENT
+════════════════════════════════════════════════════════ -->
+<div id="s4" class="screen">
+<div class="app-layout">
+  <div class="sidebar">
+    <div class="sidebar-logo">Service<span>Link</span></div>
+    <div class="sidebar-user">
+      <div class="avatar" style="background:var(--teal)">TK</div>
+      <div class="sidebar-user-info">
+        <div class="sidebar-user-name">T. Karki</div>
+        <div class="sidebar-user-role">Technician</div>
+      </div>
+    </div>
+    <div class="sidebar-section">Main</div>
+    <div class="nav-item"><span class="nav-icon">📊</span> Dashboard</div>
+    <div class="nav-item"><span class="nav-icon">🎫</span> Tickets <span class="nav-badge">5</span></div>
+    <div class="nav-item active"><span class="nav-icon">💻</span> Resources</div>
+    <div class="nav-item"><span class="nav-icon">📚</span> Knowledge Base</div>
+    <div class="sidebar-bottom">
+      <a href="#">⚙ Settings</a>
+      <a href="#">← Sign out</a>
+    </div>
+  </div>
+  <div class="main-content">
+    <div class="topbar">
+      <div>
+        <div class="topbar-title">Resource Inventory</div>
+        <div class="topbar-sub">Hardware · Software · Virtual — 150 records total</div>
+      </div>
+      <div class="topbar-actions">
+        <button class="btn-sm btn-blue" style="font-size:13px;padding:8px 16px;">+ Add Resource</button>
+        <div class="icon-btn">🔔</div>
+      </div>
+    </div>
+    <div class="page-body">
+
+      <!-- Summary stats -->
+      <div class="resource-summary">
+        <div class="res-stat"><span class="res-icon">🖥️</span><div><div class="res-num">89</div><div class="res-lbl">Hardware</div></div></div>
+        <div class="res-stat"><span class="res-icon">📦</span><div><div class="res-num">42</div><div class="res-lbl">Software</div></div></div>
+        <div class="res-stat"><span class="res-icon">☁️</span><div><div class="res-num">19</div><div class="res-lbl">Virtual</div></div></div>
+        <div class="res-stat"><span class="res-icon">⚠️</span><div><div class="res-num" style="color:var(--red)">6</div><div class="res-lbl">Lost / Disposed</div></div></div>
+      </div>
+
+      <!-- Toolbar -->
+      <div class="resource-toolbar">
+        <div class="search-box"><input placeholder="Search by tag, model, serial, user…"></div>
+        <select class="filter-select"><option>All Types</option><option>Hardware</option><option>Software</option><option>Virtual</option></select>
+        <select class="filter-select"><option>All Statuses</option><option>In Use</option><option>In Stock</option><option>Disposed</option><option>Lost/Missing</option></select>
+        <select class="filter-select"><option>All Warranties</option><option>Expiring Soon</option><option>Expired</option></select>
+        <button class="btn-sm btn-blue">Filter</button>
+        <button class="btn-sm btn-outline">Export CSV</button>
+      </div>
+
+      <!-- Table -->
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Resource Tag</th>
+              <th>Type</th>
+              <th>Make / Model</th>
+              <th>Serial No.</th>
+              <th>Assigned To</th>
+              <th>Status</th>
+              <th>Warranty End</th>
+              <th>Linked Tickets</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="tag-mono">RSC-0042</span></td>
+              <td><span class="badge badge-assigned">Hardware</span></td>
+              <td>Dell XPS 15 (9520)</td>
+              <td style="font-size:11px;color:var(--sub);">CN7823JK1</td>
+              <td>A. Mutti</td>
+              <td><span class="status-dot dot-in-use">In Use</span></td>
+              <td style="font-size:12px;">Mar 2026 <span style="color:var(--red);font-weight:700;">⚠</span></td>
+              <td><a class="action-link">3 tickets</a></td>
+              <td><a class="action-link">Edit</a></td>
+            </tr>
+            <tr>
+              <td><span class="tag-mono">RSC-0041</span></td>
+              <td><span class="badge badge-assigned">Hardware</span></td>
+              <td>LG 27UK850 Monitor</td>
+              <td style="font-size:11px;color:var(--sub);">LG20221847</td>
+              <td>A. Mutti</td>
+              <td><span class="status-dot dot-in-use">In Use</span></td>
+              <td style="font-size:12px;">Nov 2027</td>
+              <td><a class="action-link">1 ticket</a></td>
+              <td><a class="action-link">Edit</a></td>
+            </tr>
+            <tr>
+              <td><span class="tag-mono">RSC-0038</span></td>
+              <td><span class="badge badge-medium">Software</span></td>
+              <td>Adobe Creative Suite</td>
+              <td style="font-size:11px;color:var(--sub);">LIC-AC-00291</td>
+              <td>Design Team</td>
+              <td><span class="status-dot dot-in-use">In Use</span></td>
+              <td style="font-size:12px;">Jan 2027</td>
+              <td><a class="action-link">0 tickets</a></td>
+              <td><a class="action-link">Edit</a></td>
+            </tr>
+            <tr>
+              <td><span class="tag-mono">RSC-0035</span></td>
+              <td><span class="badge badge-new">Virtual</span></td>
+              <td>VM — Dev Server 04</td>
+              <td style="font-size:11px;color:var(--sub);">—</td>
+              <td>Dev Team</td>
+              <td><span class="status-dot dot-in-use">In Use</span></td>
+              <td style="font-size:12px;">N/A</td>
+              <td><a class="action-link">7 tickets</a></td>
+              <td><a class="action-link">Edit</a></td>
+            </tr>
+            <tr>
+              <td><span class="tag-mono">RSC-0029</span></td>
+              <td><span class="badge badge-assigned">Hardware</span></td>
+              <td>MacBook Pro 14" M2</td>
+              <td style="font-size:11px;color:var(--sub);">C02XK8HK</td>
+              <td>Unassigned</td>
+              <td><span class="status-dot dot-stock">In Stock</span></td>
+              <td style="font-size:12px;">Aug 2028</td>
+              <td><a class="action-link">0 tickets</a></td>
+              <td><a class="action-link">Edit</a></td>
+            </tr>
+            <tr>
+              <td><span class="tag-mono">RSC-0017</span></td>
+              <td><span class="badge badge-assigned">Hardware</span></td>
+              <td>PowerEdge R740 Server</td>
+              <td style="font-size:11px;color:var(--sub);">SRV-PE-7412</td>
+              <td>IT Dept</td>
+              <td><span class="status-dot dot-missing">Lost/Missing</span></td>
+              <td style="font-size:12px;">Dec 2025</td>
+              <td><a class="action-link">2 tickets</a></td>
+              <td><a class="action-link">Edit</a></td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="table-footer">
+          <span>Showing 1–6 of 150 resources</span>
+          <div class="page-btns">
+            <button class="page-btn active">1</button>
+            <button class="page-btn">2</button>
+            <button class="page-btn">3</button>
+            <span style="padding:4px 6px;font-size:12px;">…</span>
+            <button class="page-btn">25</button>
+            <button class="page-btn">Next →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════
+     SCREEN 5 — REPORTS / ANALYTICS DASHBOARD
+════════════════════════════════════════════════════════ -->
+<div id="s5" class="screen">
+<div class="app-layout">
+  <div class="sidebar">
+    <div class="sidebar-logo">Service<span>Link</span></div>
+    <div class="sidebar-user">
+      <div class="avatar">AM</div>
+      <div class="sidebar-user-info">
+        <div class="sidebar-user-name">Arshdeep Mutti</div>
+        <div class="sidebar-user-role">Manager</div>
+      </div>
+    </div>
+    <div class="sidebar-section">Main</div>
+    <div class="nav-item"><span class="nav-icon">📊</span> Dashboard</div>
+    <div class="nav-item"><span class="nav-icon">🎫</span> Tickets</div>
+    <div class="nav-item"><span class="nav-icon">💻</span> Resources</div>
+    <div class="nav-item"><span class="nav-icon">📚</span> Knowledge Base</div>
+    <div class="sidebar-section">Management</div>
+    <div class="nav-item active"><span class="nav-icon">📈</span> Reports</div>
+    <div class="nav-item"><span class="nav-icon">👥</span> Team</div>
+    <div class="sidebar-bottom">
+      <a href="#">⚙ Settings</a>
+      <a href="#">← Sign out</a>
+    </div>
+  </div>
+  <div class="main-content">
+    <div class="topbar">
+      <div>
+        <div class="topbar-title">Reports &amp; Analytics</div>
+        <div class="topbar-sub">Team performance · SLA compliance · Workload distribution</div>
+      </div>
+      <div class="topbar-actions">
+        <button class="btn-sm btn-outline" style="border:1px solid var(--border)">⬇ Export PDF</button>
+        <div class="icon-btn">🔔<span class="dot"></span></div>
+      </div>
+    </div>
+    <div class="page-body">
+
+      <!-- Filters -->
+      <div class="filter-row">
+        <span class="filter-label">Period:</span>
+        <select class="filter-select"><option selected>Last 30 days</option><option>Last 7 days</option><option>Last 90 days</option><option>Custom range</option></select>
+        <span class="filter-label">Technician:</span>
+        <select class="filter-select"><option>All Technicians</option><option>J. Smith</option><option>P. Hansen</option><option>R. Chen</option></select>
+        <span class="filter-label">Priority:</span>
+        <select class="filter-select"><option>All</option><option>Critical</option><option>High</option><option>Medium</option><option>Low</option></select>
+        <span class="filter-label">Status:</span>
+        <select class="filter-select"><option>All</option><option>Open</option><option>Resolved</option><option>Breached</option></select>
+        <button class="btn-sm btn-blue">Apply Filters</button>
+      </div>
+
+      <!-- Top metric cards -->
+      <div class="stat-grid" style="margin-bottom:20px;">
+        <div class="stat-card">
+          <div class="stat-label">Total Tickets (30d)</div>
+          <div class="stat-value">146</div>
+          <div class="stat-delta">↑ 12% vs prior period</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Avg. Resolution Time</div>
+          <div class="stat-value" style="color:var(--teal)">1.7h</div>
+          <div class="stat-delta">↓ 18 min improvement</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">SLA Compliance</div>
+          <div class="stat-value" style="color:var(--amber)">81%</div>
+          <div class="stat-delta">Target 95% · 7 breaches</div>
+        </div>
+        <div class="stat-card ok">
+          <div class="stat-label">Resolution Rate</div>
+          <div class="stat-value">94%</div>
+          <div class="stat-delta">112 of 119 tickets closed</div>
+        </div>
+      </div>
+
+      <!-- Charts row -->
+      <div class="dash-grid" style="margin-bottom:20px;">
+
+        <!-- Tickets by day bar chart -->
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">Tickets Submitted — Last 7 Days</div>
+          </div>
+          <div class="panel-body">
+            <div class="bar-chart">
+              <div class="bar-col">
+                <div class="bar-val">8</div>
+                <div class="bar" style="height:53px;background:var(--blue);opacity:.7;"></div>
+                <div class="bar-label">Mon</div>
+              </div>
+              <div class="bar-col">
+                <div class="bar-val">14</div>
+                <div class="bar" style="height:93px;background:var(--blue);"></div>
+                <div class="bar-label">Tue</div>
+              </div>
+              <div class="bar-col">
+                <div class="bar-val">11</div>
+                <div class="bar" style="height:73px;background:var(--blue);opacity:.8;"></div>
+                <div class="bar-label">Wed</div>
+              </div>
+              <div class="bar-col">
+                <div class="bar-val">18</div>
+                <div class="bar" style="height:120px;background:var(--red);"></div>
+                <div class="bar-label">Thu</div>
+              </div>
+              <div class="bar-col">
+                <div class="bar-val">9</div>
+                <div class="bar" style="height:60px;background:var(--blue);opacity:.7;"></div>
+                <div class="bar-label">Fri</div>
+              </div>
+              <div class="bar-col">
+                <div class="bar-val">3</div>
+                <div class="bar" style="height:20px;background:var(--blue);opacity:.5;"></div>
+                <div class="bar-label">Sat</div>
+              </div>
+              <div class="bar-col">
+                <div class="bar-val">2</div>
+                <div class="bar" style="height:13px;background:var(--blue);opacity:.4;"></div>
+                <div class="bar-label">Sun</div>
+              </div>
+            </div>
+            <div style="margin-top:10px;font-size:11px;color:var(--sub);">⚠ Thursday spike: 18 tickets — 3 were Critical priority</div>
+          </div>
+        </div>
+
+        <!-- Ticket status donut -->
+        <div class="panel">
+          <div class="panel-header"><div class="panel-title">Open Tickets by Status</div></div>
+          <div class="panel-body">
+            <div class="donut-wrap">
+              <svg class="donut-svg" width="110" height="110" viewBox="0 0 110 110">
+                <circle cx="55" cy="55" r="40" fill="none" stroke="#E2E8F0" stroke-width="18"/>
+                <!-- In Progress: 35% -->
+                <circle cx="55" cy="55" r="40" fill="none" stroke="#2563EB" stroke-width="18"
+                  stroke-dasharray="87.96 163.36" stroke-dashoffset="0" transform="rotate(-90 55 55)"/>
+                <!-- Assigned: 25% -->
+                <circle cx="55" cy="55" r="40" fill="none" stroke="#7C3AED" stroke-width="18"
+                  stroke-dasharray="62.83 188.49" stroke-dashoffset="-87.96" transform="rotate(-90 55 55)"/>
+                <!-- Waiting: 20% -->
+                <circle cx="55" cy="55" r="40" fill="none" stroke="#D97706" stroke-width="18"
+                  stroke-dasharray="50.27 201.06" stroke-dashoffset="-150.8" transform="rotate(-90 55 55)"/>
+                <!-- New: 20% -->
+                <circle cx="55" cy="55" r="40" fill="none" stroke="#0EA5E9" stroke-width="18"
+                  stroke-dasharray="50.27 201.06" stroke-dashoffset="-201.06" transform="rotate(-90 55 55)"/>
+                <text x="55" y="50" text-anchor="middle" font-size="18" font-weight="800" fill="#0F172A">34</text>
+                <text x="55" y="64" text-anchor="middle" font-size="9" fill="#64748B">open</text>
+              </svg>
+              <div class="donut-legend">
+                <div class="legend-item"><div class="legend-dot" style="background:#2563EB"></div>In Progress — 12 (35%)</div>
+                <div class="legend-item"><div class="legend-dot" style="background:#7C3AED"></div>Assigned — 9 (26%)</div>
+                <div class="legend-item"><div class="legend-dot" style="background:#D97706"></div>Waiting on User — 7 (21%)</div>
+                <div class="legend-item"><div class="legend-dot" style="background:#0EA5E9"></div>New — 6 (18%)</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="dash-grid">
+        <!-- Technician performance -->
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">Technician Performance</div>
+            <div class="panel-action">Reassign →</div>
+          </div>
+          <div class="panel-body">
+            <div style="display:grid;grid-template-columns:120px 1fr 55px 60px 60px;gap:10px;font-size:10px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.4px;padding-bottom:8px;">
+              <span>Name</span><span>Resolved</span><span>Tickets</span><span>Avg Res.</span><span>Breaches</span>
+            </div>
+            <div class="tech-perf-row">
+              <span style="font-weight:600;">J. Smith</span>
+              <div class="perf-bar-wrap"><div class="perf-bar" style="width:85%"></div></div>
+              <span style="font-weight:700;">42</span>
+              <span style="color:var(--sub);">2.4h</span>
+              <span style="color:var(--red);font-weight:700;">3</span>
+            </div>
+            <div class="tech-perf-row">
+              <span style="font-weight:600;">P. Hansen</span>
+              <div class="perf-bar-wrap"><div class="perf-bar" style="width:65%"></div></div>
+              <span style="font-weight:700;">32</span>
+              <span style="color:var(--sub);">1.8h</span>
+              <span style="color:var(--amber);font-weight:700;">2</span>
+            </div>
+            <div class="tech-perf-row">
+              <span style="font-weight:600;">R. Chen</span>
+              <div class="perf-bar-wrap"><div class="perf-bar" style="width:50%"></div></div>
+              <span style="font-weight:700;">24</span>
+              <span style="color:var(--sub);">1.2h</span>
+              <span style="color:var(--green);font-weight:700;">0</span>
+            </div>
+            <div class="tech-perf-row" style="border-bottom:none;">
+              <span style="font-weight:600;">L. Davis</span>
+              <div class="perf-bar-wrap"><div class="perf-bar" style="width:28%"></div></div>
+              <span style="font-weight:700;">14</span>
+              <span style="color:var(--sub);">0.9h</span>
+              <span style="color:var(--green);font-weight:700;">0</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Key metrics -->
+        <div class="panel">
+          <div class="panel-header"><div class="panel-title">Key Metrics (30d)</div></div>
+          <div class="panel-body">
+            <div class="metric-grid">
+              <div class="metric-item">
+                <div class="m-label">Avg. First Response</div>
+                <div class="m-val">47 min</div>
+                <div class="m-sub">Target: 60 min ✓</div>
+              </div>
+              <div class="metric-item">
+                <div class="m-label">Tickets Reopened</div>
+                <div class="m-val" style="color:var(--amber)">4</div>
+                <div class="m-sub">Within 7-day window</div>
+              </div>
+              <div class="metric-item">
+                <div class="m-label">Escalations</div>
+                <div class="m-val">6</div>
+                <div class="m-sub">5 Critical · 1 High</div>
+              </div>
+              <div class="metric-item">
+                <div class="m-label">KB Articles Used</div>
+                <div class="m-val" style="color:var(--teal)">28</div>
+                <div class="m-sub">Attached at resolution</div>
+              </div>
+              <div class="metric-item">
+                <div class="m-label">Resources Linked</div>
+                <div class="m-val">19</div>
+                <div class="m-sub">Across 14 tickets</div>
+              </div>
+              <div class="metric-item">
+                <div class="m-label">Avg. Queue Time</div>
+                <div class="m-val">22 min</div>
+                <div class="m-sub">New → Assigned</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+</div>
+
+</div><!-- end screen-wrap -->
+
+<script>
+function show(id, tab) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab-bar span:not(.tab-label)').forEach(t => t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  tab.classList.add('active');
+}
+// Priority selector
+document.querySelectorAll('.priority-opt').forEach(opt => {
+  opt.addEventListener('click', function() {
+    const grid = this.closest('.priority-grid');
+    grid.querySelectorAll('.priority-opt').forEach(o => o.classList.remove('sel'));
+    this.classList.add('sel');
+  });
+});
+</script>
+</body>
+</html>
