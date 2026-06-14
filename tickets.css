@@ -160,6 +160,7 @@ body, .topbar, .sidemenu, .filterbar, .tickets thead th,
   border-right: 1px solid var(--line);
   padding: 14px 10px;
   display: flex; flex-direction: column; gap: 2px;
+  overflow-y: auto;
 }
 .sidemenu__item {
   display: block;
@@ -173,9 +174,15 @@ body, .topbar, .sidemenu, .filterbar, .tickets thead th,
 .sidemenu__item.is-active { background: rgba(61,126,255,.15); color: var(--accent); }
 
 /* main */
-.main { flex: 1; min-width: 0; overflow: auto; padding: 18px 22px; }
+.main {
+  flex: 1; min-width: 0; min-height: 0;
+  overflow: hidden;
+  padding: 18px 22px;
+  display: flex; flex-direction: column;
+}
 
 .page-head {
+  flex: none;
   display: flex; align-items: center; justify-content: space-between;
   margin-bottom: 16px;
 }
@@ -196,6 +203,7 @@ body, .topbar, .sidemenu, .filterbar, .tickets thead th,
 
 /* filter bar */
 .filterbar {
+  flex: none;
   display: flex; align-items: flex-end; gap: 14px; flex-wrap: wrap;
   background: var(--bg-panel);
   border: 1px solid var(--line);
@@ -217,13 +225,16 @@ body, .topbar, .sidemenu, .filterbar, .tickets thead th,
 
 /* ===================== TABLE ===================== */
 .tablewrap {
+  flex: 1; min-height: 0;
+  overflow: auto;
   background: var(--bg-panel);
   border: 1px solid var(--line);
   border-radius: var(--radius);
-  overflow: hidden;
 }
 .tickets { width: 100%; border-collapse: collapse; font-size: 13px; }
 .tickets thead th {
+  position: sticky; top: 0; z-index: 1;
+  background: var(--bg-panel);
   text-align: left; font-weight: 600; color: var(--text-dim);
   padding: 11px 14px;
   border-bottom: 1px solid var(--line);
@@ -281,6 +292,7 @@ body, .topbar, .sidemenu, .filterbar, .tickets thead th,
 
 /* pager */
 .pager {
+  flex: none;
   display: flex; align-items: center; justify-content: space-between;
   padding: 14px 2px 4px;
 }
