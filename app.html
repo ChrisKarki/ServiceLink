@@ -1,0 +1,1413 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ServiceLink IT Service Desk</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0d1117;
+            --sidebar-bg: #161b22;
+            --panel-bg: #161b22;
+            --panel-border: #30363d;
+            --text-primary: #c9d1d9;
+            --text-secondary: #8b949e;
+            --accent-color: #2f81f7;
+            --accent-hover: #1f6feb;
+            --success-color: #238636;
+            --warning-color: #d29922;
+            --danger-color: #da3633;
+            --button-secondary-bg: #21262d;
+            --button-secondary-hover: #30363d;
+            --input-bg: #0d1117;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 260px;
+            background-color: var(--sidebar-bg);
+            border-right: 1px solid var(--panel-border);
+            display: flex;
+            flex-direction: column;
+            padding: 24px 0;
+            z-index: 10;
+        }
+
+        .brand {
+            font-size: 20px;
+            font-weight: 600;
+            padding: 0 24px 32px;
+            color: var(--text-primary);
+        }
+
+        .nav-menu {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            padding: 0 16px;
+        }
+
+        .nav-item {
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            color: var(--text-secondary);
+            font-weight: 500;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 14px;
+        }
+
+        .nav-item:hover:not(.active) {
+            background-color: var(--button-secondary-bg);
+            color: var(--text-primary);
+        }
+
+        .nav-item.active {
+            background: var(--accent-color);
+            color: #ffffff;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .topbar {
+            height: 64px;
+            border-bottom: 1px solid var(--panel-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 32px;
+            background: var(--sidebar-bg);
+            z-index: 10;
+        }
+
+        /* Search Dropdown */
+        .search-container {
+            position: relative;
+            width: 300px;
+        }
+
+        .search-input {
+            width: 100%;
+            background: var(--input-bg);
+            border: 1px solid var(--panel-border);
+            padding: 8px 16px;
+            border-radius: 6px;
+            color: var(--text-primary);
+            font-size: 14px;
+            transition: border-color 0.2s;
+            font-family: inherit;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+
+        /* Dropdowns */
+        .dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 8px;
+            background: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 6px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+            width: 320px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(4px);
+            transition: all 0.2s ease;
+            z-index: 100;
+        }
+
+        .dropdown.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .dropdown-header {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--panel-border);
+            font-weight: 600;
+            font-size: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .dropdown-item {
+            padding: 10px 16px;
+            border-bottom: 1px solid var(--panel-border);
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+
+        .dropdown-item:hover {
+            background: var(--button-secondary-bg);
+        }
+
+        .dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .topbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .icon-btn {
+            background: none;
+            border: 1px solid transparent;
+            color: var(--text-secondary);
+            cursor: pointer;
+            position: relative;
+            padding: 6px;
+            border-radius: 6px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .icon-btn:hover {
+            background: var(--button-secondary-bg);
+            border-color: var(--panel-border);
+            color: var(--text-primary);
+        }
+
+        .icon-btn .badge-dot {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            width: 8px;
+            height: 8px;
+            background: var(--danger-color);
+            border-radius: 50%;
+            border: 2px solid var(--sidebar-bg);
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 6px;
+            transition: background 0.2s;
+        }
+
+        .user-profile:hover {
+            background: var(--button-secondary-bg);
+        }
+
+        .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--button-secondary-hover);
+            border: 1px solid var(--panel-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 12px;
+            color: var(--text-primary);
+        }
+
+        .content-area {
+            flex: 1;
+            padding: 32px;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .view-section {
+            display: none;
+        }
+
+        .view-section.active {
+            display: block;
+        }
+
+        /* Panels */
+        .panel {
+            background: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 6px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        /* Typography & Utils */
+        h1 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 24px;
+            color: var(--text-primary);
+        }
+
+        h2 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: var(--text-primary);
+        }
+
+        .text-sm {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .flex-row {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .flex-between {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .mt-4 {
+            margin-top: 16px;
+        }
+
+        .mb-4 {
+            margin-bottom: 16px;
+        }
+
+        /* Badges */
+        .badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .badge-priority-high {
+            color: var(--danger-color);
+            border: 1px solid var(--danger-color);
+        }
+
+        .badge-status-open {
+            color: var(--accent-color);
+            border: 1px solid var(--accent-color);
+        }
+
+        .badge-status-resolved {
+            color: var(--success-color);
+            border: 1px solid var(--success-color);
+        }
+
+        /* Filter UI */
+        .filter-bar {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filter-pill {
+            background: transparent;
+            border: 1px solid var(--panel-border);
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+
+        .filter-pill:hover {
+            border-color: var(--text-secondary);
+            color: var(--text-primary);
+        }
+
+        .filter-pill.active {
+            background: var(--button-secondary-bg);
+            color: var(--text-primary);
+            border-color: var(--text-secondary);
+        }
+
+        /* Forms & Inputs */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 13px;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            background: var(--input-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 6px;
+            padding: 8px 12px;
+            color: var(--text-primary);
+            font-size: 14px;
+            font-family: inherit;
+            transition: border-color 0.2s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            border: 1px solid transparent;
+            font-weight: 500;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        .btn-sm {
+            padding: 4px 12px;
+            font-size: 13px;
+        }
+
+        .btn-primary {
+            background: var(--accent-color);
+            color: #ffffff;
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-hover);
+        }
+
+        .btn-secondary {
+            background: var(--button-secondary-bg);
+            color: var(--text-primary);
+            border-color: var(--panel-border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--button-secondary-hover);
+            border-color: var(--text-secondary);
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--accent-color);
+        }
+
+        .btn-ghost:hover {
+            text-decoration: underline;
+        }
+
+        /* Table */
+        .table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        th,
+        td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--panel-border);
+        }
+
+        th {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr.clickable {
+            cursor: pointer;
+        }
+
+        tr.clickable:hover td {
+            background: var(--button-secondary-bg);
+        }
+
+        /* Login specific */
+        body.login-active .sidebar,
+        body.login-active .topbar {
+            display: none;
+        }
+
+        body.login-active .main-content {
+            justify-content: center;
+            align-items: center;
+            background: var(--bg-color);
+        }
+
+        .login-card {
+            width: 360px;
+            text-align: left;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+        }
+
+        .login-card .brand {
+            padding: 0;
+            margin-bottom: 8px;
+            font-size: 24px;
+            color: var(--text-primary);
+            text-align: center;
+        }
+
+        .login-card .subtitle {
+            text-align: center;
+            margin-bottom: 32px;
+            color: var(--text-secondary);
+        }
+
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .toast {
+            background: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            border-left: 4px solid var(--accent-color);
+            padding: 16px 20px;
+            border-radius: 6px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+            color: var(--text-primary);
+            transform: translateX(120%);
+            transition: transform 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        .toast.success {
+            border-left-color: var(--success-color);
+        }
+
+        /* Escalation Flow Styles */
+        .flow-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 0;
+        }
+
+        .flow-node {
+            background: var(--input-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 6px;
+            padding: 16px 24px;
+            min-width: 200px;
+            text-align: center;
+            position: relative;
+            z-index: 2;
+            font-size: 14px;
+        }
+
+        .flow-node.escalated {
+            border-color: var(--danger-color);
+        }
+
+        .flow-arrow {
+            width: 1px;
+            height: 32px;
+            background: var(--panel-border);
+            position: relative;
+        }
+
+        .flow-arrow::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: -4px;
+            width: 0;
+            height: 0;
+            border-left: 4px solid transparent;
+            border-right: 4px solid transparent;
+            border-top: 6px solid var(--panel-border);
+        }
+
+        .flow-arrow.escalate-arrow {
+            background: var(--danger-color);
+        }
+
+        .flow-arrow.escalate-arrow::after {
+            border-top-color: var(--danger-color);
+        }
+
+        .sla-tracker {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-top: 24px;
+            width: 100%;
+        }
+
+        .sla-card {
+            background: var(--input-bg);
+            padding: 20px;
+            border-radius: 6px;
+            border: 1px solid var(--panel-border);
+            text-align: center;
+        }
+
+        .sla-value {
+            font-size: 28px;
+            font-weight: 600;
+            margin: 8px 0;
+            color: var(--text-primary);
+        }
+
+        .sla-card.danger .sla-value {
+            color: var(--danger-color);
+        }
+
+        /* Comment styles */
+        .ticket-header {
+            border-bottom: 1px solid var(--panel-border);
+            padding-bottom: 16px;
+            margin-bottom: 16px;
+        }
+
+        .comment-thread {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .comment {
+            background: var(--input-bg);
+            padding: 16px;
+            border-radius: 6px;
+            border: 1px solid var(--panel-border);
+            font-size: 14px;
+        }
+
+        .comment-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .comment-input {
+            width: 100%;
+            background: var(--input-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 6px;
+            padding: 12px;
+            color: var(--text-primary);
+            font-family: inherit;
+            resize: vertical;
+            min-height: 100px;
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+
+        .comment-input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+    </style>
+</head>
+
+<body class="login-active">
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Sidebar Navigation -->
+    <div class="sidebar">
+        <div class="brand">ServiceLink</div>
+        <ul class="nav-menu">
+            <li class="nav-item" onclick="switchView('dashboard-view', this)">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6">
+                    </path>
+                </svg>
+                Dashboard
+            </li>
+            <li class="nav-item" onclick="switchView('create-ticket-view', this)">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                </svg>
+                Create Ticket
+            </li>
+            <li class="nav-item" onclick="switchView('ticket-view', this)">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                    </path>
+                </svg>
+                Ticket Detail
+            </li>
+            <li class="nav-item" onclick="switchView('resource-view', this)">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path>
+                </svg>
+                Asset Management
+            </li>
+            <li class="nav-item" onclick="switchView('kb-view', this)">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253">
+                    </path>
+                </svg>
+                Knowledge Base
+            </li>
+            <li class="nav-item" onclick="switchView('escalation-view', this)">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                </svg>
+                Escalation Flow
+            </li>
+            <li class="nav-item" onclick="switchView('admin-view', this)">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z">
+                    </path>
+                </svg>
+                Admin Panel
+            </li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="topbar">
+            <div class="search-container">
+                <input type="text" class="search-input" placeholder="Search tickets, articles, resources..."
+                    onfocus="toggleDropdown('searchDropdown')"
+                    onblur="setTimeout(()=>toggleDropdown('searchDropdown'), 200)">
+                <div class="dropdown" id="searchDropdown" style="left: 0; right: auto; width: 400px;">
+                    <div class="dropdown-header">Recent Searches</div>
+                    <div class="dropdown-item">INC-1042 Production Build</div>
+                    <div class="dropdown-item">VPN Configuration KB</div>
+                    <div class="dropdown-item" style="color: var(--accent-color); text-align: center;">Advanced
+                        Search...</div>
+                </div>
+            </div>
+            <div class="topbar-actions">
+                <div style="position: relative;">
+                    <button class="icon-btn" onclick="toggleDropdown('notifDropdown')">
+                        <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9">
+                            </path>
+                        </svg>
+                        <div class="badge-dot"></div>
+                    </button>
+                    <div class="dropdown" id="notifDropdown">
+                        <div class="dropdown-header">Notifications <span class="badge"
+                                style="background: var(--button-secondary-bg); border: 1px solid var(--panel-border);">2</span>
+                        </div>
+                        <div class="dropdown-item">
+                            <div class="text-sm" style="color: var(--text-primary); font-weight: 500;">SLA Breach
+                                Warning</div>
+                            <div class="text-sm" style="font-size: 12px; margin-top: 4px;">INC-1042 is approaching 4hr
+                                resolution target.</div>
+                        </div>
+                        <div class="dropdown-item">
+                            <div class="text-sm" style="color: var(--text-primary); font-weight: 500;">Ticket Assigned
+                            </div>
+                            <div class="text-sm" style="font-size: 12px; margin-top: 4px;">REQ-2055 has been assigned to
+                                you.</div>
+                        </div>
+                        <div class="dropdown-item"
+                            style="color: var(--accent-color); text-align: center; padding: 8px;">Mark all as read</div>
+                    </div>
+                </div>
+
+                <div style="position: relative;">
+                    <div class="user-profile" onclick="toggleDropdown('profileDropdown')">
+                        <div class="text-sm" style="text-align: right;">
+                            <div style="color: var(--text-primary); font-weight: 500;">Chris Karki</div>
+                            <div style="font-size: 12px;">Manager</div>
+                        </div>
+                        <div class="avatar">CK</div>
+                    </div>
+                    <div class="dropdown" id="profileDropdown">
+                        <div class="dropdown-item flex-row" style="padding: 16px;">
+                            <div class="avatar" style="width: 40px; height: 40px; font-size: 14px;">CK</div>
+                            <div>
+                                <div style="color: var(--text-primary); font-weight: 500;">Chris Karki</div>
+                                <div class="text-sm">chris@company.com</div>
+                            </div>
+                        </div>
+                        <div class="dropdown-item flex-row"><svg width="16" height="16" fill="none"
+                                stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z">
+                                </path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            </svg> Settings</div>
+                        <div class="dropdown-item flex-row" style="color: var(--danger-color);" onclick="doLogout()">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1">
+                                </path>
+                            </svg> Sign out</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-area">
+
+            <!-- VIEW: LOGIN -->
+            <div id="login-view" class="view-section active">
+                <div class="panel login-card">
+                    <div class="brand">ServiceLink</div>
+                    <p class="subtitle text-sm">Sign in to your IT Service Desk</p>
+                    <div class="form-group">
+                        <label class="form-label">Email Address</label>
+                        <input type="email" class="form-control" id="login-email">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Password</label>
+                        <input type="password" class="form-control" id="login-password">
+                    </div>
+                    <button class="btn btn-primary" style="width: 100%; margin-top: 8px;" onclick="doLogin()">Sign
+                        In</button>
+                    <p class="text-sm mt-4" style="cursor: pointer; color: var(--accent-color); text-align: center;">
+                        Forgot Password?</p>
+                </div>
+            </div>
+
+            <!-- VIEW: DASHBOARD -->
+            <div id="dashboard-view" class="view-section">
+                <div class="flex-between mb-4">
+                    <h1>Manager Dashboard</h1>
+                    <button class="btn btn-primary"
+                        onclick="switchView('create-ticket-view', document.querySelectorAll('.nav-item')[1])">+ New
+                        Ticket</button>
+                </div>
+
+                <div class="sla-tracker" style="margin-top: 0; margin-bottom: 24px;">
+                    <div class="sla-card">
+                        <div class="text-sm">My Open Tickets</div>
+                        <div class="sla-value">5</div>
+                        <div class="text-sm">Needs attention</div>
+                    </div>
+                    <div class="sla-card">
+                        <div class="text-sm">Team Unassigned</div>
+                        <div class="sla-value">12</div>
+                        <div class="text-sm" style="color: var(--warning-color);">Waiting in queue</div>
+                    </div>
+                    <div class="sla-card">
+                        <div class="text-sm">Resolved Today</div>
+                        <div class="sla-value">34</div>
+                        <div class="text-sm" style="color: var(--success-color);">+12% from yesterday</div>
+                    </div>
+                </div>
+
+                <div class="flex-between mb-4">
+                    <h2>Recent Tickets</h2>
+                    <div class="filter-bar" style="margin-bottom: 0;">
+                        <div class="filter-pill active">All Open</div>
+                        <div class="filter-pill">Unassigned</div>
+                        <div class="filter-pill">High Priority</div>
+                        <div class="filter-pill">SLA Breach</div>
+                    </div>
+                </div>
+
+                <div class="panel" style="padding: 0;">
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Title</th>
+                                    <th>Status</th>
+                                    <th>Priority</th>
+                                    <th>Assignee</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="clickable"
+                                    onclick="if(event.target.tagName !== 'BUTTON') switchView('ticket-view', document.querySelectorAll('.nav-item')[2])">
+                                    <td style="font-weight: 500; color: var(--text-primary);">INC-1042</td>
+                                    <td>Production Build Pipeline Failing</td>
+                                    <td><span class="badge badge-status-open">In Progress</span></td>
+                                    <td><span class="badge badge-priority-high">Critical</span></td>
+                                    <td>Chris Karki</td>
+                                    <td><button class="btn btn-secondary btn-sm"
+                                            onclick="showToast('Ticket re-assigned')">Reassign</button></td>
+                                </tr>
+                                <tr class="clickable">
+                                    <td style="font-weight: 500; color: var(--text-primary);">REQ-2055</td>
+                                    <td>Request Adobe Creative Cloud License</td>
+                                    <td><span class="badge"
+                                            style="border: 1px solid var(--panel-border); color: var(--text-secondary);">New</span>
+                                    </td>
+                                    <td><span class="badge"
+                                            style="border: 1px solid var(--panel-border); color: var(--text-secondary);">Low</span>
+                                    </td>
+                                    <td><span
+                                            style="color: var(--text-secondary); font-style: italic;">Unassigned</span>
+                                    </td>
+                                    <td><button class="btn btn-ghost btn-sm"
+                                            onclick="showToast('Ticket claimed by you', 'success')">Claim</button></td>
+                                </tr>
+                                <tr class="clickable">
+                                    <td style="font-weight: 500; color: var(--text-primary);">INC-1041</td>
+                                    <td>VPN Connection Dropping</td>
+                                    <td><span class="badge badge-status-resolved">Resolved</span></td>
+                                    <td><span class="badge"
+                                            style="border: 1px solid var(--warning-color); color: var(--warning-color);">Medium</span>
+                                    </td>
+                                    <td>Jane Developer</td>
+                                    <td><button class="btn btn-secondary btn-sm">View</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: CREATE TICKET -->
+            <div id="create-ticket-view" class="view-section">
+                <h1>Submit a New Request</h1>
+                <div class="panel" style="max-width: 800px;">
+                    <div class="form-group">
+                        <label class="form-label">Summary / Title</label>
+                        <input type="text" class="form-control">
+                    </div>
+                    <div class="flex-row form-group">
+                        <div style="flex: 1;">
+                            <label class="form-label">Category</label>
+                            <select class="form-control">
+                                <option>Hardware</option>
+                                <option>Software</option>
+                                <option>Network</option>
+                                <option>Access / Permissions</option>
+                            </select>
+                        </div>
+                        <div style="flex: 1;">
+                            <label class="form-label">Priority</label>
+                            <select class="form-control">
+                                <option>Low</option>
+                                <option>Medium</option>
+                                <option>High</option>
+                                <option>Critical</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Detailed Description</label>
+                        <textarea class="form-control" rows="6"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Attachments (Optional)</label>
+                        <input type="file" class="form-control"
+                            style="background: transparent; border: none; padding: 0;">
+                    </div>
+                    <div class="flex-row mt-4">
+                        <button class="btn btn-primary" onclick="submitTicket()">Submit Ticket</button>
+                        <button class="btn btn-secondary"
+                            onclick="switchView('dashboard-view', document.querySelectorAll('.nav-item')[0])">Cancel</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: TICKET DETAIL -->
+            <div id="ticket-view" class="view-section">
+                <div class="flex-between mb-4">
+                    <h1>INC-1042: Production Build Pipeline Failing</h1>
+                    <div class="flex-row">
+                        <button class="btn btn-secondary">Reassign</button>
+                        <button class="btn btn-secondary"
+                            style="color: var(--danger-color); border-color: var(--danger-color);">Escalate</button>
+                        <button class="btn btn-primary"
+                            onclick="showToast('Ticket marked as resolved', 'success')">Resolve Issue</button>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <div class="ticket-header flex-between">
+                        <div class="flex-row">
+                            <span class="badge badge-status-open">In Progress</span>
+                            <span class="badge badge-priority-high">Priority: Critical</span>
+                        </div>
+                        <div class="text-sm">Created: Oct 24, 2026 at 09:15 AM by <strong>Jane Developer</strong></div>
+                    </div>
+
+                    <div class="flex-row" style="margin-bottom: 24px;">
+                        <div style="flex: 1;">
+                            <div class="text-sm mb-4">Assignee: <strong style="color: var(--text-primary);">Chris
+                                    Karki</strong></div>
+                            <div class="text-sm">Category: <strong style="color: var(--text-primary);">DevOps /
+                                    Infrastructure</strong></div>
+                        </div>
+                        <div style="flex: 1;">
+                            <div class="text-sm mb-4">Linked Resources: <span class="badge"
+                                    style="border: 1px solid var(--panel-border); cursor: pointer;"
+                                    onclick="switchView('resource-view', document.querySelectorAll('.nav-item')[3])">VRT-Build-Server-01</span>
+                            </div>
+                            <div class="text-sm">SLA Target: <strong style="color: var(--text-primary);">4 Hours
+                                    (Resolution)</strong></div>
+                        </div>
+                    </div>
+
+                    <h2>Description</h2>
+                    <p style="color: var(--text-secondary); line-height: 1.6; margin-bottom: 32px; font-size: 14px;">
+                        The automated deployment pipeline to staging has been failing for the past hour. The error logs
+                        indicate a timeout when connecting to the internal artifact repository. This is blocking the
+                        release candidate for the new mobile app update.
+                        <br><br>Please check network routing and repository instance health immediately.
+                    </p>
+
+                    <h2>Activity & Comments</h2>
+                    <div class="comment-thread mt-4">
+                        <div class="comment" style="border-left: 3px solid var(--warning-color);">
+                            <div class="comment-header">
+                                <div class="flex-row">
+                                    <div class="avatar" style="width: 24px; height: 24px; font-size: 10px;">CK</div>
+                                    <strong style="color: var(--text-primary);">Chris Karki (Manager)</strong>
+                                </div>
+                                <span class="text-sm">Today at 09:30 AM (Internal Note)</span>
+                            </div>
+                            <p style="color: var(--text-secondary);">Checked the firewall logs, there seems to be a new
+                                rule blocking port 8081. Reverting the recent network config update now.</p>
+                        </div>
+                        <div class="comment">
+                            <div class="comment-header">
+                                <div class="flex-row">
+                                    <div class="avatar"
+                                        style="width: 24px; height: 24px; font-size: 10px; background: var(--button-secondary-bg);">
+                                        SYS</div> <strong style="color: var(--text-primary);">System Automated</strong>
+                                </div>
+                                <span class="text-sm">Today at 09:20 AM</span>
+                            </div>
+                            <p style="color: var(--text-secondary); font-style: italic;">Ticket status changed from
+                                <em>New</em> to <em>Assigned</em>. Auto-assigned to Chris Karki based on category.</p>
+                        </div>
+                    </div>
+
+                    <div class="mt-4" style="margin-top: 32px;">
+                        <textarea class="comment-input" placeholder="Add a comment or internal note..."></textarea>
+                        <div class="flex-between">
+                            <label
+                                style="display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer; color: var(--text-secondary);">
+                                <input type="checkbox"> Make internal note (visible only to staff)
+                            </label>
+                            <button class="btn btn-primary"
+                                onclick="showToast('Comment posted successfully', 'success')">Post Comment</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: RESOURCE MANAGEMENT -->
+            <div id="resource-view" class="view-section">
+                <div class="flex-between mb-4">
+                    <h1>Asset Management</h1>
+                    <button class="btn btn-primary">+ Add Resource</button>
+                </div>
+
+                <div class="filter-bar">
+                    <div class="filter-pill active">All Resources</div>
+                    <div class="filter-pill">Hardware</div>
+                    <div class="filter-pill">Software</div>
+                    <div class="filter-pill">Virtual</div>
+                </div>
+
+                <div class="panel" style="padding: 0;">
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Resource Tag</th>
+                                    <th>Type</th>
+                                    <th>Make & Model</th>
+                                    <th>Assigned User</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="clickable">
+                                    <td style="font-weight: 500; color: var(--text-primary);">VRT-Build-Server-01</td>
+                                    <td>Virtual</td>
+                                    <td>AWS EC2 t3.xlarge</td>
+                                    <td>DevOps Team</td>
+                                    <td><span class="badge badge-status-open"
+                                            style="border-color: var(--danger-color); color: var(--danger-color);">Incident
+                                            Active</span></td>
+                                    <td><button class="btn btn-secondary btn-sm">Edit</button></td>
+                                </tr>
+                                <tr class="clickable">
+                                    <td style="font-weight: 500; color: var(--text-primary);">HW-LTP-4092</td>
+                                    <td>Hardware</td>
+                                    <td>Dell XPS 15 2025</td>
+                                    <td>Jane Developer</td>
+                                    <td><span class="badge badge-status-resolved">In Use</span></td>
+                                    <td><button class="btn btn-secondary btn-sm">Edit</button></td>
+                                </tr>
+                                <tr class="clickable">
+                                    <td style="font-weight: 500; color: var(--text-primary);">SW-LIC-ADOBE-CC</td>
+                                    <td>Software</td>
+                                    <td>Adobe Creative Cloud</td>
+                                    <td><span
+                                            style="color: var(--text-secondary); font-style: italic;">Unassigned</span>
+                                    </td>
+                                    <td><span class="badge badge-status-resolved">In Stock</span></td>
+                                    <td><button class="btn btn-secondary btn-sm">Edit</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: KNOWLEDGE BASE -->
+            <div id="kb-view" class="view-section">
+                <div class="flex-between mb-4">
+                    <div class="text-sm">Knowledge Base > Networking > VPN Configuration</div>
+                    <button class="btn btn-secondary">Edit Article</button>
+                </div>
+
+                <div class="panel">
+                    <h1 style="font-size: 28px; margin-bottom: 16px;">Troubleshooting Remote VPN Connectivity Drops</h1>
+
+                    <div class="kb-meta"
+                        style="display: flex; gap: 24px; color: var(--text-secondary); border-bottom: 1px solid var(--panel-border); padding-bottom: 24px; margin-bottom: 24px; font-size: 13px;">
+                        <div class="flex-row">
+                            <div class="avatar" style="width: 24px; height: 24px; font-size: 10px;">PH</div> <strong
+                                style="color: var(--text-primary);">Prabhnoorjit Hans</strong>
+                        </div>
+                        <div class="flex-row">Published: <strong style="color: var(--text-primary);">Aug 12,
+                                2026</strong></div>
+                        <div class="flex-row">Visibility: <span class="badge badge-status-resolved">Public</span></div>
+                    </div>
+
+                    <div class="kb-article" style="line-height: 1.7; color: var(--text-secondary); font-size: 14px;">
+                        <h2 style="margin-top: 24px;">Overview</h2>
+                        <p style="margin-bottom: 16px;">This guide addresses the common issue where end users experience
+                            frequent disconnects from the corporate VPN, specifically when utilizing split-tunneling on
+                            Windows 11 machines.</p>
+
+                        <h2 style="margin-top: 24px;">Resolution Steps</h2>
+                        <p style="margin-bottom: 16px;"><strong>Step 1: Verify the client version.</strong><br>Ensure
+                            the user is running the latest version of the VPN client (v4.2.1 or higher). Older versions
+                            have known compatibility issues with recent Windows OS updates.</p>
+
+                        <p style="margin-bottom: 16px;"><strong>Step 2: Check MTU Settings.</strong><br>Often, home ISP
+                            routers fragment packets if the MTU is too high. Instruct the user or use remote management
+                            to lower the VPN adapter MTU to 1350.</p>
+                        <pre
+                            style="background: var(--input-bg); padding: 16px; border-radius: 6px; border: 1px solid var(--panel-border); margin: 16px 0; color: var(--text-primary); font-family: monospace; overflow-x: auto;"><code>netsh interface ipv4 set subinterface "VPN Connection" mtu=1350 store=persistent</code></pre>
+
+                        <p style="margin-bottom: 16px;"><strong>Step 3: Update Network Drivers.</strong><br>Check the
+                            linked hardware resource in ServiceLink. If the device is a Dell XPS model from 2025, push
+                            the latest Intel Wi-Fi driver update via the management console.</p>
+
+                        <h2 style="margin-top: 24px;">Escalation</h2>
+                        <p style="margin-bottom: 16px;">If the issue persists after these steps, escalate the ticket to
+                            the Level 2 Network team and attach this KB article indicating steps already taken.</p>
+                    </div>
+
+                    <div class="kb-tags" style="display: flex; gap: 8px; margin-top: 32px;">
+                        <span class="badge"
+                            style="border: 1px solid var(--panel-border); color: var(--text-secondary);">#VPN</span>
+                        <span class="badge"
+                            style="border: 1px solid var(--panel-border); color: var(--text-secondary);">#Networking</span>
+                        <span class="badge"
+                            style="border: 1px solid var(--panel-border); color: var(--text-secondary);">#Windows11</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: ESCALATION FLOW -->
+            <div id="escalation-view" class="view-section">
+                <h1>Ticket Escalation & Status Flow</h1>
+                <p class="text-sm mb-4">Live tracking of automated SLA enforcement and manual escalation pathways.</p>
+
+                <div class="panel">
+                    <div class="flow-container">
+                        <div class="flow-node">
+                            <strong style="color: var(--text-primary);">New Ticket Submitted</strong>
+                            <div class="text-sm mt-4">Priority: High</div>
+                        </div>
+                        <div class="flow-arrow"></div>
+
+                        <div class="flow-node">
+                            <strong style="color: var(--text-primary);">Auto-Assigned</strong>
+                            <div class="text-sm mt-4">Technician: Hiten Lamba</div>
+                        </div>
+                        <div class="flow-arrow"></div>
+
+                        <div class="flow-node">
+                            <strong style="color: var(--text-primary);">In Progress</strong>
+                            <div class="text-sm mt-4">SLA Timer Active</div>
+                        </div>
+                        <div class="flow-arrow escalate-arrow"></div>
+
+                        <div class="flow-node escalated">
+                            <strong style="color: var(--danger-color);">SLA Breached / Escalated</strong>
+                            <div class="text-sm mt-4">Notified Manager</div>
+                            <div class="text-sm" style="color: var(--danger-color);">Time in state: 4h 15m</div>
+                        </div>
+                        <div class="flow-arrow"></div>
+
+                        <div class="flow-node" style="border-color: var(--success-color);">
+                            <strong style="color: var(--success-color);">Resolved</strong>
+                            <div class="text-sm mt-4">KB Article Linked</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: ADMIN PANEL -->
+            <div id="admin-view" class="view-section">
+                <div class="flex-between mb-4">
+                    <h1>User & Role Management</h1>
+                    <button class="btn btn-primary" onclick="showToast('Invite link sent to clipboard', 'success')">+
+                        Invite User</button>
+                </div>
+
+                <div class="panel" style="padding: 0;">
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Role</th>
+                                    <th>Status</th>
+                                    <th>Last Login</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td style="font-weight: 500; color: var(--text-primary);">Chris Karki</td>
+                                    <td style="color: var(--text-secondary);">chris@example.com</td>
+                                    <td>
+                                        <select class="form-control"
+                                            style="padding: 4px 8px; font-size: 13px; width: auto;"
+                                            onchange="showToast('Role updated to ' + this.value, 'success')">
+                                            <option>Administrator</option>
+                                            <option selected>Manager</option>
+                                            <option>Technician</option>
+                                            <option>End User</option>
+                                        </select>
+                                    </td>
+                                    <td><span class="badge badge-status-resolved">Active</span></td>
+                                    <td class="text-sm">Just now</td>
+                                    <td><button class="btn btn-secondary btn-sm">Edit</button></td>
+                                </tr>
+                                <tr>
+                                    <td style="font-weight: 500; color: var(--text-primary);">Arshdeep Mutti</td>
+                                    <td style="color: var(--text-secondary);">arshdeep@example.com</td>
+                                    <td>
+                                        <select class="form-control"
+                                            style="padding: 4px 8px; font-size: 13px; width: auto;"
+                                            onchange="showToast('Role updated to ' + this.value, 'success')">
+                                            <option>Administrator</option>
+                                            <option>Manager</option>
+                                            <option selected>Technician</option>
+                                            <option>End User</option>
+                                        </select>
+                                    </td>
+                                    <td><span class="badge badge-status-resolved">Active</span></td>
+                                    <td class="text-sm">2 hours ago</td>
+                                    <td><button class="btn btn-secondary btn-sm">Edit</button></td>
+                                </tr>
+                                <tr>
+                                    <td style="font-weight: 500; color: var(--text-primary);">Katie Weng</td>
+                                    <td style="color: var(--text-secondary);">katie@example.com</td>
+                                    <td>
+                                        <select class="form-control"
+                                            style="padding: 4px 8px; font-size: 13px; width: auto;"
+                                            onchange="showToast('Role updated to ' + this.value, 'success')">
+                                            <option>Administrator</option>
+                                            <option>Manager</option>
+                                            <option selected>Technician</option>
+                                            <option>End User</option>
+                                        </select>
+                                    </td>
+                                    <td><span class="badge"
+                                            style="border: 1px solid var(--warning-color); color: var(--warning-color);">Away</span>
+                                    </td>
+                                    <td class="text-sm">1 day ago</td>
+                                    <td><button class="btn btn-secondary btn-sm">Edit</button></td>
+                                </tr>
+                                <tr>
+                                    <td style="font-weight: 500; color: var(--text-primary);">Unknown User</td>
+                                    <td style="color: var(--text-secondary);">newguy@example.com</td>
+                                    <td>
+                                        <select class="form-control"
+                                            style="padding: 4px 8px; font-size: 13px; width: auto;"
+                                            onchange="showToast('Role updated to ' + this.value, 'success')">
+                                            <option>Administrator</option>
+                                            <option>Manager</option>
+                                            <option>Technician</option>
+                                            <option selected>End User</option>
+                                        </select>
+                                    </td>
+                                    <td><span class="badge badge-priority-high">Suspended</span></td>
+                                    <td class="text-sm">Never</td>
+                                    <td><button class="btn btn-secondary btn-sm"
+                                            onclick="showToast('User Activated', 'success')">Activate</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // UI Interaction Scripts
+        function doLogin() {
+            document.body.classList.remove('login-active');
+            switchView('dashboard-view', document.querySelectorAll('.nav-item')[0]);
+            showToast('Logged in successfully', 'success');
+        }
+
+        function doLogout() {
+            document.body.classList.add('login-active');
+            switchView('login-view');
+            document.getElementById('profileDropdown').classList.remove('active');
+            showToast('Signed out');
+        }
+
+        function switchView(viewId, element) {
+            // Update active state in sidebar if element provided
+            if (element) {
+                document.querySelectorAll('.nav-item').forEach(item => {
+                    item.classList.remove('active');
+                });
+                element.classList.add('active');
+            }
+
+            // Show selected view
+            document.querySelectorAll('.view-section').forEach(view => {
+                view.classList.remove('active');
+            });
+            document.getElementById(viewId).classList.add('active');
+        }
+
+        function submitTicket() {
+            switchView('dashboard-view', document.querySelectorAll('.nav-item')[0]);
+            showToast('Ticket submitted successfully! ID: REQ-2056', 'success');
+        }
+
+        // Dropdown toggle logic
+        function toggleDropdown(id) {
+            const dropdown = document.getElementById(id);
+            // Close other dropdowns
+            document.querySelectorAll('.dropdown').forEach(d => {
+                if (d.id !== id) d.classList.remove('active');
+            });
+            dropdown.classList.toggle('active');
+        }
+
+        // Close dropdowns on outside click
+        document.addEventListener('click', function (e) {
+            if (!e.target.closest('.search-container') &&
+                !e.target.closest('.topbar-actions')) {
+                document.querySelectorAll('.dropdown').forEach(d => {
+                    d.classList.remove('active');
+                });
+            }
+        });
+
+        // Toast Notification System
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+
+            const icon = type === 'success'
+                ? '<svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>'
+                : '<svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>';
+
+            toast.innerHTML = icon + message;
+            container.appendChild(toast);
+
+            // Animate in
+            setTimeout(() => toast.classList.add('show'), 10);
+
+            // Remove after 3 seconds
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300); // Wait for transition
+            }, 3000);
+        }
+    </script>
+</body>
+
+</html>
