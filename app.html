@@ -928,6 +928,41 @@
                                     <td>Jane Developer</td>
                                     <td><button class="btn btn-secondary btn-sm">View</button></td>
                                 </tr>
+                                <tr class="clickable">
+                                    <td style="font-weight: 500; color: var(--text-primary);">REQ-2054</td>
+                                    <td>New Monitor Setup for Engineering</td>
+                                    <td><span class="badge"
+                                            style="border: 1px solid var(--panel-border); color: var(--text-secondary);">New</span>
+                                    </td>
+                                    <td><span class="badge"
+                                            style="border: 1px solid var(--panel-border); color: var(--text-secondary);">Low</span>
+                                    </td>
+                                    <td><span
+                                            style="color: var(--text-secondary); font-style: italic;">Unassigned</span>
+                                    </td>
+                                    <td><button class="btn btn-ghost btn-sm"
+                                            onclick="showToast('Ticket claimed by you', 'success')">Claim</button></td>
+                                </tr>
+                                <tr class="clickable">
+                                    <td style="font-weight: 500; color: var(--text-primary);">INC-1040</td>
+                                    <td>Email Sync Issue on Mobile</td>
+                                    <td><span class="badge badge-status-open">In Progress</span></td>
+                                    <td><span class="badge"
+                                            style="border: 1px solid var(--warning-color); color: var(--warning-color);">Medium</span>
+                                    </td>
+                                    <td>Arshdeep Mutti</td>
+                                    <td><button class="btn btn-secondary btn-sm">View</button></td>
+                                </tr>
+                                <tr class="clickable">
+                                    <td style="font-weight: 500; color: var(--text-primary);">INC-1039</td>
+                                    <td>Printer Network Configuration</td>
+                                    <td><span class="badge badge-status-resolved">Resolved</span></td>
+                                    <td><span class="badge"
+                                            style="border: 1px solid var(--panel-border); color: var(--text-secondary);">Low</span>
+                                    </td>
+                                    <td>Hiten Lamba</td>
+                                    <td><button class="btn btn-secondary btn-sm">View</button></td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -1051,6 +1086,27 @@
                             <p style="color: var(--text-secondary); font-style: italic;">Ticket status changed from
                                 <em>New</em> to <em>Assigned</em>. Auto-assigned to Chris Karki based on category.</p>
                         </div>
+                        <div class="comment">
+                            <div class="comment-header">
+                                <div class="flex-row">
+                                    <div class="avatar" style="width: 24px; height: 24px; font-size: 10px;">JD</div>
+                                    <strong style="color: var(--text-primary);">Jane Developer</strong>
+                                </div>
+                                <span class="text-sm">Today at 09:16 AM</span>
+                            </div>
+                            <p style="color: var(--text-secondary);">This is causing a complete blocker for the Q3 feature release. I've attempted to re-run the pipeline three times and it fails at the exact same step every time. Logs are attached.</p>
+                        </div>
+                        <div class="comment">
+                            <div class="comment-header">
+                                <div class="flex-row">
+                                    <div class="avatar"
+                                        style="width: 24px; height: 24px; font-size: 10px; background: var(--button-secondary-bg);">
+                                        SYS</div> <strong style="color: var(--text-primary);">System Automated</strong>
+                                </div>
+                                <span class="text-sm">Today at 09:15 AM</span>
+                            </div>
+                            <p style="color: var(--text-secondary); font-style: italic;">Ticket <strong>INC-1042</strong> submitted via Service Portal.</p>
+                        </div>
                     </div>
 
                     <div class="mt-4" style="margin-top: 32px;">
@@ -1123,6 +1179,32 @@
                                     <td><span class="badge badge-status-resolved">In Stock</span></td>
                                     <td><button class="btn btn-secondary btn-sm">Edit</button></td>
                                 </tr>
+                                <tr class="clickable">
+                                    <td style="font-weight: 500; color: var(--text-primary);">HW-MNT-2098</td>
+                                    <td>Hardware</td>
+                                    <td>LG 34" Ultrawide</td>
+                                    <td><span
+                                            style="color: var(--text-secondary); font-style: italic;">Unassigned</span>
+                                    </td>
+                                    <td><span class="badge badge-status-resolved">In Stock</span></td>
+                                    <td><button class="btn btn-secondary btn-sm">Edit</button></td>
+                                </tr>
+                                <tr class="clickable">
+                                    <td style="font-weight: 500; color: var(--text-primary);">VRT-DB-Prod-02</td>
+                                    <td>Virtual</td>
+                                    <td>AWS RDS PostgreSQL</td>
+                                    <td>Database Team</td>
+                                    <td><span class="badge badge-status-resolved">Active</span></td>
+                                    <td><button class="btn btn-secondary btn-sm">Edit</button></td>
+                                </tr>
+                                <tr class="clickable">
+                                    <td style="font-weight: 500; color: var(--text-primary);">SW-LIC-OFFICE</td>
+                                    <td>Software</td>
+                                    <td>Microsoft Office 365 E3</td>
+                                    <td>Hiten Lamba</td>
+                                    <td><span class="badge badge-status-resolved">In Use</span></td>
+                                    <td><button class="btn btn-secondary btn-sm">Edit</button></td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -1183,6 +1265,40 @@
                             style="border: 1px solid var(--panel-border); color: var(--text-secondary);">#Networking</span>
                         <span class="badge"
                             style="border: 1px solid var(--panel-border); color: var(--text-secondary);">#Windows11</span>
+                    </div>
+                </div>
+
+                <div class="panel" style="margin-top: 24px;">
+                    <h1 style="font-size: 28px; margin-bottom: 16px;">Requesting New Hardware via ServiceLink</h1>
+
+                    <div class="kb-meta"
+                        style="display: flex; gap: 24px; color: var(--text-secondary); border-bottom: 1px solid var(--panel-border); padding-bottom: 24px; margin-bottom: 24px; font-size: 13px;">
+                        <div class="flex-row">
+                            <div class="avatar" style="width: 24px; height: 24px; font-size: 10px;">KW</div> <strong
+                                style="color: var(--text-primary);">Katie Weng</strong>
+                        </div>
+                        <div class="flex-row">Published: <strong style="color: var(--text-primary);">Jul 05,
+                                2026</strong></div>
+                        <div class="flex-row">Visibility: <span class="badge badge-status-resolved">Public</span></div>
+                    </div>
+
+                    <div class="kb-article" style="line-height: 1.7; color: var(--text-secondary); font-size: 14px;">
+                        <h2 style="margin-top: 24px;">Policy Update</h2>
+                        <p style="margin-bottom: 16px;">As of Q3 2026, all hardware requests must go through the standard ServiceLink portal to ensure proper inventory tracking and manager approval workflows.</p>
+
+                        <h2 style="margin-top: 24px;">Submission Process</h2>
+                        <p style="margin-bottom: 16px;"><strong>Step 1:</strong> Navigate to the "Create Ticket" view in the left sidebar.</p>
+                        <p style="margin-bottom: 16px;"><strong>Step 2:</strong> Under Category, select "Hardware Request". This will automatically trigger the manager approval workflow.</p>
+                        <p style="margin-bottom: 16px;"><strong>Step 3:</strong> Specify the exact hardware model required. If it's standard issue (e.g. Dell XPS, MacBook Pro 14"), it will be auto-approved. Non-standard equipment requires Director level sign-off.</p>
+                    </div>
+
+                    <div class="kb-tags" style="display: flex; gap: 8px; margin-top: 32px;">
+                        <span class="badge"
+                            style="border: 1px solid var(--panel-border); color: var(--text-secondary);">#Hardware</span>
+                        <span class="badge"
+                            style="border: 1px solid var(--panel-border); color: var(--text-secondary);">#Policy</span>
+                        <span class="badge"
+                            style="border: 1px solid var(--panel-border); color: var(--text-secondary);">#Onboarding</span>
                     </div>
                 </div>
             </div>
@@ -1319,6 +1435,57 @@
                                     <td class="text-sm">Never</td>
                                     <td><button class="btn btn-secondary btn-sm"
                                             onclick="showToast('User Activated', 'success')">Activate</button></td>
+                                </tr>
+                                <tr>
+                                    <td style="font-weight: 500; color: var(--text-primary);">Hiten Lamba</td>
+                                    <td style="color: var(--text-secondary);">hiten@example.com</td>
+                                    <td>
+                                        <select class="form-control"
+                                            style="padding: 4px 8px; font-size: 13px; width: auto;"
+                                            onchange="showToast('Role updated to ' + this.value, 'success')">
+                                            <option>Administrator</option>
+                                            <option>Manager</option>
+                                            <option selected>Technician</option>
+                                            <option>End User</option>
+                                        </select>
+                                    </td>
+                                    <td><span class="badge badge-status-resolved">Active</span></td>
+                                    <td class="text-sm">4 hours ago</td>
+                                    <td><button class="btn btn-secondary btn-sm">Edit</button></td>
+                                </tr>
+                                <tr>
+                                    <td style="font-weight: 500; color: var(--text-primary);">John Doe</td>
+                                    <td style="color: var(--text-secondary);">john.doe@example.com</td>
+                                    <td>
+                                        <select class="form-control"
+                                            style="padding: 4px 8px; font-size: 13px; width: auto;"
+                                            onchange="showToast('Role updated to ' + this.value, 'success')">
+                                            <option>Administrator</option>
+                                            <option>Manager</option>
+                                            <option>Technician</option>
+                                            <option selected>End User</option>
+                                        </select>
+                                    </td>
+                                    <td><span class="badge badge-status-resolved">Active</span></td>
+                                    <td class="text-sm">3 days ago</td>
+                                    <td><button class="btn btn-secondary btn-sm">Edit</button></td>
+                                </tr>
+                                <tr>
+                                    <td style="font-weight: 500; color: var(--text-primary);">Jane Smith</td>
+                                    <td style="color: var(--text-secondary);">jane.smith@example.com</td>
+                                    <td>
+                                        <select class="form-control"
+                                            style="padding: 4px 8px; font-size: 13px; width: auto;"
+                                            onchange="showToast('Role updated to ' + this.value, 'success')">
+                                            <option>Administrator</option>
+                                            <option>Manager</option>
+                                            <option>Technician</option>
+                                            <option selected>End User</option>
+                                        </select>
+                                    </td>
+                                    <td><span class="badge badge-status-resolved">Active</span></td>
+                                    <td class="text-sm">5 hours ago</td>
+                                    <td><button class="btn btn-secondary btn-sm">Edit</button></td>
                                 </tr>
                             </tbody>
                         </table>
