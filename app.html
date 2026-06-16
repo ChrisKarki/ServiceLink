@@ -56,6 +56,9 @@
             font-weight: 600;
             padding: 0 24px 32px;
             color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
 
         .nav-menu {
@@ -719,7 +722,10 @@
 
     <!-- Sidebar Navigation -->
     <div class="sidebar">
-        <div class="brand">ServiceLink</div>
+        <div class="brand">
+            <img src="logo.png" alt="Logo" style="height: 28px; width: auto;">
+            ServiceLink
+        </div>
         <ul class="nav-menu">
             <li class="nav-item" onclick="switchView('dashboard-view', this)">
                 <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -868,7 +874,10 @@
             <!-- VIEW: LOGIN -->
             <div id="login-view" class="view-section active">
                 <div class="panel login-card">
-                    <div class="brand">ServiceLink</div>
+                    <div class="brand" style="justify-content: center;">
+                        <img src="logo.png" alt="Logo" style="height: 36px; width: auto;">
+                        ServiceLink
+                    </div>
                     <p class="subtitle text-sm">Sign in to your IT Service Desk</p>
                     <div class="form-group" style="position: relative;">
                         <label class="form-label">Email Address</label>
