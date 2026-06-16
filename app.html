@@ -8,20 +8,20 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #0d1117;
-            --sidebar-bg: #161b22;
-            --panel-bg: #161b22;
-            --panel-border: #30363d;
-            --text-primary: #c9d1d9;
-            --text-secondary: #8b949e;
-            --accent-color: #2f81f7;
-            --accent-hover: #1f6feb;
-            --success-color: #238636;
-            --warning-color: #d29922;
-            --danger-color: #da3633;
-            --button-secondary-bg: #21262d;
-            --button-secondary-hover: #30363d;
-            --input-bg: #0d1117;
+            --bg-color: #000000;
+            --sidebar-bg: #0a0a0a;
+            --panel-bg: #0a0a0a;
+            --panel-border: #262626;
+            --text-primary: #ffffff;
+            --text-secondary: #a3a3a3;
+            --accent-color: #0066ff;
+            --accent-hover: #0052cc;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --button-secondary-bg: #171717;
+            --button-secondary-hover: #262626;
+            --input-bg: #000000;
         }
 
         * {
@@ -248,7 +248,7 @@
 
         .content-area {
             flex: 1;
-            padding: 32px;
+            padding: 16px 32px 32px 32px;
             overflow-y: auto;
             position: relative;
         }
@@ -271,6 +271,16 @@
         }
 
         /* Typography & Utils */
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6,
+        p {
+            margin-top: 0;
+        }
+
         h1 {
             font-size: 24px;
             font-weight: 600;
@@ -283,6 +293,12 @@
             font-weight: 600;
             margin-bottom: 16px;
             color: var(--text-primary);
+        }
+
+        .flex-between h1,
+        .flex-between h2,
+        .flex-between p {
+            margin-bottom: 0;
         }
 
         .text-sm {
@@ -337,16 +353,17 @@
 
         /* Filter UI */
         .filter-bar {
-            display: flex;
-            gap: 8px;
+            display: inline-flex;
+            background: var(--button-secondary-bg);
+            padding: 4px;
+            border-radius: 8px;
             margin-bottom: 20px;
-            flex-wrap: wrap;
         }
 
         .filter-pill {
             background: transparent;
-            border: 1px solid var(--panel-border);
-            padding: 6px 12px;
+            border: none;
+            padding: 6px 16px;
             border-radius: 6px;
             font-size: 13px;
             color: var(--text-secondary);
@@ -356,14 +373,13 @@
         }
 
         .filter-pill:hover {
-            border-color: var(--text-secondary);
             color: var(--text-primary);
         }
 
         .filter-pill.active {
-            background: var(--button-secondary-bg);
+            background: var(--bg-color);
             color: var(--text-primary);
-            border-color: var(--text-secondary);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
         }
 
         /* Forms & Inputs */
@@ -384,7 +400,7 @@
             background: var(--input-bg);
             border: 1px solid var(--panel-border);
             border-radius: 6px;
-            padding: 8px 12px;
+            padding: 14px 16px;
             color: var(--text-primary);
             font-size: 14px;
             font-family: inherit;
@@ -394,6 +410,17 @@
         .form-control:focus {
             outline: none;
             border-color: var(--accent-color);
+        }
+
+        select.form-control {
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url('data:image/svg+xml;utf8,<svg fill="none" stroke="%238a8f98" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path></svg>');
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+            background-size: 16px;
+            padding-right: 40px;
+            cursor: pointer;
         }
 
         /* Buttons */
@@ -489,28 +516,38 @@
         }
 
         body.login-active .main-content {
-            justify-content: center;
-            align-items: center;
             background: var(--bg-color);
         }
 
+        body.login-active .content-area {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            width: 100%;
+        }
+
         .login-card {
-            width: 360px;
+            width: 440px;
+            padding: 40px;
             text-align: left;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 16px 48px rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--panel-border);
+            border-radius: 12px;
         }
 
         .login-card .brand {
             padding: 0;
             margin-bottom: 8px;
-            font-size: 24px;
+            font-size: 28px;
             color: var(--text-primary);
             text-align: center;
         }
 
         .login-card .subtitle {
             text-align: center;
-            margin-bottom: 32px;
+            margin-bottom: 40px;
+            font-size: 15px;
             color: var(--text-secondary);
         }
 
@@ -711,7 +748,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path>
                 </svg>
-                Asset Management
+                Resource Management
             </li>
             <li class="nav-item" onclick="switchView('kb-view', this)">
                 <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -742,11 +779,16 @@
     <!-- Main Content -->
     <div class="main-content">
         <div class="topbar">
-            <div class="search-container">
+            <div class="search-container" style="position: relative; display: flex; align-items: center; width: 400px;">
+                <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                    style="position: absolute; left: 12px; color: var(--text-secondary); pointer-events: none;">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
                 <input type="text" class="search-input" placeholder="Search tickets, articles, resources..."
-                    onfocus="toggleDropdown('searchDropdown')"
+                    style="padding-left: 38px; width: 100%;" onfocus="toggleDropdown('searchDropdown')"
                     onblur="setTimeout(()=>toggleDropdown('searchDropdown'), 200)">
-                <div class="dropdown" id="searchDropdown" style="left: 0; right: auto; width: 400px;">
+                <div class="dropdown" id="searchDropdown" style="left: 0; right: auto; width: 100%; top: 44px;">
                     <div class="dropdown-header">Recent Searches</div>
                     <div class="dropdown-item">INC-1042 Production Build</div>
                     <div class="dropdown-item">VPN Configuration KB</div>
@@ -814,7 +856,8 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1">
                                 </path>
-                            </svg> Sign out</div>
+                            </svg> Sign out
+                        </div>
                     </div>
                 </div>
             </div>
@@ -827,17 +870,33 @@
                 <div class="panel login-card">
                     <div class="brand">ServiceLink</div>
                     <p class="subtitle text-sm">Sign in to your IT Service Desk</p>
-                    <div class="form-group">
+                    <div class="form-group" style="position: relative;">
                         <label class="form-label">Email Address</label>
-                        <input type="email" class="form-control" id="login-email">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                            style="position: absolute; left: 16px; top: 36px; color: var(--text-secondary); pointer-events: none;">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z">
+                            </path>
+                        </svg>
+                        <input type="email" class="form-control" id="login-email" placeholder="you@company.com"
+                            style="padding-left: 48px;">
                     </div>
-                    <div class="form-group">
+                    <div class="form-group" style="position: relative; margin-bottom: 32px;">
                         <label class="form-label">Password</label>
-                        <input type="password" class="form-control" id="login-password">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                            style="position: absolute; left: 16px; top: 36px; color: var(--text-secondary); pointer-events: none;">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z">
+                            </path>
+                        </svg>
+                        <input type="password" class="form-control" id="login-password" placeholder="••••••••"
+                            style="padding-left: 48px;">
                     </div>
-                    <button class="btn btn-primary" style="width: 100%; margin-top: 8px;" onclick="doLogin()">Sign
+                    <button class="btn btn-primary"
+                        style="width: 100%; padding: 14px; font-size: 16px; font-weight: 600;" onclick="doLogin()">Sign
                         In</button>
-                    <p class="text-sm mt-4" style="cursor: pointer; color: var(--accent-color); text-align: center;">
+                    <p class="text-sm mt-4"
+                        style="cursor: pointer; color: var(--accent-color); text-align: center; margin-top: 24px;">
                         Forgot Password?</p>
                 </div>
             </div>
@@ -851,21 +910,149 @@
                         Ticket</button>
                 </div>
 
-                <div class="sla-tracker" style="margin-top: 0; margin-bottom: 24px;">
-                    <div class="sla-card">
-                        <div class="text-sm">My Open Tickets</div>
-                        <div class="sla-value">5</div>
-                        <div class="text-sm">Needs attention</div>
+                <div style="display: grid; grid-template-columns: 3fr 1fr; gap: 24px; margin-bottom: 24px;">
+                    <div>
+                        <div class="sla-tracker"
+                            style="margin-top: 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;">
+                            <div class="sla-card">
+                                <div class="text-sm">My Open Tickets</div>
+                                <div class="sla-value">5</div>
+                                <div class="text-sm">Needs attention</div>
+                            </div>
+                            <div class="sla-card">
+                                <div class="text-sm">Team Unassigned</div>
+                                <div class="sla-value">12</div>
+                                <div class="text-sm" style="color: var(--warning-color);">Waiting in queue</div>
+                            </div>
+                            <div class="sla-card">
+                                <div class="text-sm">Resolved Today</div>
+                                <div class="sla-value">34</div>
+                                <div class="text-sm" style="color: var(--success-color);">+12% from yesterday</div>
+                            </div>
+                            <div class="sla-card">
+                                <div class="text-sm">Avg Resolution Time</div>
+                                <div class="sla-value">1.4h</div>
+                                <div class="text-sm" style="color: var(--success-color);">-0.2h from avg</div>
+                            </div>
+                        </div>
+
+                        <!-- Chart placeholder -->
+                        <div class="panel"
+                            style="margin-top: 24px; height: 220px; display: flex; flex-direction: column; justify-content: flex-end; padding: 24px; border: 1px solid var(--panel-border); background: var(--button-secondary-bg);">
+                            <div style="font-weight: 500; margin-bottom: auto;">Ticket Volume (Last 7 Days)</div>
+                            <div
+                                style="display: flex; align-items: flex-end; justify-content: space-between; height: 120px; padding-top: 20px;">
+                                <div
+                                    style="display: flex; flex-direction: column; align-items: center; gap: 8px; flex: 1;">
+                                    <div
+                                        style="width: 32px; height: 40px; background: var(--accent-color); border-radius: 4px 4px 0 0; opacity: 0.8;">
+                                    </div>
+                                    <div class="text-sm" style="font-size: 11px;">Mon</div>
+                                </div>
+                                <div
+                                    style="display: flex; flex-direction: column; align-items: center; gap: 8px; flex: 1;">
+                                    <div
+                                        style="width: 32px; height: 60px; background: var(--accent-color); border-radius: 4px 4px 0 0; opacity: 0.8;">
+                                    </div>
+                                    <div class="text-sm" style="font-size: 11px;">Tue</div>
+                                </div>
+                                <div
+                                    style="display: flex; flex-direction: column; align-items: center; gap: 8px; flex: 1;">
+                                    <div
+                                        style="width: 32px; height: 100px; background: var(--accent-color); border-radius: 4px 4px 0 0; opacity: 0.8;">
+                                    </div>
+                                    <div class="text-sm" style="font-size: 11px;">Wed</div>
+                                </div>
+                                <div
+                                    style="display: flex; flex-direction: column; align-items: center; gap: 8px; flex: 1;">
+                                    <div
+                                        style="width: 32px; height: 45px; background: var(--accent-color); border-radius: 4px 4px 0 0; opacity: 0.8;">
+                                    </div>
+                                    <div class="text-sm" style="font-size: 11px;">Thu</div>
+                                </div>
+                                <div
+                                    style="display: flex; flex-direction: column; align-items: center; gap: 8px; flex: 1;">
+                                    <div
+                                        style="width: 32px; height: 80px; background: var(--accent-color); border-radius: 4px 4px 0 0; opacity: 0.8;">
+                                    </div>
+                                    <div class="text-sm" style="font-size: 11px;">Fri</div>
+                                </div>
+                                <div
+                                    style="display: flex; flex-direction: column; align-items: center; gap: 8px; flex: 1;">
+                                    <div
+                                        style="width: 32px; height: 20px; background: var(--accent-color); border-radius: 4px 4px 0 0; opacity: 0.8;">
+                                    </div>
+                                    <div class="text-sm" style="font-size: 11px;">Sat</div>
+                                </div>
+                                <div
+                                    style="display: flex; flex-direction: column; align-items: center; gap: 8px; flex: 1;">
+                                    <div
+                                        style="width: 32px; height: 35px; background: var(--accent-color); border-radius: 4px 4px 0 0; opacity: 0.8;">
+                                    </div>
+                                    <div class="text-sm" style="font-size: 11px;">Sun</div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="sla-card">
-                        <div class="text-sm">Team Unassigned</div>
-                        <div class="sla-value">12</div>
-                        <div class="text-sm" style="color: var(--warning-color);">Waiting in queue</div>
-                    </div>
-                    <div class="sla-card">
-                        <div class="text-sm">Resolved Today</div>
-                        <div class="sla-value">34</div>
-                        <div class="text-sm" style="color: var(--success-color);">+12% from yesterday</div>
+
+                    <div class="panel" style="margin: 0;">
+                        <h3
+                            style="font-size: 14px; margin-bottom: 16px; border-bottom: 1px solid var(--panel-border); padding-bottom: 12px;">
+                            Live Activity Feed</h3>
+                        <div style="display: flex; flex-direction: column; gap: 16px;">
+                            <div style="display: flex; gap: 12px;">
+                                <div
+                                    style="width: 8px; height: 8px; border-radius: 50%; background: var(--accent-color); margin-top: 6px; flex-shrink: 0;">
+                                </div>
+                                <div>
+                                    <div class="text-sm" style="line-height: 1.4;"><strong>Hiten Lamba</strong> resolved
+                                        <a href="#"
+                                            style="color: var(--accent-color); text-decoration: none;">INC-1038</a>
+                                    </div>
+                                    <div style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;">10 mins
+                                        ago</div>
+                                </div>
+                            </div>
+                            <div style="display: flex; gap: 12px;">
+                                <div
+                                    style="width: 8px; height: 8px; border-radius: 50%; background: var(--warning-color); margin-top: 6px; flex-shrink: 0;">
+                                </div>
+                                <div>
+                                    <div class="text-sm" style="line-height: 1.4;"><strong>System</strong> escalated <a
+                                            href="#"
+                                            style="color: var(--accent-color); text-decoration: none;">INC-0992</a>
+                                    </div>
+                                    <div style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;">45 mins
+                                        ago</div>
+                                </div>
+                            </div>
+                            <div style="display: flex; gap: 12px;">
+                                <div
+                                    style="width: 8px; height: 8px; border-radius: 50%; background: var(--success-color); margin-top: 6px; flex-shrink: 0;">
+                                </div>
+                                <div>
+                                    <div class="text-sm" style="line-height: 1.4;"><strong>Jane Developer</strong>
+                                        created <a href="#"
+                                            style="color: var(--accent-color); text-decoration: none;">REQ-2053</a>
+                                    </div>
+                                    <div style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;">1 hour
+                                        ago</div>
+                                </div>
+                            </div>
+                            <div style="display: flex; gap: 12px;">
+                                <div
+                                    style="width: 8px; height: 8px; border-radius: 50%; background: var(--text-secondary); margin-top: 6px; flex-shrink: 0;">
+                                </div>
+                                <div>
+                                    <div class="text-sm" style="line-height: 1.4;"><strong>Katie Weng</strong> updated
+                                        article <a href="#"
+                                            style="color: var(--text-primary); text-decoration: underline;">Hardware
+                                            Policy</a></div>
+                                    <div style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;">3 hours
+                                        ago</div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -963,6 +1150,47 @@
                                     <td>Hiten Lamba</td>
                                     <td><button class="btn btn-secondary btn-sm">View</button></td>
                                 </tr>
+                                <tr class="clickable">
+                                    <td style="font-weight: 500; color: var(--text-primary);">REQ-2053</td>
+                                    <td>Access to GitHub Organization</td>
+                                    <td><span class="badge badge-status-open">In Progress</span></td>
+                                    <td><span class="badge"
+                                            style="border: 1px solid var(--panel-border); color: var(--text-secondary);">Low</span>
+                                    </td>
+                                    <td>Katie Weng</td>
+                                    <td><button class="btn btn-secondary btn-sm">View</button></td>
+                                </tr>
+                                <tr class="clickable">
+                                    <td style="font-weight: 500; color: var(--text-primary);">INC-1038</td>
+                                    <td>Database Read Replica Lag</td>
+                                    <td><span class="badge badge-status-resolved">Resolved</span></td>
+                                    <td><span class="badge badge-priority-high">Critical</span></td>
+                                    <td>Jane Developer</td>
+                                    <td><button class="btn btn-secondary btn-sm">View</button></td>
+                                </tr>
+                                <tr class="clickable">
+                                    <td style="font-weight: 500; color: var(--text-primary);">REQ-2052</td>
+                                    <td>Increase S3 Bucket Storage Limit</td>
+                                    <td><span class="badge"
+                                            style="border: 1px solid var(--panel-border); color: var(--text-secondary);">New</span>
+                                    </td>
+                                    <td><span class="badge"
+                                            style="border: 1px solid var(--warning-color); color: var(--warning-color);">Medium</span>
+                                    </td>
+                                    <td><span
+                                            style="color: var(--text-secondary); font-style: italic;">Unassigned</span>
+                                    </td>
+                                    <td><button class="btn btn-ghost btn-sm"
+                                            onclick="showToast('Ticket claimed by you', 'success')">Claim</button></td>
+                                </tr>
+                                <tr class="clickable">
+                                    <td style="font-weight: 500; color: var(--text-primary);">INC-1037</td>
+                                    <td>SSO Integration Failing for Jira</td>
+                                    <td><span class="badge badge-status-open">In Progress</span></td>
+                                    <td><span class="badge badge-priority-high">High</span></td>
+                                    <td>Chris Karki</td>
+                                    <td><button class="btn btn-secondary btn-sm">View</button></td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -971,45 +1199,144 @@
 
             <!-- VIEW: CREATE TICKET -->
             <div id="create-ticket-view" class="view-section">
-                <h1>Submit a New Request</h1>
-                <div class="panel" style="max-width: 800px;">
-                    <div class="form-group">
-                        <label class="form-label">Summary / Title</label>
-                        <input type="text" class="form-control">
+                <div class="flex-between mb-4">
+                    <h1>Submit a New Request or Incident</h1>
+                    <button class="btn btn-secondary"
+                        onclick="switchView('dashboard-view', document.querySelectorAll('.nav-item')[0])">Cancel</button>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px;">
+                    <div class="panel">
+                        <h2
+                            style="font-size: 16px; border-bottom: 1px solid var(--panel-border); padding-bottom: 12px; margin-bottom: 20px;">
+                            Request Details</h2>
+
+                        <div class="form-group">
+                            <label class="form-label">Summary / Title *</label>
+                            <input type="text" class="form-control"
+                                placeholder="Brief description of the issue or request">
+                        </div>
+
+                        <div class="flex-row form-group">
+                            <div style="flex: 1;">
+                                <label class="form-label">Category *</label>
+                                <select class="form-control">
+                                    <option value="" disabled selected>Select Category...</option>
+                                    <option>Hardware (Laptop, Monitor, Peripherals)</option>
+                                    <option>Software (Licenses, Installation)</option>
+                                    <option>Network & Connectivity (VPN, Wi-Fi)</option>
+                                    <option>Access & Identity (SSO, Active Directory)</option>
+                                    <option>Enterprise Applications (Jira, Salesforce)</option>
+                                    <option>Other / Unsure</option>
+                                </select>
+                            </div>
+                            <div style="flex: 1;">
+                                <label class="form-label">Sub-Category</label>
+                                <select class="form-control">
+                                    <option value="" disabled selected>Select Sub-Category...</option>
+                                    <option>New Request</option>
+                                    <option>Break / Fix Incident</option>
+                                    <option>Modification / Change</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Detailed Description *</label>
+                            <textarea class="form-control" rows="6"
+                                placeholder="Please provide as much detail as possible. If this is an incident, include steps to reproduce, error messages, and what you were doing when it occurred."></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Steps to Reproduce (For Incidents)</label>
+                            <textarea class="form-control" rows="3"
+                                placeholder="1. Go to...\n2. Click on...\n3. Error appears..."></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Attachments (Logs, Screenshots, Documents)</label>
+                            <div style="border: 2px dashed var(--panel-border); border-radius: 6px; padding: 32px; text-align: center; color: var(--text-secondary); cursor: pointer; transition: all 0.2s;"
+                                onmouseover="this.style.borderColor='var(--accent-color)'"
+                                onmouseout="this.style.borderColor='var(--panel-border)'">
+                                <svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                    style="margin-bottom: 8px;">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12">
+                                    </path>
+                                </svg>
+                                <p>Drag and drop files here or click to browse</p>
+                                <p style="font-size: 12px; margin-top: 4px;">Max file size: 25MB. Supported: .log, .png,
+                                    .pdf, .docx</p>
+                                <input type="file" style="display: none;">
+                            </div>
+                        </div>
                     </div>
-                    <div class="flex-row form-group">
-                        <div style="flex: 1;">
-                            <label class="form-label">Category</label>
+
+                    <div class="panel" style="height: fit-content;">
+                        <h2
+                            style="font-size: 16px; border-bottom: 1px solid var(--panel-border); padding-bottom: 12px; margin-bottom: 20px;">
+                            Classification & Impact</h2>
+
+                        <div class="form-group">
+                            <label class="form-label">Urgency (How quickly is a fix needed?)</label>
                             <select class="form-control">
-                                <option>Hardware</option>
-                                <option>Software</option>
-                                <option>Network</option>
-                                <option>Access / Permissions</option>
+                                <option>Low - Workaround available, no immediate pressure</option>
+                                <option>Medium - Affects daily work, but manageable</option>
+                                <option>High - Severe impact on productivity</option>
+                                <option>Critical - Business halting, VIP user</option>
                             </select>
                         </div>
-                        <div style="flex: 1;">
-                            <label class="form-label">Priority</label>
+
+                        <div class="form-group">
+                            <label class="form-label">Impact (How many users/services affected?)</label>
                             <select class="form-control">
-                                <option>Low</option>
-                                <option>Medium</option>
-                                <option>High</option>
-                                <option>Critical</option>
+                                <option>Single User</option>
+                                <option>Department / Team</option>
+                                <option>Site-wide / Regional</option>
+                                <option>Global / Enterprise-wide</option>
                             </select>
                         </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Detailed Description</label>
-                        <textarea class="form-control" rows="6"></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Attachments (Optional)</label>
-                        <input type="file" class="form-control"
-                            style="background: transparent; border: none; padding: 0;">
-                    </div>
-                    <div class="flex-row mt-4">
-                        <button class="btn btn-primary" onclick="submitTicket()">Submit Ticket</button>
-                        <button class="btn btn-secondary"
-                            onclick="switchView('dashboard-view', document.querySelectorAll('.nav-item')[0])">Cancel</button>
+
+                        <div class="form-group">
+                            <label class="form-label">Affected Configuration Item (CI) / Resource</label>
+                            <div style="position: relative;">
+                                <input type="text" class="form-control"
+                                    placeholder="Search resources (e.g. VRT-WEB-01)...">
+                                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                    style="position: absolute; right: 12px; top: 10px; color: var(--text-secondary);">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                </svg>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Preferred Contact Method</label>
+                            <select class="form-control">
+                                <option>Email</option>
+                                <option>Slack / Teams</option>
+                                <option>Phone</option>
+                            </select>
+                        </div>
+
+                        <div
+                            style="background: var(--button-secondary-bg); padding: 16px; border-radius: 6px; margin-top: 24px; border: 1px solid var(--panel-border);">
+                            <div class="text-sm" style="margin-bottom: 12px;"><strong>Suggested KB Articles:</strong>
+                            </div>
+                            <ul style="list-style: none; display: flex; flex-direction: column; gap: 8px;">
+                                <li
+                                    style="font-size: 13px; color: var(--accent-color); cursor: pointer; text-decoration: underline;">
+                                    How to request a new software license</li>
+                                <li
+                                    style="font-size: 13px; color: var(--accent-color); cursor: pointer; text-decoration: underline;">
+                                    Troubleshooting VPN Connectivity Issues</li>
+                            </ul>
+                        </div>
+
+                        <button class="btn btn-primary"
+                            style="width: 100%; margin-top: 24px; padding: 12px; font-size: 16px;"
+                            onclick="showToast('Ticket submitted successfully! Ticket ID: REQ-2056', 'success'); switchView('ticket-view', document.querySelectorAll('.nav-item')[2])">Submit
+                            Ticket</button>
                     </div>
                 </div>
             </div>
@@ -1084,7 +1411,8 @@
                                 <span class="text-sm">Today at 09:20 AM</span>
                             </div>
                             <p style="color: var(--text-secondary); font-style: italic;">Ticket status changed from
-                                <em>New</em> to <em>Assigned</em>. Auto-assigned to Chris Karki based on category.</p>
+                                <em>New</em> to <em>Assigned</em>. Auto-assigned to Chris Karki based on category.
+                            </p>
                         </div>
                         <div class="comment">
                             <div class="comment-header">
@@ -1094,7 +1422,9 @@
                                 </div>
                                 <span class="text-sm">Today at 09:16 AM</span>
                             </div>
-                            <p style="color: var(--text-secondary);">This is causing a complete blocker for the Q3 feature release. I've attempted to re-run the pipeline three times and it fails at the exact same step every time. Logs are attached.</p>
+                            <p style="color: var(--text-secondary);">This is causing a complete blocker for the Q3
+                                feature release. I've attempted to re-run the pipeline three times and it fails at the
+                                exact same step every time. Logs are attached.</p>
                         </div>
                         <div class="comment">
                             <div class="comment-header">
@@ -1105,7 +1435,9 @@
                                 </div>
                                 <span class="text-sm">Today at 09:15 AM</span>
                             </div>
-                            <p style="color: var(--text-secondary); font-style: italic;">Ticket <strong>INC-1042</strong> submitted via Service Portal.</p>
+                            <p style="color: var(--text-secondary); font-style: italic;">Ticket
+                                <strong>INC-1042</strong> submitted via Service Portal.
+                            </p>
                         </div>
                     </div>
 
@@ -1126,7 +1458,7 @@
             <!-- VIEW: RESOURCE MANAGEMENT -->
             <div id="resource-view" class="view-section">
                 <div class="flex-between mb-4">
-                    <h1>Asset Management</h1>
+                    <h1>Resource Management</h1>
                     <button class="btn btn-primary">+ Add Resource</button>
                 </div>
 
@@ -1205,6 +1537,42 @@
                                     <td><span class="badge badge-status-resolved">In Use</span></td>
                                     <td><button class="btn btn-secondary btn-sm">Edit</button></td>
                                 </tr>
+                                <tr class="clickable">
+                                    <td style="font-weight: 500; color: var(--text-primary);">VRT-WEB-Prod-01</td>
+                                    <td>Virtual</td>
+                                    <td>AWS EC2 c5.2xlarge</td>
+                                    <td>DevOps Team</td>
+                                    <td><span class="badge badge-status-resolved">Active</span></td>
+                                    <td><button class="btn btn-secondary btn-sm">Edit</button></td>
+                                </tr>
+                                <tr class="clickable">
+                                    <td style="font-weight: 500; color: var(--text-primary);">HW-MAC-5021</td>
+                                    <td>Hardware</td>
+                                    <td>Apple MacBook Pro M3 Max</td>
+                                    <td>Chris Karki</td>
+                                    <td><span class="badge badge-status-resolved">In Use</span></td>
+                                    <td><button class="btn btn-secondary btn-sm">Edit</button></td>
+                                </tr>
+                                <tr class="clickable">
+                                    <td style="font-weight: 500; color: var(--text-primary);">SW-LIC-FIGMA</td>
+                                    <td>Software</td>
+                                    <td>Figma Professional Plan</td>
+                                    <td><span
+                                            style="color: var(--text-secondary); font-style: italic;">Unassigned</span>
+                                    </td>
+                                    <td><span class="badge badge-status-resolved">In Stock</span></td>
+                                    <td><button class="btn btn-secondary btn-sm">Edit</button></td>
+                                </tr>
+                                <tr class="clickable">
+                                    <td style="font-weight: 500; color: var(--text-primary);">NW-RTR-001</td>
+                                    <td>Networking</td>
+                                    <td>Cisco Meraki MX100</td>
+                                    <td>IT Infrastructure</td>
+                                    <td><span class="badge badge-status-open"
+                                            style="border-color: var(--warning-color); color: var(--warning-color);">Maintenance
+                                            Needed</span></td>
+                                    <td><button class="btn btn-secondary btn-sm">Edit</button></td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -1214,130 +1582,371 @@
             <!-- VIEW: KNOWLEDGE BASE -->
             <div id="kb-view" class="view-section">
                 <div class="flex-between mb-4">
-                    <div class="text-sm">Knowledge Base > Networking > VPN Configuration</div>
-                    <button class="btn btn-secondary">Edit Article</button>
+                    <h1>Enterprise Knowledge Base</h1>
+                    <button class="btn btn-primary">+ New Article</button>
                 </div>
 
-                <div class="panel">
-                    <h1 style="font-size: 28px; margin-bottom: 16px;">Troubleshooting Remote VPN Connectivity Drops</h1>
-
-                    <div class="kb-meta"
-                        style="display: flex; gap: 24px; color: var(--text-secondary); border-bottom: 1px solid var(--panel-border); padding-bottom: 24px; margin-bottom: 24px; font-size: 13px;">
-                        <div class="flex-row">
-                            <div class="avatar" style="width: 24px; height: 24px; font-size: 10px;">PH</div> <strong
-                                style="color: var(--text-primary);">Prabhnoorjit Hans</strong>
+                <div class="panel" style="margin-bottom: 24px; padding: 16px;">
+                    <div class="flex-row" style="gap: 16px;">
+                        <div style="position: relative; flex: 1;">
+                            <input type="text" class="form-control"
+                                placeholder="Search the Knowledge Base for errors, policies, or how-to guides..."
+                                style="padding-left: 40px; font-size: 16px; padding-top: 12px; padding-bottom: 12px;">
+                            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                style="position: absolute; left: 12px; top: 12px; color: var(--text-secondary);">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
                         </div>
-                        <div class="flex-row">Published: <strong style="color: var(--text-primary);">Aug 12,
-                                2026</strong></div>
-                        <div class="flex-row">Visibility: <span class="badge badge-status-resolved">Public</span></div>
-                    </div>
-
-                    <div class="kb-article" style="line-height: 1.7; color: var(--text-secondary); font-size: 14px;">
-                        <h2 style="margin-top: 24px;">Overview</h2>
-                        <p style="margin-bottom: 16px;">This guide addresses the common issue where end users experience
-                            frequent disconnects from the corporate VPN, specifically when utilizing split-tunneling on
-                            Windows 11 machines.</p>
-
-                        <h2 style="margin-top: 24px;">Resolution Steps</h2>
-                        <p style="margin-bottom: 16px;"><strong>Step 1: Verify the client version.</strong><br>Ensure
-                            the user is running the latest version of the VPN client (v4.2.1 or higher). Older versions
-                            have known compatibility issues with recent Windows OS updates.</p>
-
-                        <p style="margin-bottom: 16px;"><strong>Step 2: Check MTU Settings.</strong><br>Often, home ISP
-                            routers fragment packets if the MTU is too high. Instruct the user or use remote management
-                            to lower the VPN adapter MTU to 1350.</p>
-                        <pre
-                            style="background: var(--input-bg); padding: 16px; border-radius: 6px; border: 1px solid var(--panel-border); margin: 16px 0; color: var(--text-primary); font-family: monospace; overflow-x: auto;"><code>netsh interface ipv4 set subinterface "VPN Connection" mtu=1350 store=persistent</code></pre>
-
-                        <p style="margin-bottom: 16px;"><strong>Step 3: Update Network Drivers.</strong><br>Check the
-                            linked hardware resource in ServiceLink. If the device is a Dell XPS model from 2025, push
-                            the latest Intel Wi-Fi driver update via the management console.</p>
-
-                        <h2 style="margin-top: 24px;">Escalation</h2>
-                        <p style="margin-bottom: 16px;">If the issue persists after these steps, escalate the ticket to
-                            the Level 2 Network team and attach this KB article indicating steps already taken.</p>
-                    </div>
-
-                    <div class="kb-tags" style="display: flex; gap: 8px; margin-top: 32px;">
-                        <span class="badge"
-                            style="border: 1px solid var(--panel-border); color: var(--text-secondary);">#VPN</span>
-                        <span class="badge"
-                            style="border: 1px solid var(--panel-border); color: var(--text-secondary);">#Networking</span>
-                        <span class="badge"
-                            style="border: 1px solid var(--panel-border); color: var(--text-secondary);">#Windows11</span>
+                        <select class="form-control" style="width: 200px; padding: 12px;">
+                            <option>All Categories</option>
+                            <option>Networking & VPN</option>
+                            <option>Hardware & Policies</option>
+                            <option>Software & Licenses</option>
+                            <option>Security</option>
+                        </select>
                     </div>
                 </div>
 
-                <div class="panel" style="margin-top: 24px;">
-                    <h1 style="font-size: 28px; margin-bottom: 16px;">Requesting New Hardware via ServiceLink</h1>
-
-                    <div class="kb-meta"
-                        style="display: flex; gap: 24px; color: var(--text-secondary); border-bottom: 1px solid var(--panel-border); padding-bottom: 24px; margin-bottom: 24px; font-size: 13px;">
-                        <div class="flex-row">
-                            <div class="avatar" style="width: 24px; height: 24px; font-size: 10px;">KW</div> <strong
-                                style="color: var(--text-primary);">Katie Weng</strong>
+                <div style="display: grid; grid-template-columns: 250px 1fr; gap: 24px;">
+                    <!-- KB Sidebar -->
+                    <div style="display: flex; flex-direction: column; gap: 16px;">
+                        <div class="panel" style="padding: 16px;">
+                            <h3 style="font-size: 14px; margin-bottom: 12px; color: var(--text-primary);">Categories
+                            </h3>
+                            <ul
+                                style="list-style: none; display: flex; flex-direction: column; gap: 8px; font-size: 14px; color: var(--text-secondary);">
+                                <li
+                                    style="cursor: pointer; padding: 4px 8px; border-radius: 4px; background: var(--button-secondary-bg); color: var(--accent-color); font-weight: 500;">
+                                    Networking & VPN (12)</li>
+                                <li style="cursor: pointer; padding: 4px 8px; border-radius: 4px; transition: background 0.2s;"
+                                    onmouseover="this.style.background='var(--button-secondary-bg)'"
+                                    onmouseout="this.style.background='transparent'">Hardware & Policies (8)</li>
+                                <li style="cursor: pointer; padding: 4px 8px; border-radius: 4px; transition: background 0.2s;"
+                                    onmouseover="this.style.background='var(--button-secondary-bg)'"
+                                    onmouseout="this.style.background='transparent'">Software & Licenses (24)</li>
+                                <li style="cursor: pointer; padding: 4px 8px; border-radius: 4px; transition: background 0.2s;"
+                                    onmouseover="this.style.background='var(--button-secondary-bg)'"
+                                    onmouseout="this.style.background='transparent'">Security & Identity (15)</li>
+                                <li style="cursor: pointer; padding: 4px 8px; border-radius: 4px; transition: background 0.2s;"
+                                    onmouseover="this.style.background='var(--button-secondary-bg)'"
+                                    onmouseout="this.style.background='transparent'">HR & Onboarding (5)</li>
+                            </ul>
                         </div>
-                        <div class="flex-row">Published: <strong style="color: var(--text-primary);">Jul 05,
-                                2026</strong></div>
-                        <div class="flex-row">Visibility: <span class="badge badge-status-resolved">Public</span></div>
+
+                        <div class="panel" style="padding: 16px;">
+                            <h3 style="font-size: 14px; margin-bottom: 12px; color: var(--text-primary);">Popular Tags
+                            </h3>
+                            <div class="kb-tags" style="display: flex; flex-wrap: wrap; gap: 8px;">
+                                <span class="badge"
+                                    style="border: 1px solid var(--panel-border); color: var(--text-secondary); cursor: pointer;">#VPN</span>
+                                <span class="badge"
+                                    style="border: 1px solid var(--panel-border); color: var(--text-secondary); cursor: pointer;">#macOS</span>
+                                <span class="badge"
+                                    style="border: 1px solid var(--panel-border); color: var(--text-secondary); cursor: pointer;">#Hardware</span>
+                                <span class="badge"
+                                    style="border: 1px solid var(--panel-border); color: var(--text-secondary); cursor: pointer;">#Onboarding</span>
+                                <span class="badge"
+                                    style="border: 1px solid var(--panel-border); color: var(--text-secondary); cursor: pointer;">#Security</span>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="kb-article" style="line-height: 1.7; color: var(--text-secondary); font-size: 14px;">
-                        <h2 style="margin-top: 24px;">Policy Update</h2>
-                        <p style="margin-bottom: 16px;">As of Q3 2026, all hardware requests must go through the standard ServiceLink portal to ensure proper inventory tracking and manager approval workflows.</p>
+                    <!-- KB Content Area -->
+                    <div style="display: flex; flex-direction: column; gap: 24px;">
+                        <div class="text-sm">Showing top results in <strong>Networking & VPN</strong></div>
 
-                        <h2 style="margin-top: 24px;">Submission Process</h2>
-                        <p style="margin-bottom: 16px;"><strong>Step 1:</strong> Navigate to the "Create Ticket" view in the left sidebar.</p>
-                        <p style="margin-bottom: 16px;"><strong>Step 2:</strong> Under Category, select "Hardware Request". This will automatically trigger the manager approval workflow.</p>
-                        <p style="margin-bottom: 16px;"><strong>Step 3:</strong> Specify the exact hardware model required. If it's standard issue (e.g. Dell XPS, MacBook Pro 14"), it will be auto-approved. Non-standard equipment requires Director level sign-off.</p>
-                    </div>
+                        <div class="panel">
+                            <div class="flex-between" style="margin-bottom: 16px;">
+                                <h1 style="font-size: 28px;">Troubleshooting Remote VPN Connectivity Drops</h1>
+                                <div class="flex-row gap-2">
+                                    <button class="btn btn-secondary btn-sm"><svg width="14" height="14" fill="none"
+                                            stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z">
+                                            </path>
+                                        </svg> Share</button>
+                                    <button class="btn btn-secondary btn-sm"><svg width="14" height="14" fill="none"
+                                            stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z">
+                                            </path>
+                                        </svg> Edit</button>
+                                </div>
+                            </div>
 
-                    <div class="kb-tags" style="display: flex; gap: 8px; margin-top: 32px;">
-                        <span class="badge"
-                            style="border: 1px solid var(--panel-border); color: var(--text-secondary);">#Hardware</span>
-                        <span class="badge"
-                            style="border: 1px solid var(--panel-border); color: var(--text-secondary);">#Policy</span>
-                        <span class="badge"
-                            style="border: 1px solid var(--panel-border); color: var(--text-secondary);">#Onboarding</span>
+                            <div class="kb-meta"
+                                style="display: flex; gap: 24px; color: var(--text-secondary); border-bottom: 1px solid var(--panel-border); padding-bottom: 24px; margin-bottom: 24px; font-size: 13px;">
+                                <div class="flex-row">
+                                    <div class="avatar" style="width: 24px; height: 24px; font-size: 10px;">PH</div>
+                                    <strong style="color: var(--text-primary);">Prabhnoorjit Hans</strong>
+                                </div>
+                                <div class="flex-row">Published: <strong style="color: var(--text-primary);">Aug 12,
+                                        2026</strong></div>
+                                <div class="flex-row">Updated: <strong style="color: var(--text-primary);">2 weeks
+                                        ago</strong></div>
+                                <div class="flex-row">Views: <strong style="color: var(--text-primary);">1,402</strong>
+                                </div>
+                                <div class="flex-row">Visibility: <span
+                                        class="badge badge-status-resolved">Public</span></div>
+                            </div>
+
+                            <div class="kb-article"
+                                style="line-height: 1.7; color: var(--text-secondary); font-size: 14px;">
+                                <div
+                                    style="background: var(--button-secondary-bg); border-left: 4px solid var(--accent-color); padding: 16px; border-radius: 0 6px 6px 0; margin-bottom: 24px;">
+                                    <strong
+                                        style="color: var(--text-primary); display: block; margin-bottom: 8px;">Table of
+                                        Contents</strong>
+                                    <ul style="list-style: none; padding-left: 0; color: var(--accent-color);">
+                                        <li style="margin-bottom: 4px; cursor: pointer;">1. Overview & Scope</li>
+                                        <li style="margin-bottom: 4px; cursor: pointer;">2. Resolution Steps (Windows
+                                            11)</li>
+                                        <li style="margin-bottom: 4px; cursor: pointer;">3. Advanced MTU Adjustments
+                                        </li>
+                                        <li style="margin-bottom: 4px; cursor: pointer;">4. Escalation Path</li>
+                                    </ul>
+                                </div>
+
+                                <h2
+                                    style="margin-top: 24px; color: var(--text-primary); border-bottom: 1px solid var(--panel-border); padding-bottom: 8px;">
+                                    1. Overview & Scope</h2>
+                                <p style="margin-bottom: 16px;">This guide addresses the common issue where end users
+                                    experience
+                                    frequent disconnects from the corporate VPN, specifically when utilizing
+                                    split-tunneling on
+                                    Windows 11 machines connecting via home ISPs.</p>
+
+                                <h2
+                                    style="margin-top: 24px; color: var(--text-primary); border-bottom: 1px solid var(--panel-border); padding-bottom: 8px;">
+                                    2. Resolution Steps</h2>
+                                <p style="margin-bottom: 16px;"><strong>Step 1: Verify the client
+                                        version.</strong><br>Ensure
+                                    the user is running the latest version of the VPN client (v4.2.1 or higher). Older
+                                    versions
+                                    have known compatibility issues with recent Windows OS updates.</p>
+
+                                <p style="margin-bottom: 16px;"><strong>Step 2: Check MTU Settings.</strong><br>Often,
+                                    home ISP
+                                    routers fragment packets if the MTU is too high. Instruct the user or use remote
+                                    management
+                                    to lower the VPN adapter MTU to 1350.</p>
+                                <pre
+                                    style="background: var(--input-bg); padding: 16px; border-radius: 6px; border: 1px solid var(--panel-border); margin: 16px 0; color: var(--text-primary); font-family: monospace; overflow-x: auto;"><code>netsh interface ipv4 set subinterface "VPN Connection" mtu=1350 store=persistent</code></pre>
+
+                                <p style="margin-bottom: 16px;"><strong>Step 3: Update Network
+                                        Drivers.</strong><br>Check the
+                                    linked hardware resource in ServiceLink. If the device is a Dell XPS model from
+                                    2025, push
+                                    the latest Intel Wi-Fi driver update via the management console.</p>
+
+                                <h2
+                                    style="margin-top: 24px; color: var(--text-primary); border-bottom: 1px solid var(--panel-border); padding-bottom: 8px;">
+                                    3. Escalation</h2>
+                                <p style="margin-bottom: 16px;">If the issue persists after these steps, escalate the
+                                    ticket to
+                                    the Level 2 Network team and attach this KB article indicating steps already taken.
+                                </p>
+                            </div>
+
+                            <div
+                                style="border-top: 1px solid var(--panel-border); margin-top: 32px; padding-top: 24px; display: flex; justify-content: space-between; align-items: center;">
+                                <div class="kb-tags" style="display: flex; gap: 8px;">
+                                    <span class="badge"
+                                        style="border: 1px solid var(--panel-border); color: var(--text-secondary);">#VPN</span>
+                                    <span class="badge"
+                                        style="border: 1px solid var(--panel-border); color: var(--text-secondary);">#Networking</span>
+                                    <span class="badge"
+                                        style="border: 1px solid var(--panel-border); color: var(--text-secondary);">#Windows11</span>
+                                </div>
+                                <div class="flex-row" style="color: var(--text-secondary); font-size: 14px;">
+                                    Was this article helpful?
+                                    <button class="btn btn-secondary btn-sm">Yes (42)</button>
+                                    <button class="btn btn-secondary btn-sm">No (3)</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="panel" style="margin-top: 24px;">
+                            <h1 style="font-size: 28px; margin-bottom: 16px;">Requesting New Hardware via ServiceLink
+                            </h1>
+
+                            <div class="kb-meta"
+                                style="display: flex; gap: 24px; color: var(--text-secondary); border-bottom: 1px solid var(--panel-border); padding-bottom: 24px; margin-bottom: 24px; font-size: 13px;">
+                                <div class="flex-row">
+                                    <div class="avatar" style="width: 24px; height: 24px; font-size: 10px;">KW</div>
+                                    <strong style="color: var(--text-primary);">Katie Weng</strong>
+                                </div>
+                                <div class="flex-row">Published: <strong style="color: var(--text-primary);">Jul 05,
+                                        2026</strong></div>
+                                <div class="flex-row">Visibility: <span
+                                        class="badge badge-status-resolved">Public</span></div>
+                            </div>
+
+                            <div class="kb-article"
+                                style="line-height: 1.7; color: var(--text-secondary); font-size: 14px;">
+                                <h2 style="margin-top: 24px;">Policy Update</h2>
+                                <p style="margin-bottom: 16px;">As of Q3 2026, all hardware requests must go through the
+                                    standard ServiceLink portal to ensure proper inventory tracking and manager approval
+                                    workflows.</p>
+
+                                <h2 style="margin-top: 24px;">Submission Process</h2>
+                                <p style="margin-bottom: 16px;"><strong>Step 1:</strong> Navigate to the "Create Ticket"
+                                    view in the left sidebar.</p>
+                                <p style="margin-bottom: 16px;"><strong>Step 2:</strong> Under Category, select
+                                    "Hardware Request". This will automatically trigger the manager approval workflow.
+                                </p>
+                                <p style="margin-bottom: 16px;"><strong>Step 3:</strong> Specify the exact hardware
+                                    model required. If it's standard issue (e.g. Dell XPS, MacBook Pro 14"), it will be
+                                    auto-approved. Non-standard equipment requires Director level sign-off.</p>
+                            </div>
+
+                            <div class="kb-tags" style="display: flex; gap: 8px; margin-top: 32px;">
+                                <span class="badge"
+                                    style="border: 1px solid var(--panel-border); color: var(--text-secondary);">#Hardware</span>
+                                <span class="badge"
+                                    style="border: 1px solid var(--panel-border); color: var(--text-secondary);">#Policy</span>
+                                <span class="badge"
+                                    style="border: 1px solid var(--panel-border); color: var(--text-secondary);">#Onboarding</span>
+                            </div>
+                        </div>
+
+                        <div class="panel" style="margin-top: 24px;">
+                            <h1 style="font-size: 28px; margin-bottom: 16px;">Resolving Zoom Audio Issues on Mac</h1>
+
+                            <div class="kb-meta"
+                                style="display: flex; gap: 24px; color: var(--text-secondary); border-bottom: 1px solid var(--panel-border); padding-bottom: 24px; margin-bottom: 24px; font-size: 13px;">
+                                <div class="flex-row">
+                                    <div class="avatar" style="width: 24px; height: 24px; font-size: 10px;">AM</div>
+                                    <strong style="color: var(--text-primary);">Arshdeep Mutti</strong>
+                                </div>
+                                <div class="flex-row">Published: <strong style="color: var(--text-primary);">Mar 22,
+                                        2026</strong></div>
+                                <div class="flex-row">Visibility: <span
+                                        class="badge badge-status-resolved">Public</span></div>
+                            </div>
+
+                            <div class="kb-article"
+                                style="line-height: 1.7; color: var(--text-secondary); font-size: 14px;">
+                                <h2 style="margin-top: 24px;">Symptom</h2>
+                                <p style="margin-bottom: 16px;">Users on macOS Sonoma frequently report that Zoom cannot
+                                    capture audio from their microphone, even if the correct microphone is selected in
+                                    Zoom settings.</p>
+
+                                <h2 style="margin-top: 24px;">Resolution</h2>
+                                <p style="margin-bottom: 16px;"><strong>Step 1:</strong> Have the user open <em>System
+                                        Settings &gt; Privacy &amp; Security &gt; Microphone</em>.</p>
+                                <p style="margin-bottom: 16px;"><strong>Step 2:</strong> Ensure the toggle next to
+                                    <strong>zoom.us</strong> is turned ON.
+                                </p>
+                                <p style="margin-bottom: 16px;"><strong>Step 3:</strong> If the toggle is missing, the
+                                    user must reinstall Zoom to trigger the system prompt for microphone access again.
+                                </p>
+                                <p style="margin-bottom: 16px;"><strong>Step 4:</strong> Check the "Core Audio" service
+                                    if the above fails by running <code>sudo killall coreaudiod</code> in the Terminal
+                                    to reset the macOS audio daemon.</p>
+                            </div>
+
+                            <div class="kb-tags" style="display: flex; gap: 8px; margin-top: 32px;">
+                                <span class="badge"
+                                    style="border: 1px solid var(--panel-border); color: var(--text-secondary);">#macOS</span>
+                                <span class="badge"
+                                    style="border: 1px solid var(--panel-border); color: var(--text-secondary);">#Zoom</span>
+                                <span class="badge"
+                                    style="border: 1px solid var(--panel-border); color: var(--text-secondary);">#Audio</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
 
             <!-- VIEW: ESCALATION FLOW -->
+            <!-- VIEW: ESCALATION FLOW -->
             <div id="escalation-view" class="view-section">
-                <h1>Ticket Escalation & Status Flow</h1>
-                <p class="text-sm mb-4">Live tracking of automated SLA enforcement and manual escalation pathways.</p>
+                <div class="flex-between mb-4">
+                    <h1>Automated Escalation & SLA Flow</h1>
+                    <button class="btn btn-secondary"
+                        style="border-color: var(--danger-color); color: var(--danger-color);">Trigger Manual
+                        Escalation</button>
+                </div>
+                <p class="text-sm mb-4">Live tracking of automated SLA enforcement and active escalation pathways for
+                    high priority incidents.</p>
 
-                <div class="panel">
-                    <div class="flow-container">
-                        <div class="flow-node">
-                            <strong style="color: var(--text-primary);">New Ticket Submitted</strong>
-                            <div class="text-sm mt-4">Priority: High</div>
+                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px;">
+                    <div class="panel">
+                        <div class="flow-container"
+                            style="padding: 20px 0; align-items: flex-start; margin-left: 40px;">
+                            <div
+                                style="display: flex; align-items: center; gap: 24px; position: relative; margin-bottom: 32px; width: 100%;">
+                                <div
+                                    style="width: 16px; height: 16px; border-radius: 50%; background: var(--success-color); z-index: 2; box-shadow: 0 0 0 4px var(--button-secondary-bg);">
+                                </div>
+                                <div
+                                    style="position: absolute; left: 7px; top: 16px; bottom: -32px; width: 2px; background: var(--success-color); z-index: 1;">
+                                </div>
+                                <div class="flow-node"
+                                    style="text-align: left; width: 100%; border-color: var(--success-color);">
+                                    <strong style="color: var(--text-primary);">New Ticket Submitted (Priority:
+                                        High)</strong>
+                                    <div class="text-sm mt-2">09:15 AM - Ticket INC-1042 entered system.</div>
+                                </div>
+                            </div>
+
+                            <div
+                                style="display: flex; align-items: center; gap: 24px; position: relative; margin-bottom: 32px; width: 100%;">
+                                <div
+                                    style="width: 16px; height: 16px; border-radius: 50%; background: var(--success-color); z-index: 2; box-shadow: 0 0 0 4px var(--button-secondary-bg);">
+                                </div>
+                                <div
+                                    style="position: absolute; left: 7px; top: 16px; bottom: -32px; width: 2px; background: var(--warning-color); z-index: 1;">
+                                </div>
+                                <div class="flow-node"
+                                    style="text-align: left; width: 100%; border-color: var(--success-color);">
+                                    <strong style="color: var(--text-primary);">Auto-Assigned & In Progress</strong>
+                                    <div class="text-sm mt-2">09:20 AM - Assigned to Hiten Lamba. SLA timer started (4h
+                                        Resolution).</div>
+                                </div>
+                            </div>
+
+                            <div
+                                style="display: flex; align-items: center; gap: 24px; position: relative; margin-bottom: 32px; width: 100%;">
+                                <div
+                                    style="width: 16px; height: 16px; border-radius: 50%; background: var(--danger-color); z-index: 2; box-shadow: 0 0 0 4px rgba(255,107,107,0.2);">
+                                </div>
+                                <div
+                                    style="position: absolute; left: 7px; top: 16px; bottom: -32px; width: 2px; background: transparent; border-left: 2px dashed var(--panel-border); z-index: 1;">
+                                </div>
+                                <div class="flow-node escalated" style="text-align: left; width: 100%;">
+                                    <strong style="color: var(--danger-color);">SLA Breached / Escalated to L2</strong>
+                                    <div class="text-sm mt-2">01:20 PM - 4h threshold crossed. Automated webhook sent to
+                                        On-Call Manager (PagerDuty).</div>
+                                </div>
+                            </div>
+
+                            <div
+                                style="display: flex; align-items: center; gap: 24px; position: relative; width: 100%;">
+                                <div
+                                    style="width: 16px; height: 16px; border-radius: 50%; background: var(--panel-border); z-index: 2; box-shadow: 0 0 0 4px var(--button-secondary-bg);">
+                                </div>
+                                <div class="flow-node" style="text-align: left; width: 100%; opacity: 0.5;">
+                                    <strong style="color: var(--text-primary);">Resolution & Post-Mortem</strong>
+                                    <div class="text-sm mt-2">Pending - Awaiting resolution by Level 2 team.</div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="flow-arrow"></div>
+                    </div>
 
-                        <div class="flow-node">
-                            <strong style="color: var(--text-primary);">Auto-Assigned</strong>
-                            <div class="text-sm mt-4">Technician: Hiten Lamba</div>
-                        </div>
-                        <div class="flow-arrow"></div>
-
-                        <div class="flow-node">
-                            <strong style="color: var(--text-primary);">In Progress</strong>
-                            <div class="text-sm mt-4">SLA Timer Active</div>
-                        </div>
-                        <div class="flow-arrow escalate-arrow"></div>
-
-                        <div class="flow-node escalated">
-                            <strong style="color: var(--danger-color);">SLA Breached / Escalated</strong>
-                            <div class="text-sm mt-4">Notified Manager</div>
-                            <div class="text-sm" style="color: var(--danger-color);">Time in state: 4h 15m</div>
-                        </div>
-                        <div class="flow-arrow"></div>
-
-                        <div class="flow-node" style="border-color: var(--success-color);">
-                            <strong style="color: var(--success-color);">Resolved</strong>
-                            <div class="text-sm mt-4">KB Article Linked</div>
+                    <div style="display: flex; flex-direction: column; gap: 24px;">
+                        <div class="panel">
+                            <h3
+                                style="font-size: 14px; margin-bottom: 16px; border-bottom: 1px solid var(--panel-border); padding-bottom: 12px;">
+                                Active Policies</h3>
+                            <div class="text-sm" style="margin-bottom: 8px;"><strong>Standard SLA (High):</strong> 4
+                                Hours</div>
+                            <div class="text-sm" style="margin-bottom: 8px;"><strong>Escalation Target:</strong> Level 2
+                                Network Team</div>
+                            <div class="text-sm"><strong>Notifications:</strong> Email, Slack (#incidents), PagerDuty
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1346,149 +1955,262 @@
             <!-- VIEW: ADMIN PANEL -->
             <div id="admin-view" class="view-section">
                 <div class="flex-between mb-4">
-                    <h1>User & Role Management</h1>
+                    <h1>Admin & Organization Settings</h1>
                     <button class="btn btn-primary" onclick="showToast('Invite link sent to clipboard', 'success')">+
                         Invite User</button>
                 </div>
 
-                <div class="panel" style="padding: 0;">
-                    <div class="table-wrapper">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Name</th>
-                                    <th>Email</th>
-                                    <th>Role</th>
-                                    <th>Status</th>
-                                    <th>Last Login</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td style="font-weight: 500; color: var(--text-primary);">Chris Karki</td>
-                                    <td style="color: var(--text-secondary);">chris@example.com</td>
-                                    <td>
-                                        <select class="form-control"
-                                            style="padding: 4px 8px; font-size: 13px; width: auto;"
-                                            onchange="showToast('Role updated to ' + this.value, 'success')">
-                                            <option>Administrator</option>
-                                            <option selected>Manager</option>
-                                            <option>Technician</option>
-                                            <option>End User</option>
-                                        </select>
-                                    </td>
-                                    <td><span class="badge badge-status-resolved">Active</span></td>
-                                    <td class="text-sm">Just now</td>
-                                    <td><button class="btn btn-secondary btn-sm">Edit</button></td>
-                                </tr>
-                                <tr>
-                                    <td style="font-weight: 500; color: var(--text-primary);">Arshdeep Mutti</td>
-                                    <td style="color: var(--text-secondary);">arshdeep@example.com</td>
-                                    <td>
-                                        <select class="form-control"
-                                            style="padding: 4px 8px; font-size: 13px; width: auto;"
-                                            onchange="showToast('Role updated to ' + this.value, 'success')">
-                                            <option>Administrator</option>
-                                            <option>Manager</option>
-                                            <option selected>Technician</option>
-                                            <option>End User</option>
-                                        </select>
-                                    </td>
-                                    <td><span class="badge badge-status-resolved">Active</span></td>
-                                    <td class="text-sm">2 hours ago</td>
-                                    <td><button class="btn btn-secondary btn-sm">Edit</button></td>
-                                </tr>
-                                <tr>
-                                    <td style="font-weight: 500; color: var(--text-primary);">Katie Weng</td>
-                                    <td style="color: var(--text-secondary);">katie@example.com</td>
-                                    <td>
-                                        <select class="form-control"
-                                            style="padding: 4px 8px; font-size: 13px; width: auto;"
-                                            onchange="showToast('Role updated to ' + this.value, 'success')">
-                                            <option>Administrator</option>
-                                            <option>Manager</option>
-                                            <option selected>Technician</option>
-                                            <option>End User</option>
-                                        </select>
-                                    </td>
-                                    <td><span class="badge"
-                                            style="border: 1px solid var(--warning-color); color: var(--warning-color);">Away</span>
-                                    </td>
-                                    <td class="text-sm">1 day ago</td>
-                                    <td><button class="btn btn-secondary btn-sm">Edit</button></td>
-                                </tr>
-                                <tr>
-                                    <td style="font-weight: 500; color: var(--text-primary);">Unknown User</td>
-                                    <td style="color: var(--text-secondary);">newguy@example.com</td>
-                                    <td>
-                                        <select class="form-control"
-                                            style="padding: 4px 8px; font-size: 13px; width: auto;"
-                                            onchange="showToast('Role updated to ' + this.value, 'success')">
-                                            <option>Administrator</option>
-                                            <option>Manager</option>
-                                            <option>Technician</option>
-                                            <option selected>End User</option>
-                                        </select>
-                                    </td>
-                                    <td><span class="badge badge-priority-high">Suspended</span></td>
-                                    <td class="text-sm">Never</td>
-                                    <td><button class="btn btn-secondary btn-sm"
-                                            onclick="showToast('User Activated', 'success')">Activate</button></td>
-                                </tr>
-                                <tr>
-                                    <td style="font-weight: 500; color: var(--text-primary);">Hiten Lamba</td>
-                                    <td style="color: var(--text-secondary);">hiten@example.com</td>
-                                    <td>
-                                        <select class="form-control"
-                                            style="padding: 4px 8px; font-size: 13px; width: auto;"
-                                            onchange="showToast('Role updated to ' + this.value, 'success')">
-                                            <option>Administrator</option>
-                                            <option>Manager</option>
-                                            <option selected>Technician</option>
-                                            <option>End User</option>
-                                        </select>
-                                    </td>
-                                    <td><span class="badge badge-status-resolved">Active</span></td>
-                                    <td class="text-sm">4 hours ago</td>
-                                    <td><button class="btn btn-secondary btn-sm">Edit</button></td>
-                                </tr>
-                                <tr>
-                                    <td style="font-weight: 500; color: var(--text-primary);">John Doe</td>
-                                    <td style="color: var(--text-secondary);">john.doe@example.com</td>
-                                    <td>
-                                        <select class="form-control"
-                                            style="padding: 4px 8px; font-size: 13px; width: auto;"
-                                            onchange="showToast('Role updated to ' + this.value, 'success')">
-                                            <option>Administrator</option>
-                                            <option>Manager</option>
-                                            <option>Technician</option>
-                                            <option selected>End User</option>
-                                        </select>
-                                    </td>
-                                    <td><span class="badge badge-status-resolved">Active</span></td>
-                                    <td class="text-sm">3 days ago</td>
-                                    <td><button class="btn btn-secondary btn-sm">Edit</button></td>
-                                </tr>
-                                <tr>
-                                    <td style="font-weight: 500; color: var(--text-primary);">Jane Smith</td>
-                                    <td style="color: var(--text-secondary);">jane.smith@example.com</td>
-                                    <td>
-                                        <select class="form-control"
-                                            style="padding: 4px 8px; font-size: 13px; width: auto;"
-                                            onchange="showToast('Role updated to ' + this.value, 'success')">
-                                            <option>Administrator</option>
-                                            <option>Manager</option>
-                                            <option>Technician</option>
-                                            <option selected>End User</option>
-                                        </select>
-                                    </td>
-                                    <td><span class="badge badge-status-resolved">Active</span></td>
-                                    <td class="text-sm">5 hours ago</td>
-                                    <td><button class="btn btn-secondary btn-sm">Edit</button></td>
-                                </tr>
-                            </tbody>
-                        </table>
+                <div style="display: grid; grid-template-columns: 250px 1fr; gap: 24px;">
+                    <!-- Admin Sidebar -->
+                    <div style="display: flex; flex-direction: column; gap: 16px;">
+                        <div class="panel" style="padding: 16px;">
+                            <ul
+                                style="list-style: none; display: flex; flex-direction: column; gap: 8px; font-size: 14px; color: var(--text-secondary);">
+                                <li
+                                    style="cursor: pointer; padding: 8px 12px; border-radius: 6px; background: var(--button-secondary-bg); color: var(--accent-color); font-weight: 500;">
+                                    User Management</li>
+                                <li style="cursor: pointer; padding: 8px 12px; border-radius: 6px; transition: background 0.2s;"
+                                    onmouseover="this.style.background='var(--button-secondary-bg)'"
+                                    onmouseout="this.style.background='transparent'">Role Permissions</li>
+                                <li style="cursor: pointer; padding: 8px 12px; border-radius: 6px; transition: background 0.2s;"
+                                    onmouseover="this.style.background='var(--button-secondary-bg)'"
+                                    onmouseout="this.style.background='transparent'">SLA Configurations</li>
+                                <li style="cursor: pointer; padding: 8px 12px; border-radius: 6px; transition: background 0.2s;"
+                                    onmouseover="this.style.background='var(--button-secondary-bg)'"
+                                    onmouseout="this.style.background='transparent'">SSO & Identity</li>
+                                <li style="cursor: pointer; padding: 8px 12px; border-radius: 6px; transition: background 0.2s;"
+                                    onmouseover="this.style.background='var(--button-secondary-bg)'"
+                                    onmouseout="this.style.background='transparent'">Audit Logs</li>
+                            </ul>
+                        </div>
+
+                        <div class="panel" style="padding: 16px;">
+                            <h3
+                                style="font-size: 13px; margin-bottom: 12px; color: var(--text-secondary); text-transform: uppercase;">
+                                System Health</h3>
+                            <div
+                                style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px;">
+                                <span>API Status</span>
+                                <span style="color: var(--success-color);">Operational</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; font-size: 13px;">
+                                <span>License Usage</span>
+                                <span>45 / 50</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Admin Main Content -->
+                    <div class="panel" style="padding: 0; margin: 0; height: fit-content;">
+                        <div class="table-wrapper">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Email</th>
+                                        <th>Role</th>
+                                        <th>Status</th>
+                                        <th>Last Login</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td style="font-weight: 500; color: var(--text-primary);">Chris Karki</td>
+                                        <td style="color: var(--text-secondary);">chris@example.com</td>
+                                        <td>
+                                            <select class="form-control"
+                                                style="padding: 4px 8px; font-size: 13px; width: auto;"
+                                                onchange="showToast('Role updated to ' + this.value, 'success')">
+                                                <option>Administrator</option>
+                                                <option selected>Manager</option>
+                                                <option>Technician</option>
+                                                <option>End User</option>
+                                            </select>
+                                        </td>
+                                        <td><span class="badge badge-status-resolved">Active</span></td>
+                                        <td class="text-sm">Just now</td>
+                                        <td><button class="btn btn-secondary btn-sm">Edit</button></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="font-weight: 500; color: var(--text-primary);">Arshdeep Mutti</td>
+                                        <td style="color: var(--text-secondary);">arshdeep@example.com</td>
+                                        <td>
+                                            <select class="form-control"
+                                                style="padding: 4px 8px; font-size: 13px; width: auto;"
+                                                onchange="showToast('Role updated to ' + this.value, 'success')">
+                                                <option>Administrator</option>
+                                                <option>Manager</option>
+                                                <option selected>Technician</option>
+                                                <option>End User</option>
+                                            </select>
+                                        </td>
+                                        <td><span class="badge badge-status-resolved">Active</span></td>
+                                        <td class="text-sm">2 hours ago</td>
+                                        <td><button class="btn btn-secondary btn-sm">Edit</button></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="font-weight: 500; color: var(--text-primary);">Katie Weng</td>
+                                        <td style="color: var(--text-secondary);">katie@example.com</td>
+                                        <td>
+                                            <select class="form-control"
+                                                style="padding: 4px 8px; font-size: 13px; width: auto;"
+                                                onchange="showToast('Role updated to ' + this.value, 'success')">
+                                                <option>Administrator</option>
+                                                <option>Manager</option>
+                                                <option selected>Technician</option>
+                                                <option>End User</option>
+                                            </select>
+                                        </td>
+                                        <td><span class="badge"
+                                                style="border: 1px solid var(--warning-color); color: var(--warning-color);">Away</span>
+                                        </td>
+                                        <td class="text-sm">1 day ago</td>
+                                        <td><button class="btn btn-secondary btn-sm">Edit</button></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="font-weight: 500; color: var(--text-primary);">Unknown User</td>
+                                        <td style="color: var(--text-secondary);">newguy@example.com</td>
+                                        <td>
+                                            <select class="form-control"
+                                                style="padding: 4px 8px; font-size: 13px; width: auto;"
+                                                onchange="showToast('Role updated to ' + this.value, 'success')">
+                                                <option>Administrator</option>
+                                                <option>Manager</option>
+                                                <option>Technician</option>
+                                                <option selected>End User</option>
+                                            </select>
+                                        </td>
+                                        <td><span class="badge badge-priority-high">Suspended</span></td>
+                                        <td class="text-sm">Never</td>
+                                        <td><button class="btn btn-secondary btn-sm"
+                                                onclick="showToast('User Activated', 'success')">Activate</button></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="font-weight: 500; color: var(--text-primary);">Hiten Lamba</td>
+                                        <td style="color: var(--text-secondary);">hiten@example.com</td>
+                                        <td>
+                                            <select class="form-control"
+                                                style="padding: 4px 8px; font-size: 13px; width: auto;"
+                                                onchange="showToast('Role updated to ' + this.value, 'success')">
+                                                <option>Administrator</option>
+                                                <option>Manager</option>
+                                                <option selected>Technician</option>
+                                                <option>End User</option>
+                                            </select>
+                                        </td>
+                                        <td><span class="badge badge-status-resolved">Active</span></td>
+                                        <td class="text-sm">4 hours ago</td>
+                                        <td><button class="btn btn-secondary btn-sm">Edit</button></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="font-weight: 500; color: var(--text-primary);">John Doe</td>
+                                        <td style="color: var(--text-secondary);">john.doe@example.com</td>
+                                        <td>
+                                            <select class="form-control"
+                                                style="padding: 4px 8px; font-size: 13px; width: auto;"
+                                                onchange="showToast('Role updated to ' + this.value, 'success')">
+                                                <option>Administrator</option>
+                                                <option>Manager</option>
+                                                <option>Technician</option>
+                                                <option selected>End User</option>
+                                            </select>
+                                        </td>
+                                        <td><span class="badge badge-status-resolved">Active</span></td>
+                                        <td class="text-sm">3 days ago</td>
+                                        <td><button class="btn btn-secondary btn-sm">Edit</button></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="font-weight: 500; color: var(--text-primary);">Jane Smith</td>
+                                        <td style="color: var(--text-secondary);">jane.smith@example.com</td>
+                                        <td>
+                                            <select class="form-control"
+                                                style="padding: 4px 8px; font-size: 13px; width: auto;"
+                                                onchange="showToast('Role updated to ' + this.value, 'success')">
+                                                <option>Administrator</option>
+                                                <option>Manager</option>
+                                                <option>Technician</option>
+                                                <option selected>End User</option>
+                                            </select>
+                                        </td>
+                                        <td><span class="badge badge-status-resolved">Active</span></td>
+                                        <td class="text-sm">5 hours ago</td>
+                                        <td><button class="btn btn-secondary btn-sm">Edit</button></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="font-weight: 500; color: var(--text-primary);">Bob Jenkins</td>
+                                        <td style="color: var(--text-secondary);">bob.j@example.com</td>
+                                        <td>
+                                            <select class="form-control"
+                                                style="padding: 4px 8px; font-size: 13px; width: auto;"
+                                                onchange="showToast('Role updated to ' + this.value, 'success')">
+                                                <option>Administrator</option>
+                                                <option>Manager</option>
+                                                <option>Technician</option>
+                                                <option selected>End User</option>
+                                            </select>
+                                        </td>
+                                        <td><span class="badge badge-status-resolved">Active</span></td>
+                                        <td class="text-sm">2 days ago</td>
+                                        <td><button class="btn btn-secondary btn-sm">Edit</button></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="font-weight: 500; color: var(--text-primary);">Alice Cooper</td>
+                                        <td style="color: var(--text-secondary);">alice.c@example.com</td>
+                                        <td>
+                                            <select class="form-control"
+                                                style="padding: 4px 8px; font-size: 13px; width: auto;"
+                                                onchange="showToast('Role updated to ' + this.value, 'success')">
+                                                <option>Administrator</option>
+                                                <option>Manager</option>
+                                                <option>Technician</option>
+                                                <option selected>End User</option>
+                                            </select>
+                                        </td>
+                                        <td><span class="badge badge-status-resolved">Active</span></td>
+                                        <td class="text-sm">1 week ago</td>
+                                        <td><button class="btn btn-secondary btn-sm">Edit</button></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="font-weight: 500; color: var(--text-primary);">Mark System</td>
+                                        <td style="color: var(--text-secondary);">mark.system@example.com</td>
+                                        <td>
+                                            <select class="form-control"
+                                                style="padding: 4px 8px; font-size: 13px; width: auto;"
+                                                onchange="showToast('Role updated to ' + this.value, 'success')">
+                                                <option>Administrator</option>
+                                                <option>Manager</option>
+                                                <option selected>Technician</option>
+                                                <option>End User</option>
+                                            </select>
+                                        </td>
+                                        <td><span class="badge"
+                                                style="border: 1px solid var(--warning-color); color: var(--warning-color);">Away</span>
+                                        </td>
+                                        <td class="text-sm">3 weeks ago</td>
+                                        <td><button class="btn btn-secondary btn-sm">Edit</button></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="font-weight: 500; color: var(--text-primary);">DevOps Service Account
+                                        </td>
+                                        <td style="color: var(--text-secondary);">svc_devops@example.com</td>
+                                        <td>
+                                            <select class="form-control"
+                                                style="padding: 4px 8px; font-size: 13px; width: auto;"
+                                                onchange="showToast('Role updated to ' + this.value, 'success')">
+                                                <option selected>Administrator</option>
+                                                <option>Manager</option>
+                                                <option>Technician</option>
+                                                <option>End User</option>
+                                            </select>
+                                        </td>
+                                        <td><span class="badge badge-status-resolved">Active</span></td>
+                                        <td class="text-sm">System</td>
+                                        <td><button class="btn btn-secondary btn-sm">Edit</button></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
