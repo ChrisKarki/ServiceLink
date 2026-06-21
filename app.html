@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ServiceLink IT Service Desk</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg-color: #000000;
@@ -31,7 +31,7 @@
         }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             background-color: var(--bg-color);
             color: var(--text-primary);
             display: flex;
@@ -71,7 +71,7 @@
 
         .nav-item {
             padding: 8px 16px;
-            border-radius: 6px;
+            border-radius: 50px;
             cursor: pointer;
             color: var(--text-secondary);
             font-weight: 500;
@@ -122,7 +122,7 @@
             background: var(--input-bg);
             border: 1px solid var(--panel-border);
             padding: 8px 16px;
-            border-radius: 6px;
+            border-radius: 50px;
             color: var(--text-primary);
             font-size: 14px;
             transition: border-color 0.2s;
@@ -331,8 +331,8 @@
 
         /* Badges */
         .badge {
-            padding: 4px 8px;
-            border-radius: 4px;
+            padding: 4px 10px;
+            border-radius: 50px;
             font-size: 12px;
             font-weight: 500;
             display: inline-flex;
@@ -359,7 +359,7 @@
             display: inline-flex;
             background: var(--button-secondary-bg);
             padding: 4px;
-            border-radius: 8px;
+            border-radius: 50px;
             margin-bottom: 20px;
         }
 
@@ -367,7 +367,7 @@
             background: transparent;
             border: none;
             padding: 6px 16px;
-            border-radius: 6px;
+            border-radius: 50px;
             font-size: 13px;
             color: var(--text-secondary);
             cursor: pointer;
@@ -429,7 +429,7 @@
         /* Buttons */
         .btn {
             padding: 8px 16px;
-            border-radius: 6px;
+            border-radius: 50px;
             border: 1px solid transparent;
             font-weight: 500;
             font-size: 14px;
@@ -650,18 +650,29 @@
         }
 
         .sla-card {
-            background: var(--input-bg);
-            padding: 20px;
-            border-radius: 6px;
+            background: var(--panel-bg);
+            padding: 16px 20px;
+            border-radius: 12px;
             border: 1px solid var(--panel-border);
-            text-align: center;
+            text-align: left;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .sla-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+            border-color: rgba(255, 255, 255, 0.1);
         }
 
         .sla-value {
             font-size: 28px;
-            font-weight: 600;
-            margin: 8px 0;
+            font-weight: 700;
+            margin: 8px 0 4px 0;
             color: var(--text-primary);
+            letter-spacing: -0.5px;
         }
 
         .sla-card.danger .sla-value {
@@ -712,6 +723,32 @@
         .comment-input:focus {
             outline: none;
             border-color: var(--accent-color);
+        }
+
+        .category-item {
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s;
+            color: var(--text-secondary);
+        }
+
+        .category-item:hover {
+            background: var(--button-secondary-bg);
+        }
+
+        .category-item.active {
+            background: var(--button-secondary-bg);
+            color: var(--accent-color);
+            font-weight: 500;
+        }
+
+        .category-kb {
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+
+        .category-admin {
+            padding: 8px 12px;
+            border-radius: 6px;
         }
     </style>
 </head>
@@ -919,8 +956,8 @@
                         Ticket</button>
                 </div>
 
-                <div style="display: grid; grid-template-columns: 3fr 1fr; gap: 24px; margin-bottom: 24px;">
-                    <div>
+                <div style="display: grid; grid-template-columns: 3fr 1fr; gap: 16px; margin-bottom: 16px;">
+                    <div style="display: flex; flex-direction: column; height: 100%;">
                         <div class="sla-tracker"
                             style="margin-top: 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;">
                             <div class="sla-card">
@@ -947,118 +984,196 @@
 
                         <!-- Chart placeholder -->
                         <div class="panel"
-                            style="margin-top: 24px; height: 220px; display: flex; flex-direction: column; justify-content: flex-end; padding: 24px; border: 1px solid var(--panel-border); background: var(--button-secondary-bg);">
-                            <div style="font-weight: 500; margin-bottom: auto;">Ticket Volume (Last 7 Days)</div>
+                            style="margin-top: 16px; flex: 1; display: flex; flex-direction: column; justify-content: flex-end; padding: 16px 24px; border: 1px solid var(--panel-border); background: var(--panel-bg); margin-bottom: 0; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
                             <div
-                                style="display: flex; align-items: flex-end; justify-content: space-between; height: 120px; padding-top: 20px;">
+                                style="font-weight: 600; margin-bottom: auto; font-size: 15px; display: flex; justify-content: space-between; align-items: center;">
+                                Ticket Volume
+                            </div>
+                            <div
+                                style="display: flex; align-items: flex-end; justify-content: space-between; flex: 1; min-height: 140px; padding-top: 20px; position: relative;">
                                 <div
-                                    style="display: flex; flex-direction: column; align-items: center; gap: 8px; flex: 1;">
-                                    <div
-                                        style="width: 32px; height: 40px; background: var(--accent-color); border-radius: 4px 4px 0 0; opacity: 0.8;">
-                                    </div>
-                                    <div class="text-sm" style="font-size: 11px;">Mon</div>
+                                    style="position: absolute; top: 20%; left: 0; right: 0; border-top: 1px dashed var(--panel-border); opacity: 0.5; z-index: 0;">
                                 </div>
                                 <div
-                                    style="display: flex; flex-direction: column; align-items: center; gap: 8px; flex: 1;">
-                                    <div
-                                        style="width: 32px; height: 60px; background: var(--accent-color); border-radius: 4px 4px 0 0; opacity: 0.8;">
-                                    </div>
-                                    <div class="text-sm" style="font-size: 11px;">Tue</div>
+                                    style="position: absolute; top: 50%; left: 0; right: 0; border-top: 1px dashed var(--panel-border); opacity: 0.5; z-index: 0;">
                                 </div>
                                 <div
-                                    style="display: flex; flex-direction: column; align-items: center; gap: 8px; flex: 1;">
-                                    <div
-                                        style="width: 32px; height: 100px; background: var(--accent-color); border-radius: 4px 4px 0 0; opacity: 0.8;">
+                                    style="position: absolute; bottom: 24px; left: 0; right: 0; border-top: 1px dashed var(--panel-border); opacity: 0.5; z-index: 0;">
+                                </div>
+
+                                <div
+                                    style="display: flex; flex-direction: column; align-items: center; gap: 8px; flex: 1; z-index: 1; height: 100%; justify-content: flex-end;">
+                                    <div style="font-size: 10px; font-weight: 600; color: var(--text-secondary);">12
                                     </div>
-                                    <div class="text-sm" style="font-size: 11px;">Wed</div>
+                                    <div style="width: 36px; height: 28%; background: linear-gradient(180deg, var(--accent-color) 0%, rgba(37,99,235,0.2) 100%); border-radius: 6px 6px 0 0; cursor: pointer; transition: filter 0.2s, height 0.5s ease-out;"
+                                        onmouseover="this.style.filter='brightness(1.2)'"
+                                        onmouseout="this.style.filter='none'"></div>
+                                    <div class="text-sm"
+                                        style="font-size: 11px; font-weight: 500; color: var(--text-secondary);">Mon
+                                    </div>
                                 </div>
                                 <div
-                                    style="display: flex; flex-direction: column; align-items: center; gap: 8px; flex: 1;">
-                                    <div
-                                        style="width: 32px; height: 45px; background: var(--accent-color); border-radius: 4px 4px 0 0; opacity: 0.8;">
+                                    style="display: flex; flex-direction: column; align-items: center; gap: 8px; flex: 1; z-index: 1; height: 100%; justify-content: flex-end;">
+                                    <div style="font-size: 10px; font-weight: 600; color: var(--text-secondary);">18
                                     </div>
-                                    <div class="text-sm" style="font-size: 11px;">Thu</div>
+                                    <div style="width: 36px; height: 42%; background: linear-gradient(180deg, var(--accent-color) 0%, rgba(37,99,235,0.2) 100%); border-radius: 6px 6px 0 0; cursor: pointer; transition: filter 0.2s, height 0.5s ease-out;"
+                                        onmouseover="this.style.filter='brightness(1.2)'"
+                                        onmouseout="this.style.filter='none'"></div>
+                                    <div class="text-sm"
+                                        style="font-size: 11px; font-weight: 500; color: var(--text-secondary);">Tue
+                                    </div>
                                 </div>
                                 <div
-                                    style="display: flex; flex-direction: column; align-items: center; gap: 8px; flex: 1;">
-                                    <div
-                                        style="width: 32px; height: 80px; background: var(--accent-color); border-radius: 4px 4px 0 0; opacity: 0.8;">
+                                    style="display: flex; flex-direction: column; align-items: center; gap: 8px; flex: 1; z-index: 1; height: 100%; justify-content: flex-end;">
+                                    <div style="font-size: 10px; font-weight: 600; color: var(--text-primary);">30</div>
+                                    <div style="width: 36px; height: 70%; background: linear-gradient(180deg, var(--accent-color) 0%, rgba(37,99,235,0.2) 100%); border-radius: 6px 6px 0 0; cursor: pointer; transition: filter 0.2s, height 0.5s ease-out;"
+                                        onmouseover="this.style.filter='brightness(1.2)'"
+                                        onmouseout="this.style.filter='none'"></div>
+                                    <div class="text-sm"
+                                        style="font-size: 11px; font-weight: 500; color: var(--text-secondary);">Wed
                                     </div>
-                                    <div class="text-sm" style="font-size: 11px;">Fri</div>
                                 </div>
                                 <div
-                                    style="display: flex; flex-direction: column; align-items: center; gap: 8px; flex: 1;">
-                                    <div
-                                        style="width: 32px; height: 20px; background: var(--accent-color); border-radius: 4px 4px 0 0; opacity: 0.8;">
+                                    style="display: flex; flex-direction: column; align-items: center; gap: 8px; flex: 1; z-index: 1; height: 100%; justify-content: flex-end;">
+                                    <div style="font-size: 10px; font-weight: 600; color: var(--text-secondary);">14
                                     </div>
-                                    <div class="text-sm" style="font-size: 11px;">Sat</div>
+                                    <div style="width: 36px; height: 33%; background: linear-gradient(180deg, var(--accent-color) 0%, rgba(37,99,235,0.2) 100%); border-radius: 6px 6px 0 0; cursor: pointer; transition: filter 0.2s, height 0.5s ease-out;"
+                                        onmouseover="this.style.filter='brightness(1.2)'"
+                                        onmouseout="this.style.filter='none'"></div>
+                                    <div class="text-sm"
+                                        style="font-size: 11px; font-weight: 500; color: var(--text-secondary);">Thu
+                                    </div>
                                 </div>
                                 <div
-                                    style="display: flex; flex-direction: column; align-items: center; gap: 8px; flex: 1;">
-                                    <div
-                                        style="width: 32px; height: 35px; background: var(--accent-color); border-radius: 4px 4px 0 0; opacity: 0.8;">
+                                    style="display: flex; flex-direction: column; align-items: center; gap: 8px; flex: 1; z-index: 1; height: 100%; justify-content: flex-end;">
+                                    <div style="font-size: 10px; font-weight: 600; color: var(--text-primary);">24</div>
+                                    <div style="width: 36px; height: 56%; background: linear-gradient(180deg, var(--accent-color) 0%, rgba(37,99,235,0.2) 100%); border-radius: 6px 6px 0 0; cursor: pointer; transition: filter 0.2s, height 0.5s ease-out;"
+                                        onmouseover="this.style.filter='brightness(1.2)'"
+                                        onmouseout="this.style.filter='none'"></div>
+                                    <div class="text-sm"
+                                        style="font-size: 11px; font-weight: 500; color: var(--text-secondary);">Fri
                                     </div>
-                                    <div class="text-sm" style="font-size: 11px;">Sun</div>
+                                </div>
+                                <div
+                                    style="display: flex; flex-direction: column; align-items: center; gap: 8px; flex: 1; z-index: 1; height: 100%; justify-content: flex-end;">
+                                    <div style="font-size: 10px; font-weight: 600; color: var(--text-secondary);">6
+                                    </div>
+                                    <div style="width: 36px; height: 14%; background: linear-gradient(180deg, var(--accent-color) 0%, rgba(37,99,235,0.2) 100%); border-radius: 6px 6px 0 0; cursor: pointer; transition: filter 0.2s, height 0.5s ease-out;"
+                                        onmouseover="this.style.filter='brightness(1.2)'"
+                                        onmouseout="this.style.filter='none'"></div>
+                                    <div class="text-sm"
+                                        style="font-size: 11px; font-weight: 500; color: var(--text-secondary);">Sat
+                                    </div>
+                                </div>
+                                <div
+                                    style="display: flex; flex-direction: column; align-items: center; gap: 8px; flex: 1; z-index: 1; height: 100%; justify-content: flex-end;">
+                                    <div style="font-size: 10px; font-weight: 600; color: var(--text-secondary);">11
+                                    </div>
+                                    <div style="width: 36px; height: 26%; background: linear-gradient(180deg, var(--accent-color) 0%, rgba(37,99,235,0.2) 100%); border-radius: 6px 6px 0 0; cursor: pointer; transition: filter 0.2s, height 0.5s ease-out;"
+                                        onmouseover="this.style.filter='brightness(1.2)'"
+                                        onmouseout="this.style.filter='none'"></div>
+                                    <div class="text-sm"
+                                        style="font-size: 11px; font-weight: 500; color: var(--text-secondary);">Sun
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="panel" style="margin: 0;">
-                        <h3
-                            style="font-size: 14px; margin-bottom: 16px; border-bottom: 1px solid var(--panel-border); padding-bottom: 12px;">
-                            Live Activity Feed</h3>
-                        <div style="display: flex; flex-direction: column; gap: 16px;">
-                            <div style="display: flex; gap: 12px;">
+                    <div class="panel"
+                        style="margin: 0; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); background: var(--panel-bg);">
+                        <div class="flex-between"
+                            style="margin-bottom: 24px; border-bottom: 1px solid var(--panel-border); padding-bottom: 16px;">
+                            <h3 style="font-size: 15px; font-weight: 600;">Live Activity Feed</h3>
+                            <span class="badge"
+                                style="background: rgba(37,99,235,0.1); color: var(--accent-color); border: 1px solid rgba(37,99,235,0.2); padding: 4px 12px; font-weight: 600;">
                                 <div
-                                    style="width: 8px; height: 8px; border-radius: 50%; background: var(--accent-color); margin-top: 6px; flex-shrink: 0;">
-                                </div>
+                                    style="width:6px;height:6px;border-radius:50%;background:var(--accent-color);display:inline-block;margin-right:6px;box-shadow: 0 0 0 rgba(37,99,235,0.4);animation: pulse 2s infinite;">
+                                </div>Live
+                            </span>
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 24px;">
+                            <div style="display: flex; gap: 16px; align-items: flex-start;">
+                                <div class="avatar"
+                                    style="width: 36px; height: 36px; font-size: 12px; flex-shrink: 0; background: var(--button-secondary-bg); color: var(--text-primary); border: 1px solid var(--panel-border);">
+                                    HL</div>
                                 <div>
-                                    <div class="text-sm" style="line-height: 1.4;"><strong>Hiten Lamba</strong> resolved
+                                    <div class="text-sm" style="line-height: 1.5; color: var(--text-primary);">
+                                        <strong>Hiten Lamba</strong> resolved ticket
                                         <a href="#"
-                                            style="color: var(--accent-color); text-decoration: none;">INC-1038</a>
+                                            style="color: var(--accent-color); text-decoration: none; font-weight: 500;">INC-1038</a>
                                     </div>
-                                    <div style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;">10 mins
-                                        ago</div>
+                                    <div
+                                        style="font-size: 12px; color: var(--text-secondary); margin-top: 6px; display: flex; align-items: center; gap: 6px;">
+                                        <svg width="12" height="12" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                        </svg>
+                                        10 mins ago
+                                    </div>
                                 </div>
                             </div>
-                            <div style="display: flex; gap: 12px;">
-                                <div
-                                    style="width: 8px; height: 8px; border-radius: 50%; background: var(--warning-color); margin-top: 6px; flex-shrink: 0;">
-                                </div>
+                            <div style="display: flex; gap: 16px; align-items: flex-start;">
+                                <div class="avatar"
+                                    style="width: 36px; height: 36px; font-size: 12px; flex-shrink: 0; background: rgba(234,179,8,0.1); color: var(--warning-color); border: 1px solid rgba(234,179,8,0.3);">
+                                    SY</div>
                                 <div>
-                                    <div class="text-sm" style="line-height: 1.4;"><strong>System</strong> escalated <a
-                                            href="#"
-                                            style="color: var(--accent-color); text-decoration: none;">INC-0992</a>
+                                    <div class="text-sm" style="line-height: 1.5; color: var(--text-primary);">
+                                        <strong>System</strong> escalated ticket <a href="#"
+                                            style="color: var(--warning-color); text-decoration: none; font-weight: 500;">INC-0992</a>
                                     </div>
-                                    <div style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;">45 mins
-                                        ago</div>
+                                    <div
+                                        style="font-size: 12px; color: var(--text-secondary); margin-top: 6px; display: flex; align-items: center; gap: 6px;">
+                                        <svg width="12" height="12" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                        </svg>
+                                        45 mins ago
+                                    </div>
                                 </div>
                             </div>
-                            <div style="display: flex; gap: 12px;">
-                                <div
-                                    style="width: 8px; height: 8px; border-radius: 50%; background: var(--success-color); margin-top: 6px; flex-shrink: 0;">
-                                </div>
+                            <div style="display: flex; gap: 16px; align-items: flex-start;">
+                                <div class="avatar"
+                                    style="width: 36px; height: 36px; font-size: 12px; flex-shrink: 0; background: var(--button-secondary-bg); color: var(--text-primary); border: 1px solid var(--panel-border);">
+                                    JD</div>
                                 <div>
-                                    <div class="text-sm" style="line-height: 1.4;"><strong>Jane Developer</strong>
-                                        created <a href="#"
-                                            style="color: var(--accent-color); text-decoration: none;">REQ-2053</a>
+                                    <div class="text-sm" style="line-height: 1.5; color: var(--text-primary);">
+                                        <strong>Jane Developer</strong> created request <a href="#"
+                                            style="color: var(--accent-color); text-decoration: none; font-weight: 500;">REQ-2053</a>
                                     </div>
-                                    <div style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;">1 hour
-                                        ago</div>
+                                    <div
+                                        style="font-size: 12px; color: var(--text-secondary); margin-top: 6px; display: flex; align-items: center; gap: 6px;">
+                                        <svg width="12" height="12" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                        </svg>
+                                        1 hour ago
+                                    </div>
                                 </div>
                             </div>
-                            <div style="display: flex; gap: 12px;">
-                                <div
-                                    style="width: 8px; height: 8px; border-radius: 50%; background: var(--text-secondary); margin-top: 6px; flex-shrink: 0;">
-                                </div>
+                            <div style="display: flex; gap: 16px; align-items: flex-start;">
+                                <div class="avatar"
+                                    style="width: 36px; height: 36px; font-size: 12px; flex-shrink: 0; background: var(--button-secondary-bg); color: var(--text-primary); border: 1px solid var(--panel-border);">
+                                    KW</div>
                                 <div>
-                                    <div class="text-sm" style="line-height: 1.4;"><strong>Katie Weng</strong> updated
+                                    <div class="text-sm" style="line-height: 1.5; color: var(--text-primary);">
+                                        <strong>Katie Weng</strong> updated
                                         article <a href="#"
-                                            style="color: var(--text-primary); text-decoration: underline;">Hardware
-                                            Policy</a></div>
-                                    <div style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;">3 hours
-                                        ago</div>
+                                            style="color: var(--text-primary); text-decoration: underline; font-weight: 500;">Hardware
+                                            Policy</a>
+                                    </div>
+                                    <div
+                                        style="font-size: 12px; color: var(--text-secondary); margin-top: 6px; display: flex; align-items: center; gap: 6px;">
+                                        <svg width="12" height="12" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                        </svg>
+                                        3 hours ago
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -1068,10 +1183,10 @@
                 <div class="flex-between mb-4">
                     <h2>Recent Tickets</h2>
                     <div class="filter-bar" style="margin-bottom: 0;">
-                        <div class="filter-pill active">All Open</div>
-                        <div class="filter-pill">Unassigned</div>
-                        <div class="filter-pill">High Priority</div>
-                        <div class="filter-pill">SLA Breach</div>
+                        <div class="filter-pill active" onclick="selectFilter(this)">All Open</div>
+                        <div class="filter-pill" onclick="selectFilter(this)">Unassigned</div>
+                        <div class="filter-pill" onclick="selectFilter(this)">High Priority</div>
+                        <div class="filter-pill" onclick="selectFilter(this)">SLA Breach</div>
                     </div>
                 </div>
 
@@ -1122,7 +1237,8 @@
                                             style="border: 1px solid var(--warning-color); color: var(--warning-color);">Medium</span>
                                     </td>
                                     <td>Jane Developer</td>
-                                    <td><button class="btn btn-secondary btn-sm">View</button></td>
+                                    <td><button class="btn btn-secondary btn-sm"
+                                            onclick="switchView('ticket-view')">View</button></td>
                                 </tr>
                                 <tr class="clickable">
                                     <td style="font-weight: 500; color: var(--text-primary);">REQ-2054</td>
@@ -1147,7 +1263,8 @@
                                             style="border: 1px solid var(--warning-color); color: var(--warning-color);">Medium</span>
                                     </td>
                                     <td>Arshdeep Mutti</td>
-                                    <td><button class="btn btn-secondary btn-sm">View</button></td>
+                                    <td><button class="btn btn-secondary btn-sm"
+                                            onclick="switchView('ticket-view')">View</button></td>
                                 </tr>
                                 <tr class="clickable">
                                     <td style="font-weight: 500; color: var(--text-primary);">INC-1039</td>
@@ -1157,7 +1274,8 @@
                                             style="border: 1px solid var(--panel-border); color: var(--text-secondary);">Low</span>
                                     </td>
                                     <td>Hiten Lamba</td>
-                                    <td><button class="btn btn-secondary btn-sm">View</button></td>
+                                    <td><button class="btn btn-secondary btn-sm"
+                                            onclick="switchView('ticket-view')">View</button></td>
                                 </tr>
                                 <tr class="clickable">
                                     <td style="font-weight: 500; color: var(--text-primary);">REQ-2053</td>
@@ -1167,7 +1285,8 @@
                                             style="border: 1px solid var(--panel-border); color: var(--text-secondary);">Low</span>
                                     </td>
                                     <td>Katie Weng</td>
-                                    <td><button class="btn btn-secondary btn-sm">View</button></td>
+                                    <td><button class="btn btn-secondary btn-sm"
+                                            onclick="switchView('ticket-view')">View</button></td>
                                 </tr>
                                 <tr class="clickable">
                                     <td style="font-weight: 500; color: var(--text-primary);">INC-1038</td>
@@ -1175,7 +1294,8 @@
                                     <td><span class="badge badge-status-resolved">Resolved</span></td>
                                     <td><span class="badge badge-priority-high">Critical</span></td>
                                     <td>Jane Developer</td>
-                                    <td><button class="btn btn-secondary btn-sm">View</button></td>
+                                    <td><button class="btn btn-secondary btn-sm"
+                                            onclick="switchView('ticket-view')">View</button></td>
                                 </tr>
                                 <tr class="clickable">
                                     <td style="font-weight: 500; color: var(--text-primary);">REQ-2052</td>
@@ -1198,7 +1318,8 @@
                                     <td><span class="badge badge-status-open">In Progress</span></td>
                                     <td><span class="badge badge-priority-high">High</span></td>
                                     <td>Chris Karki</td>
-                                    <td><button class="btn btn-secondary btn-sm">View</button></td>
+                                    <td><button class="btn btn-secondary btn-sm"
+                                            onclick="switchView('ticket-view')">View</button></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -1352,113 +1473,176 @@
 
             <!-- VIEW: TICKET DETAIL -->
             <div id="ticket-view" class="view-section">
-                <div class="flex-between mb-4">
+                <div class="flex-between" style="margin-bottom: 12px;">
                     <h1>INC-1042: Production Build Pipeline Failing</h1>
-                    <div class="flex-row">
-                        <button class="btn btn-secondary">Reassign</button>
-                        <button class="btn btn-secondary"
-                            style="color: var(--danger-color); border-color: var(--danger-color);">Escalate</button>
-                        <button class="btn btn-primary"
-                            onclick="showToast('Ticket marked as resolved', 'success')">Resolve Issue</button>
-                    </div>
+                    <div class="text-sm">Created: Oct 24, 2026 at 09:15 AM by <strong>Jane Developer</strong></div>
                 </div>
 
-                <div class="panel">
-                    <div class="ticket-header flex-between">
-                        <div class="flex-row">
-                            <span class="badge badge-status-open">In Progress</span>
-                            <span class="badge badge-priority-high">Priority: Critical</span>
+                <div style="display: grid; grid-template-columns: 3fr 1fr; gap: 24px;">
+                    <!-- LEFT COLUMN -->
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <div class="panel"
+                            style="padding: 16px 20px; background: rgba(255, 255, 255, 0.02); margin-bottom: 0;">
+                            <div style="display: flex; align-items: flex-start; gap: 12px;">
+                                <svg width="20" height="20" fill="none" stroke="var(--text-secondary)"
+                                    viewBox="0 0 24 24" style="margin-top: 2px; flex-shrink: 0;">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M4 6h16M4 12h16M4 18h7"></path>
+                                </svg>
+                                <p
+                                    style="color: var(--text-primary); line-height: 1.6; font-size: 14px; margin-bottom: 0;">
+                                    The automated deployment pipeline to staging has been failing for the past hour. The
+                                    error logs
+                                    indicate a timeout when connecting to the internal artifact repository. This is
+                                    blocking
+                                    the
+                                    release candidate for the new mobile app update.
+                                    <br><br>Please check network routing and repository instance health immediately.
+                                </p>
+                            </div>
                         </div>
-                        <div class="text-sm">Created: Oct 24, 2026 at 09:15 AM by <strong>Jane Developer</strong></div>
+
+                        <div style="display: flex; flex-direction: column;">
+                            <div style="margin-bottom: 8px; background: var(--input-bg); border: 1px solid var(--panel-border); border-radius: 8px; padding: 12px; transition: border-color 0.2s;"
+                                tabindex="0" onfocusin="this.style.borderColor='var(--text-secondary)'"
+                                onfocusout="this.style.borderColor='var(--panel-border)'">
+                                <textarea class="comment-input"
+                                    style="border: none; padding: 0; min-height: 50px; margin-bottom: 12px; background: transparent; box-shadow: none;"
+                                    placeholder="Add a comment or internal note..."></textarea>
+                                <div class="flex-between">
+                                    <label
+                                        style="display: inline-flex; align-items: center; gap: 6px; cursor: pointer; color: var(--warning-color); font-weight: 500; font-size: 12px; padding: 4px 10px; background: rgba(234, 179, 8, 0.1); border-radius: 50px;">
+                                        <input type="checkbox"
+                                            style="width: 14px; height: 14px; cursor: pointer; accent-color: var(--warning-color);">
+                                        Internal Note
+                                    </label>
+                                    <button class="btn btn-primary" style="padding: 6px 16px; font-size: 13px;"
+                                        onclick="showToast('Comment posted successfully', 'success')">Post</button>
+                                </div>
+                            </div>
+
+                            <div class="comment-thread" style="gap: 12px;">
+                                <div class="comment"
+                                    style="padding: 12px 16px; border-radius: 8px; background: var(--button-secondary-bg); border: 1px solid var(--panel-border);">
+                                    <div class="comment-header" style="margin-bottom: 8px;">
+                                        <div class="flex-row" style="gap: 8px;">
+                                            <div class="avatar" style="width: 20px; height: 20px; font-size: 9px;">CK
+                                            </div>
+                                            <strong style="color: var(--text-primary); font-size: 13px;">Chris Karki
+                                                (Manager)</strong>
+                                            <span class="badge"
+                                                style="background: rgba(234, 179, 8, 0.1); color: var(--warning-color); border: 1px solid rgba(234, 179, 8, 0.2); font-size: 10px; padding: 2px 6px;">Internal
+                                                Note</span>
+                                        </div>
+                                        <span class="text-sm" style="font-size: 11px;">Today at 09:30 AM</span>
+                                    </div>
+                                    <p
+                                        style="color: var(--text-primary); margin: 0; font-size: 13px; line-height: 1.5;">
+                                        Checked the firewall logs, there seems to be a new rule blocking port 8081.
+                                        Reverting the recent network config update now.</p>
+                                </div>
+
+                                <div class="comment"
+                                    style="padding: 12px 16px; border-radius: 8px; border: 1px solid var(--panel-border);">
+                                    <div class="comment-header" style="margin-bottom: 8px;">
+                                        <div class="flex-row" style="gap: 8px;">
+                                            <div class="avatar"
+                                                style="width: 20px; height: 20px; font-size: 9px; background: var(--panel-bg); border: 1px solid var(--panel-border);">
+                                                SYS</div>
+                                            <strong style="color: var(--text-primary); font-size: 13px;">System
+                                                Automated</strong>
+                                        </div>
+                                        <span class="text-sm" style="font-size: 11px;">Today at 09:20 AM</span>
+                                    </div>
+                                    <p
+                                        style="color: var(--text-secondary); margin: 0; font-size: 13px; font-style: italic;">
+                                        Ticket status changed from New to Assigned. Auto-assigned to Chris Karki based
+                                        on category.</p>
+                                </div>
+
+                                <div class="comment"
+                                    style="padding: 12px 16px; border-radius: 8px; border: 1px solid var(--panel-border);">
+                                    <div class="comment-header" style="margin-bottom: 8px;">
+                                        <div class="flex-row" style="gap: 8px;">
+                                            <div class="avatar" style="width: 20px; height: 20px; font-size: 9px;">JD
+                                            </div>
+                                            <strong style="color: var(--text-primary); font-size: 13px;">Jane
+                                                Developer</strong>
+                                        </div>
+                                        <span class="text-sm" style="font-size: 11px;">Today at 09:16 AM</span>
+                                    </div>
+                                    <p
+                                        style="color: var(--text-secondary); margin: 0; font-size: 13px; line-height: 1.5;">
+                                        This is causing a complete blocker for the Q3 feature release. I've attempted to
+                                        re-run the pipeline three times and it fails at the exact same step every time.
+                                        Logs are attached.</p>
+                                </div>
+
+                                <div class="comment"
+                                    style="padding: 12px 16px; border-radius: 8px; border: 1px solid var(--panel-border);">
+                                    <div class="comment-header" style="margin-bottom: 8px;">
+                                        <div class="flex-row" style="gap: 8px;">
+                                            <div class="avatar"
+                                                style="width: 20px; height: 20px; font-size: 9px; background: var(--panel-bg); border: 1px solid var(--panel-border);">
+                                                SYS</div>
+                                            <strong style="color: var(--text-primary); font-size: 13px;">System
+                                                Automated</strong>
+                                        </div>
+                                        <span class="text-sm" style="font-size: 11px;">Today at 09:15 AM</span>
+                                    </div>
+                                    <p
+                                        style="color: var(--text-secondary); margin: 0; font-size: 13px; font-style: italic;">
+                                        Ticket <strong>INC-1042</strong> submitted via Service Portal.</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="flex-row" style="margin-bottom: 24px;">
-                        <div style="flex: 1;">
-                            <div class="text-sm mb-4">Assignee: <strong style="color: var(--text-primary);">Chris
-                                    Karki</strong></div>
-                            <div class="text-sm">Category: <strong style="color: var(--text-primary);">DevOps /
-                                    Infrastructure</strong></div>
+                    <!-- RIGHT COLUMN -->
+                    <div style="display: flex; flex-direction: column; gap: 16px;">
+                        <div class="panel"
+                            style="display: flex; flex-direction: column; gap: 12px; padding: 16px 20px; margin-bottom: 0;">
+                            <button class="btn btn-primary" style="width: 100%; justify-content: center;"
+                                onclick="showToast('Ticket marked as resolved', 'success')">Resolve Issue</button>
+                            <button class="btn btn-secondary" style="width: 100%; justify-content: center;"
+                                onclick="showToast('Reassignment flow started', 'info')">Reassign Ticket</button>
+                            <button class="btn btn-secondary"
+                                style="width: 100%; justify-content: center; color: var(--danger-color); border-color: var(--danger-color);">Escalate
+                                Ticket</button>
                         </div>
-                        <div style="flex: 1;">
-                            <div class="text-sm mb-4">Linked Resources: <span class="badge"
-                                    style="border: 1px solid var(--panel-border); cursor: pointer;"
-                                    onclick="switchView('resource-view', document.querySelectorAll('.nav-item')[3])">VRT-Build-Server-01</span>
-                            </div>
-                            <div class="text-sm">SLA Target: <strong style="color: var(--text-primary);">4 Hours
-                                    (Resolution)</strong></div>
-                        </div>
-                    </div>
 
-                    <h2>Description</h2>
-                    <p style="color: var(--text-secondary); line-height: 1.6; margin-bottom: 32px; font-size: 14px;">
-                        The automated deployment pipeline to staging has been failing for the past hour. The error logs
-                        indicate a timeout when connecting to the internal artifact repository. This is blocking the
-                        release candidate for the new mobile app update.
-                        <br><br>Please check network routing and repository instance health immediately.
-                    </p>
-
-                    <h2>Activity & Comments</h2>
-                    <div class="comment-thread mt-4">
-                        <div class="comment" style="border-left: 3px solid var(--warning-color);">
-                            <div class="comment-header">
-                                <div class="flex-row">
-                                    <div class="avatar" style="width: 24px; height: 24px; font-size: 10px;">CK</div>
-                                    <strong style="color: var(--text-primary);">Chris Karki (Manager)</strong>
+                        <div class="panel" style="padding: 16px 20px; margin-bottom: 0;">
+                            <div style="display: flex; flex-direction: column; gap: 16px;">
+                                <div class="flex-between">
+                                    <span class="text-sm">Status</span>
+                                    <span class="badge badge-status-open">In Progress</span>
                                 </div>
-                                <span class="text-sm">Today at 09:30 AM (Internal Note)</span>
-                            </div>
-                            <p style="color: var(--text-secondary);">Checked the firewall logs, there seems to be a new
-                                rule blocking port 8081. Reverting the recent network config update now.</p>
-                        </div>
-                        <div class="comment">
-                            <div class="comment-header">
-                                <div class="flex-row">
-                                    <div class="avatar"
-                                        style="width: 24px; height: 24px; font-size: 10px; background: var(--button-secondary-bg);">
-                                        SYS</div> <strong style="color: var(--text-primary);">System Automated</strong>
+                                <div class="flex-between">
+                                    <span class="text-sm">Priority</span>
+                                    <span class="badge badge-priority-high">Critical</span>
                                 </div>
-                                <span class="text-sm">Today at 09:20 AM</span>
-                            </div>
-                            <p style="color: var(--text-secondary); font-style: italic;">Ticket status changed from
-                                <em>New</em> to <em>Assigned</em>. Auto-assigned to Chris Karki based on category.
-                            </p>
-                        </div>
-                        <div class="comment">
-                            <div class="comment-header">
-                                <div class="flex-row">
-                                    <div class="avatar" style="width: 24px; height: 24px; font-size: 10px;">JD</div>
-                                    <strong style="color: var(--text-primary);">Jane Developer</strong>
+                                <div style="border-top: 1px solid var(--panel-border); margin: 4px 0;"></div>
+                                <div>
+                                    <div class="text-sm" style="margin-bottom: 4px;">Assignee</div>
+                                    <div style="font-weight: 500; color: var(--text-primary); font-size: 14px;">Chris
+                                        Karki</div>
                                 </div>
-                                <span class="text-sm">Today at 09:16 AM</span>
-                            </div>
-                            <p style="color: var(--text-secondary);">This is causing a complete blocker for the Q3
-                                feature release. I've attempted to re-run the pipeline three times and it fails at the
-                                exact same step every time. Logs are attached.</p>
-                        </div>
-                        <div class="comment">
-                            <div class="comment-header">
-                                <div class="flex-row">
-                                    <div class="avatar"
-                                        style="width: 24px; height: 24px; font-size: 10px; background: var(--button-secondary-bg);">
-                                        SYS</div> <strong style="color: var(--text-primary);">System Automated</strong>
+                                <div>
+                                    <div class="text-sm" style="margin-bottom: 4px;">Category</div>
+                                    <div style="font-weight: 500; color: var(--text-primary); font-size: 14px;">DevOps /
+                                        Infrastructure</div>
                                 </div>
-                                <span class="text-sm">Today at 09:15 AM</span>
+                                <div>
+                                    <div class="text-sm" style="margin-bottom: 4px;">SLA Target</div>
+                                    <div style="font-weight: 500; color: var(--text-primary); font-size: 14px;">4 Hours
+                                        (Resolution)</div>
+                                </div>
+                                <div>
+                                    <div class="text-sm" style="margin-bottom: 8px;">Linked Resources</div>
+                                    <span class="badge" style="border: 1px solid var(--panel-border); cursor: pointer;"
+                                        onclick="switchView('resource-view', document.querySelectorAll('.nav-item')[3])">VRT-Build-Server-01</span>
+                                </div>
                             </div>
-                            <p style="color: var(--text-secondary); font-style: italic;">Ticket
-                                <strong>INC-1042</strong> submitted via Service Portal.
-                            </p>
-                        </div>
-                    </div>
-
-                    <div class="mt-4" style="margin-top: 32px;">
-                        <textarea class="comment-input" placeholder="Add a comment or internal note..."></textarea>
-                        <div class="flex-between">
-                            <label
-                                style="display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer; color: var(--text-secondary);">
-                                <input type="checkbox"> Make internal note (visible only to staff)
-                            </label>
-                            <button class="btn btn-primary"
-                                onclick="showToast('Comment posted successfully', 'success')">Post Comment</button>
                         </div>
                     </div>
                 </div>
@@ -1468,14 +1652,15 @@
             <div id="resource-view" class="view-section">
                 <div class="flex-between mb-4">
                     <h1>Resource Management</h1>
-                    <button class="btn btn-primary">+ Add Resource</button>
+                    <button class="btn btn-primary" onclick="showToast('New resource form opened', 'info')">+ Add
+                        Resource</button>
                 </div>
 
                 <div class="filter-bar">
-                    <div class="filter-pill active">All Resources</div>
-                    <div class="filter-pill">Hardware</div>
-                    <div class="filter-pill">Software</div>
-                    <div class="filter-pill">Virtual</div>
+                    <div class="filter-pill active" onclick="selectFilter(this)">All Resources</div>
+                    <div class="filter-pill" onclick="selectFilter(this)">Hardware</div>
+                    <div class="filter-pill" onclick="selectFilter(this)">Software</div>
+                    <div class="filter-pill" onclick="selectFilter(this)">Virtual</div>
                 </div>
 
                 <div class="panel" style="padding: 0;">
@@ -1500,7 +1685,8 @@
                                     <td><span class="badge badge-status-open"
                                             style="border-color: var(--danger-color); color: var(--danger-color);">Incident
                                             Active</span></td>
-                                    <td><button class="btn btn-secondary btn-sm">Edit</button></td>
+                                    <td><button class="btn btn-secondary btn-sm"
+                                            onclick="showToast('Opening edit panel...', 'info')">Edit</button></td>
                                 </tr>
                                 <tr class="clickable">
                                     <td style="font-weight: 500; color: var(--text-primary);">HW-LTP-4092</td>
@@ -1508,7 +1694,8 @@
                                     <td>Dell XPS 15 2025</td>
                                     <td>Jane Developer</td>
                                     <td><span class="badge badge-status-resolved">In Use</span></td>
-                                    <td><button class="btn btn-secondary btn-sm">Edit</button></td>
+                                    <td><button class="btn btn-secondary btn-sm"
+                                            onclick="showToast('Opening edit panel...', 'info')">Edit</button></td>
                                 </tr>
                                 <tr class="clickable">
                                     <td style="font-weight: 500; color: var(--text-primary);">SW-LIC-ADOBE-CC</td>
@@ -1518,7 +1705,8 @@
                                             style="color: var(--text-secondary); font-style: italic;">Unassigned</span>
                                     </td>
                                     <td><span class="badge badge-status-resolved">In Stock</span></td>
-                                    <td><button class="btn btn-secondary btn-sm">Edit</button></td>
+                                    <td><button class="btn btn-secondary btn-sm"
+                                            onclick="showToast('Opening edit panel...', 'info')">Edit</button></td>
                                 </tr>
                                 <tr class="clickable">
                                     <td style="font-weight: 500; color: var(--text-primary);">HW-MNT-2098</td>
@@ -1528,7 +1716,8 @@
                                             style="color: var(--text-secondary); font-style: italic;">Unassigned</span>
                                     </td>
                                     <td><span class="badge badge-status-resolved">In Stock</span></td>
-                                    <td><button class="btn btn-secondary btn-sm">Edit</button></td>
+                                    <td><button class="btn btn-secondary btn-sm"
+                                            onclick="showToast('Opening edit panel...', 'info')">Edit</button></td>
                                 </tr>
                                 <tr class="clickable">
                                     <td style="font-weight: 500; color: var(--text-primary);">VRT-DB-Prod-02</td>
@@ -1536,7 +1725,8 @@
                                     <td>AWS RDS PostgreSQL</td>
                                     <td>Database Team</td>
                                     <td><span class="badge badge-status-resolved">Active</span></td>
-                                    <td><button class="btn btn-secondary btn-sm">Edit</button></td>
+                                    <td><button class="btn btn-secondary btn-sm"
+                                            onclick="showToast('Opening edit panel...', 'info')">Edit</button></td>
                                 </tr>
                                 <tr class="clickable">
                                     <td style="font-weight: 500; color: var(--text-primary);">SW-LIC-OFFICE</td>
@@ -1544,7 +1734,8 @@
                                     <td>Microsoft Office 365 E3</td>
                                     <td>Hiten Lamba</td>
                                     <td><span class="badge badge-status-resolved">In Use</span></td>
-                                    <td><button class="btn btn-secondary btn-sm">Edit</button></td>
+                                    <td><button class="btn btn-secondary btn-sm"
+                                            onclick="showToast('Opening edit panel...', 'info')">Edit</button></td>
                                 </tr>
                                 <tr class="clickable">
                                     <td style="font-weight: 500; color: var(--text-primary);">VRT-WEB-Prod-01</td>
@@ -1552,7 +1743,8 @@
                                     <td>AWS EC2 c5.2xlarge</td>
                                     <td>DevOps Team</td>
                                     <td><span class="badge badge-status-resolved">Active</span></td>
-                                    <td><button class="btn btn-secondary btn-sm">Edit</button></td>
+                                    <td><button class="btn btn-secondary btn-sm"
+                                            onclick="showToast('Opening edit panel...', 'info')">Edit</button></td>
                                 </tr>
                                 <tr class="clickable">
                                     <td style="font-weight: 500; color: var(--text-primary);">HW-MAC-5021</td>
@@ -1560,7 +1752,8 @@
                                     <td>Apple MacBook Pro M3 Max</td>
                                     <td>Chris Karki</td>
                                     <td><span class="badge badge-status-resolved">In Use</span></td>
-                                    <td><button class="btn btn-secondary btn-sm">Edit</button></td>
+                                    <td><button class="btn btn-secondary btn-sm"
+                                            onclick="showToast('Opening edit panel...', 'info')">Edit</button></td>
                                 </tr>
                                 <tr class="clickable">
                                     <td style="font-weight: 500; color: var(--text-primary);">SW-LIC-FIGMA</td>
@@ -1570,7 +1763,8 @@
                                             style="color: var(--text-secondary); font-style: italic;">Unassigned</span>
                                     </td>
                                     <td><span class="badge badge-status-resolved">In Stock</span></td>
-                                    <td><button class="btn btn-secondary btn-sm">Edit</button></td>
+                                    <td><button class="btn btn-secondary btn-sm"
+                                            onclick="showToast('Opening edit panel...', 'info')">Edit</button></td>
                                 </tr>
                                 <tr class="clickable">
                                     <td style="font-weight: 500; color: var(--text-primary);">NW-RTR-001</td>
@@ -1580,7 +1774,8 @@
                                     <td><span class="badge badge-status-open"
                                             style="border-color: var(--warning-color); color: var(--warning-color);">Maintenance
                                             Needed</span></td>
-                                    <td><button class="btn btn-secondary btn-sm">Edit</button></td>
+                                    <td><button class="btn btn-secondary btn-sm"
+                                            onclick="showToast('Opening edit panel...', 'info')">Edit</button></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -1592,71 +1787,109 @@
             <div id="kb-view" class="view-section">
                 <div class="flex-between mb-4">
                     <h1>Enterprise Knowledge Base</h1>
-                    <button class="btn btn-primary">+ New Article</button>
+                    <button class="btn btn-primary" onclick="showToast('Article editor opened', 'info')">+ New
+                        Article</button>
                 </div>
 
-                <div class="panel" style="margin-bottom: 24px; padding: 16px;">
-                    <div class="flex-row" style="gap: 16px;">
-                        <div style="position: relative; flex: 1;">
-                            <input type="text" class="form-control"
-                                placeholder="Search the Knowledge Base for errors, policies, or how-to guides..."
-                                style="padding-left: 40px; font-size: 16px; padding-top: 12px; padding-bottom: 12px;">
+                <div style="margin-bottom: 32px;">
+                    <div style="display: flex; background: var(--panel-bg); border: 1px solid var(--panel-border); border-radius: 50px; padding: 6px; box-shadow: 0 8px 24px rgba(0,0,0,0.1); transition: border-color 0.2s;"
+                        onmouseover="this.style.borderColor='var(--accent-color)'"
+                        onmouseout="this.style.borderColor='var(--panel-border)'">
+                        <div style="position: relative; flex: 1; display: flex; align-items: center;">
                             <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                                style="position: absolute; left: 12px; top: 12px; color: var(--text-secondary);">
+                                style="position: absolute; left: 20px; color: var(--text-secondary);">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                             </svg>
+                            <input type="text"
+                                placeholder="Search the Knowledge Base for errors, policies, or how-to guides..."
+                                style="width: 100%; background: transparent; border: none; color: var(--text-primary); font-size: 15px; padding: 12px 12px 12px 52px; outline: none; font-family: inherit;">
                         </div>
-                        <select class="form-control" style="width: 200px; padding: 12px;">
-                            <option>All Categories</option>
-                            <option>Networking & VPN</option>
-                            <option>Hardware & Policies</option>
-                            <option>Software & Licenses</option>
-                            <option>Security</option>
-                        </select>
+                        <div style="width: 1px; background: var(--panel-border); margin: 8px 0;"></div>
+                        <div style="position: relative; display: flex; align-items: center;">
+                            <select
+                                style="background: transparent; border: none; color: var(--text-secondary); font-size: 14px; padding: 12px 40px 12px 20px; outline: none; font-family: inherit; cursor: pointer; appearance: none; -webkit-appearance: none;">
+                                <option>All Categories</option>
+                                <option>Networking & VPN</option>
+                                <option>Hardware & Policies</option>
+                                <option>Software & Licenses</option>
+                                <option>Security</option>
+                            </select>
+                            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                style="position: absolute; right: 16px; pointer-events: none; color: var(--text-secondary);">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </div>
                     </div>
                 </div>
 
                 <div style="display: grid; grid-template-columns: 250px 1fr; gap: 24px;">
                     <!-- KB Sidebar -->
-                    <div style="display: flex; flex-direction: column; gap: 16px;">
-                        <div class="panel" style="padding: 16px;">
-                            <h3 style="font-size: 14px; margin-bottom: 12px; color: var(--text-primary);">Categories
-                            </h3>
-                            <ul
-                                style="list-style: none; display: flex; flex-direction: column; gap: 8px; font-size: 14px; color: var(--text-secondary);">
-                                <li
-                                    style="cursor: pointer; padding: 4px 8px; border-radius: 4px; background: var(--button-secondary-bg); color: var(--accent-color); font-weight: 500;">
-                                    Networking & VPN (12)</li>
-                                <li style="cursor: pointer; padding: 4px 8px; border-radius: 4px; transition: background 0.2s;"
-                                    onmouseover="this.style.background='var(--button-secondary-bg)'"
-                                    onmouseout="this.style.background='transparent'">Hardware & Policies (8)</li>
-                                <li style="cursor: pointer; padding: 4px 8px; border-radius: 4px; transition: background 0.2s;"
-                                    onmouseover="this.style.background='var(--button-secondary-bg)'"
-                                    onmouseout="this.style.background='transparent'">Software & Licenses (24)</li>
-                                <li style="cursor: pointer; padding: 4px 8px; border-radius: 4px; transition: background 0.2s;"
-                                    onmouseover="this.style.background='var(--button-secondary-bg)'"
-                                    onmouseout="this.style.background='transparent'">Security & Identity (15)</li>
-                                <li style="cursor: pointer; padding: 4px 8px; border-radius: 4px; transition: background 0.2s;"
-                                    onmouseover="this.style.background='var(--button-secondary-bg)'"
-                                    onmouseout="this.style.background='transparent'">HR & Onboarding (5)</li>
-                            </ul>
+                    <div style="display: flex; flex-direction: column; gap: 32px;">
+                        <div>
+                            <h3
+                                style="font-size: 12px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px; color: var(--text-secondary); font-weight: 600;">
+                                Browse Categories</h3>
+                            <div style="display: flex; flex-direction: column; gap: 4px;">
+                                <div class="category-item category-kb active" onclick="selectCategory(this)"
+                                    style="display: flex; justify-content: space-between; align-items: center; border-radius: 50px; padding: 10px 16px;">
+                                    <span style="font-size: 14px;">Networking & VPN</span>
+                                    <span
+                                        style="background: rgba(255,255,255,0.1); padding: 2px 8px; border-radius: 50px; font-size: 11px; font-weight: 600;">12</span>
+                                </div>
+                                <div class="category-item category-kb" onclick="selectCategory(this)"
+                                    style="display: flex; justify-content: space-between; align-items: center; border-radius: 50px; padding: 10px 16px;">
+                                    <span style="font-size: 14px;">Hardware & Policies</span>
+                                    <span
+                                        style="background: rgba(255,255,255,0.05); padding: 2px 8px; border-radius: 50px; font-size: 11px; font-weight: 600;">8</span>
+                                </div>
+                                <div class="category-item category-kb" onclick="selectCategory(this)"
+                                    style="display: flex; justify-content: space-between; align-items: center; border-radius: 50px; padding: 10px 16px;">
+                                    <span style="font-size: 14px;">Software & Licenses</span>
+                                    <span
+                                        style="background: rgba(255,255,255,0.05); padding: 2px 8px; border-radius: 50px; font-size: 11px; font-weight: 600;">24</span>
+                                </div>
+                                <div class="category-item category-kb" onclick="selectCategory(this)"
+                                    style="display: flex; justify-content: space-between; align-items: center; border-radius: 50px; padding: 10px 16px;">
+                                    <span style="font-size: 14px;">Security & Identity</span>
+                                    <span
+                                        style="background: rgba(255,255,255,0.05); padding: 2px 8px; border-radius: 50px; font-size: 11px; font-weight: 600;">15</span>
+                                </div>
+                                <div class="category-item category-kb" onclick="selectCategory(this)"
+                                    style="display: flex; justify-content: space-between; align-items: center; border-radius: 50px; padding: 10px 16px;">
+                                    <span style="font-size: 14px;">HR & Onboarding</span>
+                                    <span
+                                        style="background: rgba(255,255,255,0.05); padding: 2px 8px; border-radius: 50px; font-size: 11px; font-weight: 600;">5</span>
+                                </div>
+                            </div>
                         </div>
 
-                        <div class="panel" style="padding: 16px;">
-                            <h3 style="font-size: 14px; margin-bottom: 12px; color: var(--text-primary);">Popular Tags
-                            </h3>
-                            <div class="kb-tags" style="display: flex; flex-wrap: wrap; gap: 8px;">
+                        <div>
+                            <h3
+                                style="font-size: 12px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px; color: var(--text-secondary); font-weight: 600;">
+                                Popular Tags</h3>
+                            <div style="display: flex; flex-wrap: wrap; gap: 8px;">
                                 <span class="badge"
-                                    style="border: 1px solid var(--panel-border); color: var(--text-secondary); cursor: pointer;">#VPN</span>
+                                    style="background: var(--button-secondary-bg); color: var(--text-primary); padding: 6px 16px; border-radius: 50px; font-size: 13px; cursor: pointer; transition: background 0.2s, border-color 0.2s; border: 1px solid transparent;"
+                                    onmouseover="this.style.borderColor='var(--accent-color)'"
+                                    onmouseout="this.style.borderColor='transparent'">#VPN</span>
                                 <span class="badge"
-                                    style="border: 1px solid var(--panel-border); color: var(--text-secondary); cursor: pointer;">#macOS</span>
+                                    style="background: var(--button-secondary-bg); color: var(--text-primary); padding: 6px 16px; border-radius: 50px; font-size: 13px; cursor: pointer; transition: background 0.2s, border-color 0.2s; border: 1px solid transparent;"
+                                    onmouseover="this.style.borderColor='var(--accent-color)'"
+                                    onmouseout="this.style.borderColor='transparent'">#macOS</span>
                                 <span class="badge"
-                                    style="border: 1px solid var(--panel-border); color: var(--text-secondary); cursor: pointer;">#Hardware</span>
+                                    style="background: var(--button-secondary-bg); color: var(--text-primary); padding: 6px 16px; border-radius: 50px; font-size: 13px; cursor: pointer; transition: background 0.2s, border-color 0.2s; border: 1px solid transparent;"
+                                    onmouseover="this.style.borderColor='var(--accent-color)'"
+                                    onmouseout="this.style.borderColor='transparent'">#Hardware</span>
                                 <span class="badge"
-                                    style="border: 1px solid var(--panel-border); color: var(--text-secondary); cursor: pointer;">#Onboarding</span>
+                                    style="background: var(--button-secondary-bg); color: var(--text-primary); padding: 6px 16px; border-radius: 50px; font-size: 13px; cursor: pointer; transition: background 0.2s, border-color 0.2s; border: 1px solid transparent;"
+                                    onmouseover="this.style.borderColor='var(--accent-color)'"
+                                    onmouseout="this.style.borderColor='transparent'">#Onboarding</span>
                                 <span class="badge"
-                                    style="border: 1px solid var(--panel-border); color: var(--text-secondary); cursor: pointer;">#Security</span>
+                                    style="background: var(--button-secondary-bg); color: var(--text-primary); padding: 6px 16px; border-radius: 50px; font-size: 13px; cursor: pointer; transition: background 0.2s, border-color 0.2s; border: 1px solid transparent;"
+                                    onmouseover="this.style.borderColor='var(--accent-color)'"
+                                    onmouseout="this.style.borderColor='transparent'">#Security</span>
                             </div>
                         </div>
                     </div>
@@ -1665,7 +1898,7 @@
                     <div style="display: flex; flex-direction: column; gap: 24px;">
                         <div class="text-sm">Showing top results in <strong>Networking & VPN</strong></div>
 
-                        <div class="panel">
+                        <div class="panel" style="margin-bottom: 0;">
                             <div class="flex-between" style="margin-bottom: 16px;">
                                 <h1 style="font-size: 28px;">Troubleshooting Remote VPN Connectivity Drops</h1>
                                 <div class="flex-row gap-2">
@@ -1776,7 +2009,7 @@
                             </div>
                         </div>
 
-                        <div class="panel" style="margin-top: 24px;">
+                        <div class="panel" style="margin-bottom: 0;">
                             <h1 style="font-size: 28px; margin-bottom: 16px;">Requesting New Hardware via ServiceLink
                             </h1>
 
@@ -1820,7 +2053,7 @@
                             </div>
                         </div>
 
-                        <div class="panel" style="margin-top: 24px;">
+                        <div class="panel" style="margin-bottom: 0;">
                             <h1 style="font-size: 28px; margin-bottom: 16px;">Resolving Zoom Audio Issues on Mac</h1>
 
                             <div class="kb-meta"
@@ -1972,24 +2205,18 @@
                 <div style="display: grid; grid-template-columns: 250px 1fr; gap: 24px;">
                     <!-- Admin Sidebar -->
                     <div style="display: flex; flex-direction: column; gap: 16px;">
-                        <div class="panel" style="padding: 16px;">
+                        <div class="panel" style="padding: 16px; margin-bottom: 0;">
                             <ul
                                 style="list-style: none; display: flex; flex-direction: column; gap: 8px; font-size: 14px; color: var(--text-secondary);">
-                                <li
-                                    style="cursor: pointer; padding: 8px 12px; border-radius: 6px; background: var(--button-secondary-bg); color: var(--accent-color); font-weight: 500;">
-                                    User Management</li>
-                                <li style="cursor: pointer; padding: 8px 12px; border-radius: 6px; transition: background 0.2s;"
-                                    onmouseover="this.style.background='var(--button-secondary-bg)'"
-                                    onmouseout="this.style.background='transparent'">Role Permissions</li>
-                                <li style="cursor: pointer; padding: 8px 12px; border-radius: 6px; transition: background 0.2s;"
-                                    onmouseover="this.style.background='var(--button-secondary-bg)'"
-                                    onmouseout="this.style.background='transparent'">SLA Configurations</li>
-                                <li style="cursor: pointer; padding: 8px 12px; border-radius: 6px; transition: background 0.2s;"
-                                    onmouseover="this.style.background='var(--button-secondary-bg)'"
-                                    onmouseout="this.style.background='transparent'">SSO & Identity</li>
-                                <li style="cursor: pointer; padding: 8px 12px; border-radius: 6px; transition: background 0.2s;"
-                                    onmouseover="this.style.background='var(--button-secondary-bg)'"
-                                    onmouseout="this.style.background='transparent'">Audit Logs</li>
+                                <li class="category-item category-admin active" onclick="selectCategory(this)">User
+                                    Management</li>
+                                <li class="category-item category-admin" onclick="selectCategory(this)">Role Permissions
+                                </li>
+                                <li class="category-item category-admin" onclick="selectCategory(this)">SLA
+                                    Configurations</li>
+                                <li class="category-item category-admin" onclick="selectCategory(this)">SSO & Identity
+                                </li>
+                                <li class="category-item category-admin" onclick="selectCategory(this)">Audit Logs</li>
                             </ul>
                         </div>
 
@@ -2039,7 +2266,8 @@
                                         </td>
                                         <td><span class="badge badge-status-resolved">Active</span></td>
                                         <td class="text-sm">Just now</td>
-                                        <td><button class="btn btn-secondary btn-sm">Edit</button></td>
+                                        <td><button class="btn btn-secondary btn-sm"
+                                                onclick="showToast('Opening edit panel...', 'info')">Edit</button></td>
                                     </tr>
                                     <tr>
                                         <td style="font-weight: 500; color: var(--text-primary);">Arshdeep Mutti</td>
@@ -2056,7 +2284,8 @@
                                         </td>
                                         <td><span class="badge badge-status-resolved">Active</span></td>
                                         <td class="text-sm">2 hours ago</td>
-                                        <td><button class="btn btn-secondary btn-sm">Edit</button></td>
+                                        <td><button class="btn btn-secondary btn-sm"
+                                                onclick="showToast('Opening edit panel...', 'info')">Edit</button></td>
                                     </tr>
                                     <tr>
                                         <td style="font-weight: 500; color: var(--text-primary);">Katie Weng</td>
@@ -2075,7 +2304,8 @@
                                                 style="border: 1px solid var(--warning-color); color: var(--warning-color);">Away</span>
                                         </td>
                                         <td class="text-sm">1 day ago</td>
-                                        <td><button class="btn btn-secondary btn-sm">Edit</button></td>
+                                        <td><button class="btn btn-secondary btn-sm"
+                                                onclick="showToast('Opening edit panel...', 'info')">Edit</button></td>
                                     </tr>
                                     <tr>
                                         <td style="font-weight: 500; color: var(--text-primary);">Unknown User</td>
@@ -2110,7 +2340,8 @@
                                         </td>
                                         <td><span class="badge badge-status-resolved">Active</span></td>
                                         <td class="text-sm">4 hours ago</td>
-                                        <td><button class="btn btn-secondary btn-sm">Edit</button></td>
+                                        <td><button class="btn btn-secondary btn-sm"
+                                                onclick="showToast('Opening edit panel...', 'info')">Edit</button></td>
                                     </tr>
                                     <tr>
                                         <td style="font-weight: 500; color: var(--text-primary);">John Doe</td>
@@ -2127,7 +2358,8 @@
                                         </td>
                                         <td><span class="badge badge-status-resolved">Active</span></td>
                                         <td class="text-sm">3 days ago</td>
-                                        <td><button class="btn btn-secondary btn-sm">Edit</button></td>
+                                        <td><button class="btn btn-secondary btn-sm"
+                                                onclick="showToast('Opening edit panel...', 'info')">Edit</button></td>
                                     </tr>
                                     <tr>
                                         <td style="font-weight: 500; color: var(--text-primary);">Jane Smith</td>
@@ -2144,7 +2376,8 @@
                                         </td>
                                         <td><span class="badge badge-status-resolved">Active</span></td>
                                         <td class="text-sm">5 hours ago</td>
-                                        <td><button class="btn btn-secondary btn-sm">Edit</button></td>
+                                        <td><button class="btn btn-secondary btn-sm"
+                                                onclick="showToast('Opening edit panel...', 'info')">Edit</button></td>
                                     </tr>
                                     <tr>
                                         <td style="font-weight: 500; color: var(--text-primary);">Bob Jenkins</td>
@@ -2161,7 +2394,8 @@
                                         </td>
                                         <td><span class="badge badge-status-resolved">Active</span></td>
                                         <td class="text-sm">2 days ago</td>
-                                        <td><button class="btn btn-secondary btn-sm">Edit</button></td>
+                                        <td><button class="btn btn-secondary btn-sm"
+                                                onclick="showToast('Opening edit panel...', 'info')">Edit</button></td>
                                     </tr>
                                     <tr>
                                         <td style="font-weight: 500; color: var(--text-primary);">Alice Cooper</td>
@@ -2178,7 +2412,8 @@
                                         </td>
                                         <td><span class="badge badge-status-resolved">Active</span></td>
                                         <td class="text-sm">1 week ago</td>
-                                        <td><button class="btn btn-secondary btn-sm">Edit</button></td>
+                                        <td><button class="btn btn-secondary btn-sm"
+                                                onclick="showToast('Opening edit panel...', 'info')">Edit</button></td>
                                     </tr>
                                     <tr>
                                         <td style="font-weight: 500; color: var(--text-primary);">Mark System</td>
@@ -2197,7 +2432,8 @@
                                                 style="border: 1px solid var(--warning-color); color: var(--warning-color);">Away</span>
                                         </td>
                                         <td class="text-sm">3 weeks ago</td>
-                                        <td><button class="btn btn-secondary btn-sm">Edit</button></td>
+                                        <td><button class="btn btn-secondary btn-sm"
+                                                onclick="showToast('Opening edit panel...', 'info')">Edit</button></td>
                                     </tr>
                                     <tr>
                                         <td style="font-weight: 500; color: var(--text-primary);">DevOps Service Account
@@ -2215,7 +2451,8 @@
                                         </td>
                                         <td><span class="badge badge-status-resolved">Active</span></td>
                                         <td class="text-sm">System</td>
-                                        <td><button class="btn btn-secondary btn-sm">Edit</button></td>
+                                        <td><button class="btn btn-secondary btn-sm"
+                                                onclick="showToast('Opening edit panel...', 'info')">Edit</button></td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -2304,6 +2541,18 @@
                 toast.classList.remove('show');
                 setTimeout(() => toast.remove(), 300); // Wait for transition
             }, 3000);
+        }
+
+        function selectFilter(element) {
+            const parent = element.parentElement;
+            Array.from(parent.children).forEach(child => child.classList.remove('active'));
+            element.classList.add('active');
+        }
+
+        function selectCategory(element) {
+            const parent = element.parentElement;
+            Array.from(parent.children).forEach(child => child.classList.remove('active'));
+            element.classList.add('active');
         }
     </script>
 </body>
