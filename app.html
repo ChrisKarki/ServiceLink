@@ -5,7 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ServiceLink IT Service Desk</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@700&family=Montserrat:wght@400;500;600&display=swap"
+        rel="stylesheet">
     <style>
         :root {
             --bg-color: #000000;
@@ -38,6 +40,17 @@
             height: 100vh;
             overflow: hidden;
             position: relative;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            font-family: 'IBM Plex Sans', sans-serif;
+            font-weight: 700;
+            text-transform: uppercase;
         }
 
         /* Sidebar */
@@ -772,26 +785,20 @@
                 </svg>
                 Dashboard
             </li>
-            <li class="nav-item" onclick="switchView('create-ticket-view', this)">
-                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                </svg>
-                Create Ticket
-            </li>
             <li class="nav-item" onclick="switchView('ticket-view', this)">
                 <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
                     </path>
                 </svg>
-                Ticket Detail
+                Tickets
             </li>
             <li class="nav-item" onclick="switchView('resource-view', this)">
                 <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path>
                 </svg>
-                Resource Management
+                Resources
             </li>
             <li class="nav-item" onclick="switchView('kb-view', this)">
                 <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -801,12 +808,13 @@
                 </svg>
                 Knowledge Base
             </li>
-            <li class="nav-item" onclick="switchView('escalation-view', this)">
+            <li class="nav-item" onclick="switchView('reports-view', this)">
                 <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                        d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
+                    </path>
                 </svg>
-                Escalation Flow
+                Reports
             </li>
             <li class="nav-item" onclick="switchView('admin-view', this)">
                 <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -814,7 +822,7 @@
                         d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z">
                     </path>
                 </svg>
-                Admin Panel
+                Team
             </li>
         </ul>
     </div>
@@ -927,7 +935,7 @@
                         <input type="email" class="form-control" id="login-email" placeholder="you@company.com"
                             style="padding-left: 48px;">
                     </div>
-                    <div class="form-group" style="position: relative; margin-bottom: 32px;">
+                    <div class="form-group" style="position: relative; margin-bottom: 20px;">
                         <label class="form-label">Password</label>
                         <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                             style="position: absolute; left: 16px; top: 36px; color: var(--text-secondary); pointer-events: none;">
@@ -935,8 +943,18 @@
                                 d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z">
                             </path>
                         </svg>
-                        <input type="password" class="form-control" id="login-password" placeholder="••••••••"
+                        <input type="password" class="form-control" id="login-password" placeholder="••••••••••••••••••"
                             style="padding-left: 48px;">
+                    </div>
+
+                    <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--panel-border); border-radius: 6px; padding: 12px 16px; margin-bottom: 24px; display: flex; align-items: center; gap: 12px; cursor: pointer;"
+                        onclick="document.getElementById('totp-checkbox').click()">
+                        <input type="checkbox" id="totp-checkbox"
+                            style="width: 16px; height: 16px; accent-color: var(--accent-color); cursor: pointer;"
+                            checked onclick="event.stopPropagation()">
+                        <label for="totp-checkbox"
+                            style="font-size: 13px; font-weight: 500; color: var(--text-primary); cursor: pointer; margin-bottom: 0;">Use
+                            Authenticator Code</label>
                     </div>
                     <button class="btn btn-primary"
                         style="width: 100%; padding: 14px; font-size: 16px; font-weight: 600;" onclick="doLogin()">Sign
@@ -950,7 +968,7 @@
             <!-- VIEW: DASHBOARD -->
             <div id="dashboard-view" class="view-section">
                 <div class="flex-between mb-4">
-                    <h1>Manager Dashboard</h1>
+                    <h1>Dashboard</h1>
                     <button class="btn btn-primary"
                         onclick="switchView('create-ticket-view', document.querySelectorAll('.nav-item')[1])">+ New
                         Ticket</button>
@@ -1607,7 +1625,8 @@
                             <button class="btn btn-secondary" style="width: 100%; justify-content: center;"
                                 onclick="showToast('Reassignment flow started', 'info')">Reassign Ticket</button>
                             <button class="btn btn-secondary"
-                                style="width: 100%; justify-content: center; color: var(--danger-color); border-color: var(--danger-color);">Escalate
+                                style="width: 100%; justify-content: center; color: var(--danger-color); border-color: var(--danger-color);"
+                                onclick="switchView('escalation-view')">Escalate
                                 Ticket</button>
                         </div>
 
@@ -1651,7 +1670,7 @@
             <!-- VIEW: RESOURCE MANAGEMENT -->
             <div id="resource-view" class="view-section">
                 <div class="flex-between mb-4">
-                    <h1>Resource Management</h1>
+                    <h1>Resources</h1>
                     <button class="btn btn-primary" onclick="showToast('New resource form opened', 'info')">+ Add
                         Resource</button>
                 </div>
@@ -1786,7 +1805,7 @@
             <!-- VIEW: KNOWLEDGE BASE -->
             <div id="kb-view" class="view-section">
                 <div class="flex-between mb-4">
-                    <h1>Enterprise Knowledge Base</h1>
+                    <h1>Knowledge Base</h1>
                     <button class="btn btn-primary" onclick="showToast('Article editor opened', 'info')">+ New
                         Article</button>
                 </div>
@@ -2194,10 +2213,366 @@
                 </div>
             </div>
 
+            <!-- VIEW: REPORTS & ANALYTICS -->
+            <div id="reports-view" class="view-section">
+                <!-- Header -->
+                <div class="flex-between mb-4">
+                    <h1>Reports</h1>
+                    <button class="btn btn-primary" style="display: flex; align-items: center; gap: 8px;">
+                        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                        </svg>
+                        Export PDF
+                    </button>
+                </div>
+
+                <!-- Filters -->
+                <div class="panel"
+                    style="padding: 12px 20px; display: flex; align-items: center; gap: 16px; margin-bottom: 24px;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span class="text-sm" style="color: var(--text-secondary);">Period:</span>
+                        <select class="form-control"
+                            style="width: 140px; padding: 6px 12px; height: 32px; font-size: 13px; background-color: var(--input-bg); color: var(--text-primary); border-color: var(--panel-border);">
+                            <option>Last 30 days</option>
+                        </select>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span class="text-sm" style="color: var(--text-secondary);">Technician:</span>
+                        <select class="form-control"
+                            style="width: 140px; padding: 6px 12px; height: 32px; font-size: 13px; background-color: var(--input-bg); color: var(--text-primary); border-color: var(--panel-border);">
+                            <option>All Technicians</option>
+                        </select>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span class="text-sm" style="color: var(--text-secondary);">Priority:</span>
+                        <select class="form-control"
+                            style="width: 100px; padding: 6px 12px; height: 32px; font-size: 13px; background-color: var(--input-bg); color: var(--text-primary); border-color: var(--panel-border);">
+                            <option>All</option>
+                        </select>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span class="text-sm" style="color: var(--text-secondary);">Status:</span>
+                        <select class="form-control"
+                            style="width: 100px; padding: 6px 12px; height: 32px; font-size: 13px; background-color: var(--input-bg); color: var(--text-primary); border-color: var(--panel-border);">
+                            <option>All</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-secondary" style="padding: 6px 16px; height: 32px; margin-left: auto;">Apply
+                        Filters</button>
+                </div>
+
+                <!-- Top Metrics -->
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; margin-bottom: 24px;">
+                    <div class="panel" style="padding: 12px 20px; margin-bottom: 0;">
+                        <div class="text-sm"
+                            style="color: var(--text-secondary); text-transform: uppercase; font-weight: 600; margin-bottom: 4px; font-size: 11px;">
+                            Total Tickets (30D)</div>
+                        <div style="font-size: 32px; font-weight: 700; margin-bottom: 4px; color: var(--text-primary);">
+                            146</div>
+                        <div class="text-sm" style="color: var(--text-secondary); font-size: 13px;"><span
+                                style="color: var(--success-color);">↑ 12%</span> vs prior period</div>
+                    </div>
+                    <div class="panel" style="padding: 12px 20px; margin-bottom: 0;">
+                        <div class="text-sm"
+                            style="color: var(--text-secondary); text-transform: uppercase; font-weight: 600; margin-bottom: 4px; font-size: 11px;">
+                            Avg. Resolution Time</div>
+                        <div style="font-size: 32px; font-weight: 700; margin-bottom: 4px; color: #0ea5e9;">1.7h</div>
+                        <div class="text-sm" style="color: var(--text-secondary); font-size: 13px;">↓ 18 min improvement
+                        </div>
+                    </div>
+                    <div class="panel" style="padding: 12px 20px; margin-bottom: 0;">
+                        <div class="text-sm"
+                            style="color: var(--text-secondary); text-transform: uppercase; font-weight: 600; margin-bottom: 4px; font-size: 11px;">
+                            SLA Compliance</div>
+                        <div
+                            style="font-size: 32px; font-weight: 700; margin-bottom: 4px; color: var(--warning-color);">
+                            81%</div>
+                        <div class="text-sm" style="color: var(--text-secondary); font-size: 13px;">Target 95% · 7
+                            breaches</div>
+                    </div>
+                    <div class="panel" style="padding: 12px 20px; margin-bottom: 0;">
+                        <div class="text-sm"
+                            style="color: var(--text-secondary); text-transform: uppercase; font-weight: 600; margin-bottom: 4px; font-size: 11px;">
+                            Resolution Rate</div>
+                        <div
+                            style="font-size: 32px; font-weight: 700; margin-bottom: 4px; color: var(--success-color);">
+                            94%</div>
+                        <div class="text-sm" style="color: var(--text-secondary); font-size: 13px;">112 of 119 tickets
+                            closed</div>
+                    </div>
+                </div>
+
+                <!-- Charts Row -->
+                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px; margin-bottom: 24px;">
+                    <!-- Bar Chart -->
+                    <div class="panel" style="margin-bottom: 0; padding: 20px;">
+                        <h3 style="font-size: 14px; margin-bottom: 24px;">Tickets Submitted — Last 7 Days</h3>
+                        <div
+                            style="display: flex; align-items: flex-end; justify-content: space-between; height: 160px; padding-bottom: 24px; border-bottom: 1px solid var(--panel-border); position: relative; gap: 12px;">
+                            <!-- Mon -->
+                            <div
+                                style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%;">
+                                <span class="text-sm" style="font-size: 11px; margin-bottom: 4px;">8</span>
+                                <div style="width: 100%; height: 44%; background: #60a5fa; border-radius: 4px 4px 0 0;">
+                                </div>
+                            </div>
+                            <!-- Tue -->
+                            <div
+                                style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%;">
+                                <span class="text-sm" style="font-size: 11px; margin-bottom: 4px;">14</span>
+                                <div
+                                    style="width: 100%; height: 77%; background: var(--accent-color); border-radius: 4px 4px 0 0;">
+                                </div>
+                            </div>
+                            <!-- Wed -->
+                            <div
+                                style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%;">
+                                <span class="text-sm" style="font-size: 11px; margin-bottom: 4px;">11</span>
+                                <div style="width: 100%; height: 61%; background: #60a5fa; border-radius: 4px 4px 0 0;">
+                                </div>
+                            </div>
+                            <!-- Thu -->
+                            <div
+                                style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%;">
+                                <span class="text-sm" style="font-size: 11px; margin-bottom: 4px;">18</span>
+                                <div
+                                    style="width: 100%; height: 100%; background: var(--danger-color); border-radius: 4px 4px 0 0;">
+                                </div>
+                            </div>
+                            <!-- Fri -->
+                            <div
+                                style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%;">
+                                <span class="text-sm" style="font-size: 11px; margin-bottom: 4px;">9</span>
+                                <div style="width: 100%; height: 50%; background: #60a5fa; border-radius: 4px 4px 0 0;">
+                                </div>
+                            </div>
+                            <!-- Sat -->
+                            <div
+                                style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%;">
+                                <span class="text-sm" style="font-size: 11px; margin-bottom: 4px;">3</span>
+                                <div style="width: 100%; height: 16%; background: #93c5fd; border-radius: 4px 4px 0 0;">
+                                </div>
+                            </div>
+                            <!-- Sun -->
+                            <div
+                                style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%;">
+                                <span class="text-sm" style="font-size: 11px; margin-bottom: 4px;">2</span>
+                                <div style="width: 100%; height: 11%; background: #bfdbfe; border-radius: 4px 4px 0 0;">
+                                </div>
+                            </div>
+                        </div>
+                        <div
+                            style="display: flex; justify-content: space-between; padding-top: 8px; padding-bottom: 12px; padding-left: 20px; padding-right: 20px; color: var(--text-secondary); font-size: 11px;">
+                            <span style="flex: 1; text-align: center;">Mon</span>
+                            <span style="flex: 1; text-align: center;">Tue</span>
+                            <span style="flex: 1; text-align: center;">Wed</span>
+                            <span style="flex: 1; text-align: center;">Thu</span>
+                            <span style="flex: 1; text-align: center;">Fri</span>
+                            <span style="flex: 1; text-align: center;">Sat</span>
+                            <span style="flex: 1; text-align: center;">Sun</span>
+                        </div>
+                        <div class="text-sm" style="color: var(--text-secondary); font-size: 11px; margin-top: 8px;">
+                            ⚠ Thursday spike: 18 tickets — 3 were Critical priority
+                        </div>
+                    </div>
+
+                    <!-- Donut Chart -->
+                    <div class="panel" style="margin-bottom: 0; padding: 20px; display: flex; flex-direction: column;">
+                        <h3 style="font-size: 14px; margin-bottom: 24px;">Open Tickets by Status</h3>
+                        <div style="display: flex; align-items: center; justify-content: center; gap: 24px; flex: 1;">
+                            <!-- CSS Donut -->
+                            <div
+                                style="width: 120px; height: 120px; border-radius: 50%; background: conic-gradient(
+                                var(--accent-color) 0% 35%, 
+                                #a855f7 35% 61%, 
+                                var(--warning-color) 61% 82%, 
+                                #0ea5e9 82% 100%); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                <div
+                                    style="width: 80px; height: 80px; border-radius: 50%; background: var(--panel-bg); display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                                    <span
+                                        style="font-size: 20px; font-weight: 700; color: var(--text-primary); line-height: 1;">34</span>
+                                    <span style="font-size: 10px; color: var(--text-secondary);">open</span>
+                                </div>
+                            </div>
+                            <!-- Legend -->
+                            <div style="display: flex; flex-direction: column; gap: 12px;">
+                                <div
+                                    style="display: flex; align-items: center; gap: 8px; font-size: 11px; color: var(--text-secondary);">
+                                    <div
+                                        style="width: 8px; height: 8px; border-radius: 50%; background: var(--accent-color);">
+                                    </div>
+                                    <span style="color: var(--text-primary);">In Progress</span> — 12 (35%)
+                                </div>
+                                <div
+                                    style="display: flex; align-items: center; gap: 8px; font-size: 11px; color: var(--text-secondary);">
+                                    <div style="width: 8px; height: 8px; border-radius: 50%; background: #a855f7;">
+                                    </div>
+                                    <span style="color: var(--text-primary);">Assigned</span> — 9 (26%)
+                                </div>
+                                <div
+                                    style="display: flex; align-items: center; gap: 8px; font-size: 11px; color: var(--text-secondary);">
+                                    <div
+                                        style="width: 8px; height: 8px; border-radius: 50%; background: var(--warning-color);">
+                                    </div>
+                                    <span style="color: var(--text-primary);">Waiting on User</span> — 7 (21%)
+                                </div>
+                                <div
+                                    style="display: flex; align-items: center; gap: 8px; font-size: 11px; color: var(--text-secondary);">
+                                    <div style="width: 8px; height: 8px; border-radius: 50%; background: #0ea5e9;">
+                                    </div>
+                                    <span style="color: var(--text-primary);">New</span> — 6 (18%)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bottom Row -->
+                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px;">
+                    <!-- Technician Performance -->
+                    <div class="panel" style="margin-bottom: 0; padding: 20px;">
+                        <div class="flex-between" style="margin-bottom: 24px;">
+                            <h3 style="font-size: 14px;">Technician Performance</h3>
+                            <a href="#"
+                                style="color: var(--accent-color); font-size: 13px; text-decoration: none;">Reassign
+                                →</a>
+                        </div>
+
+                        <div
+                            style="display: grid; grid-template-columns: 120px 1fr 60px 80px 80px; gap: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--panel-border); font-size: 11px; color: var(--text-secondary); text-transform: uppercase; font-weight: 600; margin-bottom: 16px;">
+                            <div>Name</div>
+                            <div>Resolved</div>
+                            <div style="text-align: right;">Tickets</div>
+                            <div style="text-align: right;">Avg Res.</div>
+                            <div style="text-align: right;">Breaches</div>
+                        </div>
+
+                        <div style="display: flex; flex-direction: column; gap: 16px;">
+                            <!-- Row 1 -->
+                            <div
+                                style="display: grid; grid-template-columns: 120px 1fr 60px 80px 80px; gap: 16px; align-items: center; font-size: 13px;">
+                                <div style="font-weight: 600;">J. Smith</div>
+                                <div
+                                    style="height: 6px; background: var(--button-secondary-bg); border-radius: 4px; width: 100%; overflow: hidden;">
+                                    <div
+                                        style="height: 100%; width: 100%; background: var(--accent-color); border-radius: 4px;">
+                                    </div>
+                                </div>
+                                <div style="text-align: right; font-weight: 700;">42</div>
+                                <div style="text-align: right; color: var(--text-secondary);">2.4h</div>
+                                <div style="text-align: right; color: var(--danger-color); font-weight: 600;">3</div>
+                            </div>
+                            <!-- Row 2 -->
+                            <div
+                                style="display: grid; grid-template-columns: 120px 1fr 60px 80px 80px; gap: 16px; align-items: center; font-size: 13px;">
+                                <div style="font-weight: 600;">P. Hansen</div>
+                                <div
+                                    style="height: 6px; background: var(--button-secondary-bg); border-radius: 4px; width: 100%; overflow: hidden;">
+                                    <div
+                                        style="height: 100%; width: 76%; background: var(--accent-color); border-radius: 4px;">
+                                    </div>
+                                </div>
+                                <div style="text-align: right; font-weight: 700;">32</div>
+                                <div style="text-align: right; color: var(--text-secondary);">1.8h</div>
+                                <div style="text-align: right; color: var(--warning-color); font-weight: 600;">2</div>
+                            </div>
+                            <!-- Row 3 -->
+                            <div
+                                style="display: grid; grid-template-columns: 120px 1fr 60px 80px 80px; gap: 16px; align-items: center; font-size: 13px;">
+                                <div style="font-weight: 600;">R. Chen</div>
+                                <div
+                                    style="height: 6px; background: var(--button-secondary-bg); border-radius: 4px; width: 100%; overflow: hidden;">
+                                    <div
+                                        style="height: 100%; width: 57%; background: var(--accent-color); border-radius: 4px;">
+                                    </div>
+                                </div>
+                                <div style="text-align: right; font-weight: 700;">24</div>
+                                <div style="text-align: right; color: var(--text-secondary);">1.2h</div>
+                                <div style="text-align: right; color: var(--success-color); font-weight: 600;">0</div>
+                            </div>
+                            <!-- Row 4 -->
+                            <div
+                                style="display: grid; grid-template-columns: 120px 1fr 60px 80px 80px; gap: 16px; align-items: center; font-size: 13px;">
+                                <div style="font-weight: 600;">L. Davis</div>
+                                <div
+                                    style="height: 6px; background: var(--button-secondary-bg); border-radius: 4px; width: 100%; overflow: hidden;">
+                                    <div
+                                        style="height: 100%; width: 33%; background: var(--accent-color); border-radius: 4px;">
+                                    </div>
+                                </div>
+                                <div style="text-align: right; font-weight: 700;">14</div>
+                                <div style="text-align: right; color: var(--text-secondary);">0.9h</div>
+                                <div style="text-align: right; color: var(--success-color); font-weight: 600;">0</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Key Metrics Grid -->
+                    <div class="panel" style="margin-bottom: 0; padding: 20px;">
+                        <h3 style="font-size: 14px; margin-bottom: 24px;">Key Metrics (30d)</h3>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                            <div
+                                style="background: var(--button-secondary-bg); padding: 12px; border-radius: 6px; border: 1px solid var(--panel-border);">
+                                <div
+                                    style="font-size: 10px; color: var(--text-secondary); text-transform: uppercase; font-weight: 600; margin-bottom: 4px;">
+                                    Avg. First Response</div>
+                                <div style="font-size: 20px; font-weight: 700; margin-bottom: 2px;">47 min</div>
+                                <div style="font-size: 11px; color: var(--text-secondary);">Target: 60 min ✓</div>
+                            </div>
+                            <div
+                                style="background: var(--button-secondary-bg); padding: 12px; border-radius: 6px; border: 1px solid var(--panel-border);">
+                                <div
+                                    style="font-size: 10px; color: var(--text-secondary); text-transform: uppercase; font-weight: 600; margin-bottom: 4px;">
+                                    Tickets Reopened</div>
+                                <div
+                                    style="font-size: 20px; font-weight: 700; margin-bottom: 2px; color: var(--warning-color);">
+                                    4</div>
+                                <div style="font-size: 11px; color: var(--text-secondary);">Within 7-day window</div>
+                            </div>
+                            <div
+                                style="background: var(--button-secondary-bg); padding: 12px; border-radius: 6px; border: 1px solid var(--panel-border);">
+                                <div
+                                    style="font-size: 10px; color: var(--text-secondary); text-transform: uppercase; font-weight: 600; margin-bottom: 4px;">
+                                    Escalations</div>
+                                <div style="font-size: 20px; font-weight: 700; margin-bottom: 2px;">6</div>
+                                <div style="font-size: 11px; color: var(--text-secondary);">5 Critical · 1 High</div>
+                            </div>
+                            <div
+                                style="background: var(--button-secondary-bg); padding: 12px; border-radius: 6px; border: 1px solid var(--panel-border);">
+                                <div
+                                    style="font-size: 10px; color: var(--text-secondary); text-transform: uppercase; font-weight: 600; margin-bottom: 4px;">
+                                    KB Articles Used</div>
+                                <div
+                                    style="font-size: 20px; font-weight: 700; margin-bottom: 2px; color: var(--success-color);">
+                                    28</div>
+                                <div style="font-size: 11px; color: var(--text-secondary);">Attached at resolution</div>
+                            </div>
+                            <div
+                                style="background: var(--button-secondary-bg); padding: 12px; border-radius: 6px; border: 1px solid var(--panel-border);">
+                                <div
+                                    style="font-size: 10px; color: var(--text-secondary); text-transform: uppercase; font-weight: 600; margin-bottom: 4px;">
+                                    Resources Linked</div>
+                                <div style="font-size: 20px; font-weight: 700; margin-bottom: 2px;">19</div>
+                                <div style="font-size: 11px; color: var(--text-secondary);">Across 14 tickets</div>
+                            </div>
+                            <div
+                                style="background: var(--button-secondary-bg); padding: 12px; border-radius: 6px; border: 1px solid var(--panel-border);">
+                                <div
+                                    style="font-size: 10px; color: var(--text-secondary); text-transform: uppercase; font-weight: 600; margin-bottom: 4px;">
+                                    Avg. Queue Time</div>
+                                <div style="font-size: 20px; font-weight: 700; margin-bottom: 2px;">22 min</div>
+                                <div style="font-size: 11px; color: var(--text-secondary);">New → Assigned</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- VIEW: ADMIN PANEL -->
             <div id="admin-view" class="view-section">
                 <div class="flex-between mb-4">
-                    <h1>Admin & Organization Settings</h1>
+                    <h1>Team</h1>
                     <button class="btn btn-primary" onclick="showToast('Invite link sent to clipboard', 'success')">+
                         Invite User</button>
                 </div>
