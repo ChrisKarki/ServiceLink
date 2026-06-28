@@ -785,7 +785,7 @@
                 </svg>
                 Dashboard
             </li>
-            <li class="nav-item" onclick="switchView('ticket-view', this)">
+            <li class="nav-item" onclick="switchView('tickets-list-view', this)">
                 <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
@@ -969,9 +969,15 @@
             <div id="dashboard-view" class="view-section">
                 <div class="flex-between mb-4">
                     <h1>Dashboard</h1>
-                    <button class="btn btn-primary"
-                        onclick="switchView('create-ticket-view', document.querySelectorAll('.nav-item')[1])">+ New
-                        Ticket</button>
+                    <button class="btn btn-primary" style="display: flex; align-items: center; gap: 8px;"
+                        onclick="showToast('Dashboard customization mode enabled', 'success')">
+                        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4">
+                            </path>
+                        </svg>
+                        Customize Layout
+                    </button>
                 </div>
 
                 <div style="display: grid; grid-template-columns: 3fr 1fr; gap: 16px; margin-bottom: 16px;">
@@ -1256,7 +1262,7 @@
                                     </td>
                                     <td>Jane Developer</td>
                                     <td><button class="btn btn-secondary btn-sm"
-                                            onclick="switchView('ticket-view')">View</button></td>
+                                            onclick="switchView('edit-ticket-view', document.querySelectorAll('.nav-item')[1])">Edit</button></td>
                                 </tr>
                                 <tr class="clickable">
                                     <td style="font-weight: 500; color: var(--text-primary);">REQ-2054</td>
@@ -1282,7 +1288,7 @@
                                     </td>
                                     <td>Arshdeep Mutti</td>
                                     <td><button class="btn btn-secondary btn-sm"
-                                            onclick="switchView('ticket-view')">View</button></td>
+                                            onclick="switchView('edit-ticket-view', document.querySelectorAll('.nav-item')[1])">Edit</button></td>
                                 </tr>
                                 <tr class="clickable">
                                     <td style="font-weight: 500; color: var(--text-primary);">INC-1039</td>
@@ -1293,7 +1299,7 @@
                                     </td>
                                     <td>Hiten Lamba</td>
                                     <td><button class="btn btn-secondary btn-sm"
-                                            onclick="switchView('ticket-view')">View</button></td>
+                                            onclick="switchView('edit-ticket-view', document.querySelectorAll('.nav-item')[1])">Edit</button></td>
                                 </tr>
                                 <tr class="clickable">
                                     <td style="font-weight: 500; color: var(--text-primary);">REQ-2053</td>
@@ -1304,7 +1310,7 @@
                                     </td>
                                     <td>Katie Weng</td>
                                     <td><button class="btn btn-secondary btn-sm"
-                                            onclick="switchView('ticket-view')">View</button></td>
+                                            onclick="switchView('edit-ticket-view', document.querySelectorAll('.nav-item')[1])">Edit</button></td>
                                 </tr>
                                 <tr class="clickable">
                                     <td style="font-weight: 500; color: var(--text-primary);">INC-1038</td>
@@ -1313,7 +1319,7 @@
                                     <td><span class="badge badge-priority-high">Critical</span></td>
                                     <td>Jane Developer</td>
                                     <td><button class="btn btn-secondary btn-sm"
-                                            onclick="switchView('ticket-view')">View</button></td>
+                                            onclick="switchView('edit-ticket-view', document.querySelectorAll('.nav-item')[1])">Edit</button></td>
                                 </tr>
                                 <tr class="clickable">
                                     <td style="font-weight: 500; color: var(--text-primary);">REQ-2052</td>
@@ -1337,7 +1343,7 @@
                                     <td><span class="badge badge-priority-high">High</span></td>
                                     <td>Chris Karki</td>
                                     <td><button class="btn btn-secondary btn-sm"
-                                            onclick="switchView('ticket-view')">View</button></td>
+                                            onclick="switchView('edit-ticket-view', document.querySelectorAll('.nav-item')[1])">Edit</button></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -1489,6 +1495,270 @@
                 </div>
             </div>
 
+            <!-- VIEW: TICKETS LIST -->
+            <div id="tickets-list-view" class="view-section">
+                <div class="flex-between mb-4">
+                    <h1>Tickets</h1>
+                    <button class="btn btn-primary" onclick="switchView('create-ticket-view')">+ New Ticket</button>
+                </div>
+
+                <div class="filter-bar" style="margin-bottom: 24px;">
+                    <div class="filter-pill active">All Tickets</div>
+                    <div class="filter-pill">My Tickets</div>
+                    <div class="filter-pill">Unassigned</div>
+                    <div class="filter-pill">Resolved</div>
+                </div>
+
+                <div class="panel" style="padding: 0;">
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Title</th>
+                                    <th>Status</th>
+                                    <th>Priority</th>
+                                    <th>Assignee</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="clickable"
+                                    onclick="if(event.target.tagName !== 'BUTTON') switchView('ticket-view', document.querySelectorAll('.nav-item')[1])">
+                                    <td style="font-weight: 500; color: var(--text-primary);">INC-1042</td>
+                                    <td>Production Build Pipeline Failing</td>
+                                    <td><span class="badge badge-status-open">In Progress</span></td>
+                                    <td><span class="badge badge-priority-high">Critical</span></td>
+                                    <td>Chris Karki</td>
+                                    <td><button class="btn btn-secondary btn-sm"
+                                            onclick="showToast('Ticket re-assigned')">Reassign</button></td>
+                                </tr>
+                                <tr class="clickable">
+                                    <td style="font-weight: 500; color: var(--text-primary);">REQ-2055</td>
+                                    <td>Request Adobe Creative Cloud License</td>
+                                    <td><span class="badge"
+                                            style="border: 1px solid var(--panel-border); color: var(--text-secondary);">New</span>
+                                    </td>
+                                    <td><span class="badge"
+                                            style="border: 1px solid var(--panel-border); color: var(--text-secondary);">Low</span>
+                                    </td>
+                                    <td><span
+                                            style="color: var(--text-secondary); font-style: italic;">Unassigned</span>
+                                    </td>
+                                    <td><button class="btn btn-ghost btn-sm"
+                                            onclick="showToast('Ticket claimed by you', 'success')">Claim</button></td>
+                                </tr>
+                                <tr class="clickable">
+                                    <td style="font-weight: 500; color: var(--text-primary);">INC-1041</td>
+                                    <td>VPN Connection Dropping</td>
+                                    <td><span class="badge badge-status-resolved">Resolved</span></td>
+                                    <td><span class="badge"
+                                            style="border: 1px solid var(--warning-color); color: var(--warning-color);">Medium</span>
+                                    </td>
+                                    <td>Jane Developer</td>
+                                    <td><button class="btn btn-secondary btn-sm" onclick="switchView('edit-ticket-view', document.querySelectorAll('.nav-item')[1])">Edit</button></td>
+                                </tr>
+                                <tr class="clickable">
+                                    <td style="font-weight: 500; color: var(--text-primary);">REQ-2054</td>
+                                    <td>New Monitor Setup for Engineering</td>
+                                    <td><span class="badge"
+                                            style="border: 1px solid var(--panel-border); color: var(--text-secondary);">New</span>
+                                    </td>
+                                    <td><span class="badge"
+                                            style="border: 1px solid var(--panel-border); color: var(--text-secondary);">Low</span>
+                                    </td>
+                                    <td><span
+                                            style="color: var(--text-secondary); font-style: italic;">Unassigned</span>
+                                    </td>
+                                    <td><button class="btn btn-ghost btn-sm"
+                                            onclick="showToast('Ticket claimed by you', 'success')">Claim</button></td>
+                                </tr>
+                                <tr class="clickable">
+                                    <td style="font-weight: 500; color: var(--text-primary);">INC-1040</td>
+                                    <td>Email Sync Issue on Mobile</td>
+                                    <td><span class="badge badge-status-open">In Progress</span></td>
+                                    <td><span class="badge"
+                                            style="border: 1px solid var(--warning-color); color: var(--warning-color);">Medium</span>
+                                    </td>
+                                    <td>Arshdeep Mutti</td>
+                                    <td><button class="btn btn-secondary btn-sm" onclick="switchView('edit-ticket-view', document.querySelectorAll('.nav-item')[1])">Edit</button></td>
+                                </tr>
+                                <tr class="clickable">
+                                    <td style="font-weight: 500; color: var(--text-primary);">INC-1039</td>
+                                    <td>Printer Network Configuration</td>
+                                    <td><span class="badge badge-status-resolved">Resolved</span></td>
+                                    <td><span class="badge"
+                                            style="border: 1px solid var(--panel-border); color: var(--text-secondary);">Low</span>
+                                    </td>
+                                    <td>Hiten Lamba</td>
+                                    <td><button class="btn btn-secondary btn-sm" onclick="switchView('edit-ticket-view', document.querySelectorAll('.nav-item')[1])">Edit</button></td>
+                                </tr>
+                                <tr class="clickable">
+                                    <td style="font-weight: 500; color: var(--text-primary);">REQ-2053</td>
+                                    <td>Access to GitHub Organization</td>
+                                    <td><span class="badge badge-status-open">In Progress</span></td>
+                                    <td><span class="badge"
+                                            style="border: 1px solid var(--panel-border); color: var(--text-secondary);">Low</span>
+                                    </td>
+                                    <td>Katie Weng</td>
+                                    <td><button class="btn btn-secondary btn-sm" onclick="switchView('edit-ticket-view', document.querySelectorAll('.nav-item')[1])">Edit</button></td>
+                                </tr>
+                                <tr class="clickable">
+                                    <td style="font-weight: 500; color: var(--text-primary);">INC-1038</td>
+                                    <td>Database Read Replica Lag</td>
+                                    <td><span class="badge badge-status-resolved">Resolved</span></td>
+                                    <td><span class="badge badge-priority-high">Critical</span></td>
+                                    <td>Jane Developer</td>
+                                    <td><button class="btn btn-secondary btn-sm" onclick="switchView('edit-ticket-view', document.querySelectorAll('.nav-item')[1])">Edit</button></td>
+                                </tr>
+                                <tr class="clickable">
+                                    <td style="font-weight: 500; color: var(--text-primary);">REQ-2052</td>
+                                    <td>Increase S3 Bucket Storage Limit</td>
+                                    <td><span class="badge"
+                                            style="border: 1px solid var(--panel-border); color: var(--text-secondary);">New</span>
+                                    </td>
+                                    <td><span class="badge"
+                                            style="border: 1px solid var(--warning-color); color: var(--warning-color);">Medium</span>
+                                    </td>
+                                    <td><span
+                                            style="color: var(--text-secondary); font-style: italic;">Unassigned</span>
+                                    </td>
+                                    <td><button class="btn btn-ghost btn-sm"
+                                            onclick="showToast('Ticket claimed by you', 'success')">Claim</button></td>
+                                </tr>
+                                <tr class="clickable">
+                                    <td style="font-weight: 500; color: var(--text-primary);">INC-1037</td>
+                                    <td>SSO Integration Failing for Jira</td>
+                                    <td><span class="badge badge-status-open">In Progress</span></td>
+                                    <td><span class="badge badge-priority-high">High</span></td>
+                                    <td>Chris Karki</td>
+                                    <td><button class="btn btn-secondary btn-sm" onclick="switchView('edit-ticket-view', document.querySelectorAll('.nav-item')[1])">Edit</button></td>
+                                </tr>
+                                <tr class="clickable">
+                                    <td style="font-weight: 500; color: var(--text-primary);">REQ-2051</td>
+                                    <td>Provision AWS EC2 Instance for QA</td>
+                                    <td><span class="badge badge-status-open">In Progress</span></td>
+                                    <td><span class="badge"
+                                            style="border: 1px solid var(--panel-border); color: var(--text-secondary);">Low</span>
+                                    </td>
+                                    <td>Arshdeep Mutti</td>
+                                    <td><button class="btn btn-secondary btn-sm" onclick="switchView('edit-ticket-view', document.querySelectorAll('.nav-item')[1])">Edit</button></td>
+                                </tr>
+                                <tr class="clickable">
+                                    <td style="font-weight: 500; color: var(--text-primary);">INC-1036</td>
+                                    <td>Slack Notifications Delayed</td>
+                                    <td><span class="badge badge-status-resolved">Resolved</span></td>
+                                    <td><span class="badge"
+                                            style="border: 1px solid var(--panel-border); color: var(--text-secondary);">Low</span>
+                                    </td>
+                                    <td>Hiten Lamba</td>
+                                    <td><button class="btn btn-secondary btn-sm" onclick="switchView('edit-ticket-view', document.querySelectorAll('.nav-item')[1])">Edit</button></td>
+                                </tr>
+                                <tr class="clickable">
+                                    <td style="font-weight: 500; color: var(--text-primary);">REQ-2050</td>
+                                    <td>Figma Enterprise Seat Upgrade</td>
+                                    <td><span class="badge"
+                                            style="border: 1px solid var(--panel-border); color: var(--text-secondary);">New</span>
+                                    </td>
+                                    <td><span class="badge"
+                                            style="border: 1px solid var(--panel-border); color: var(--text-secondary);">Low</span>
+                                    </td>
+                                    <td><span
+                                            style="color: var(--text-secondary); font-style: italic;">Unassigned</span>
+                                    </td>
+                                    <td><button class="btn btn-ghost btn-sm"
+                                            onclick="showToast('Ticket claimed by you', 'success')">Claim</button></td>
+                                </tr>
+                                <tr class="clickable">
+                                    <td style="font-weight: 500; color: var(--text-primary);">INC-1035</td>
+                                    <td>Staging Cluster Memory Leak</td>
+                                    <td><span class="badge badge-status-open">In Progress</span></td>
+                                    <td><span class="badge badge-priority-high">Critical</span></td>
+                                    <td>Jane Developer</td>
+                                    <td><button class="btn btn-secondary btn-sm" onclick="switchView('edit-ticket-view', document.querySelectorAll('.nav-item')[1])">Edit</button></td>
+                                </tr>
+                                <tr class="clickable">
+                                    <td style="font-weight: 500; color: var(--text-primary);">REQ-2049</td>
+                                    <td>New Employee Laptop Onboarding</td>
+                                    <td><span class="badge badge-status-open">In Progress</span></td>
+                                    <td><span class="badge"
+                                            style="border: 1px solid var(--warning-color); color: var(--warning-color);">Medium</span>
+                                    </td>
+                                    <td>Chris Karki</td>
+                                    <td><button class="btn btn-secondary btn-sm" onclick="switchView('edit-ticket-view', document.querySelectorAll('.nav-item')[1])">Edit</button></td>
+                                </tr>
+                                <tr class="clickable">
+                                    <td style="font-weight: 500; color: var(--text-primary);">INC-1034</td>
+                                    <td>Datadog Alert Ingestion Failures</td>
+                                    <td><span class="badge badge-status-resolved">Resolved</span></td>
+                                    <td><span class="badge badge-priority-high">High</span></td>
+                                    <td>Arshdeep Mutti</td>
+                                    <td><button class="btn btn-secondary btn-sm" onclick="switchView('edit-ticket-view', document.querySelectorAll('.nav-item')[1])">Edit</button></td>
+                                </tr>
+                                <tr class="clickable">
+                                    <td style="font-weight: 500; color: var(--text-primary);">REQ-2048</td>
+                                    <td>Update DNS Records for Marketing Domain</td>
+                                    <td><span class="badge"
+                                            style="border: 1px solid var(--panel-border); color: var(--text-secondary);">New</span>
+                                    </td>
+                                    <td><span class="badge"
+                                            style="border: 1px solid var(--panel-border); color: var(--text-secondary);">Low</span>
+                                    </td>
+                                    <td><span
+                                            style="color: var(--text-secondary); font-style: italic;">Unassigned</span>
+                                    </td>
+                                    <td><button class="btn btn-ghost btn-sm"
+                                            onclick="showToast('Ticket claimed by you', 'success')">Claim</button></td>
+                                </tr>
+                                <tr class="clickable">
+                                    <td style="font-weight: 500; color: var(--text-primary);">INC-1033</td>
+                                    <td>Internal Wiki Search 500 Errors</td>
+                                    <td><span class="badge badge-status-open">In Progress</span></td>
+                                    <td><span class="badge"
+                                            style="border: 1px solid var(--warning-color); color: var(--warning-color);">Medium</span>
+                                    </td>
+                                    <td>Katie Weng</td>
+                                    <td><button class="btn btn-secondary btn-sm" onclick="switchView('edit-ticket-view', document.querySelectorAll('.nav-item')[1])">Edit</button></td>
+                                </tr>
+                                <tr class="clickable">
+                                    <td style="font-weight: 500; color: var(--text-primary);">REQ-2047</td>
+                                    <td>Grant Snowflake Read Access to BI Team</td>
+                                    <td><span class="badge badge-status-resolved">Resolved</span></td>
+                                    <td><span class="badge"
+                                            style="border: 1px solid var(--panel-border); color: var(--text-secondary);">Low</span>
+                                    </td>
+                                    <td>Hiten Lamba</td>
+                                    <td><button class="btn btn-secondary btn-sm" onclick="switchView('edit-ticket-view', document.querySelectorAll('.nav-item')[1])">Edit</button></td>
+                                </tr>
+                                <tr class="clickable">
+                                    <td style="font-weight: 500; color: var(--text-primary);">INC-1032</td>
+                                    <td>Twilio Webhook Verification Failed</td>
+                                    <td><span class="badge badge-status-open">In Progress</span></td>
+                                    <td><span class="badge badge-priority-high">High</span></td>
+                                    <td>Jane Developer</td>
+                                    <td><button class="btn btn-secondary btn-sm" onclick="switchView('edit-ticket-view', document.querySelectorAll('.nav-item')[1])">Edit</button></td>
+                                </tr>
+                                <tr class="clickable">
+                                    <td style="font-weight: 500; color: var(--text-primary);">REQ-2046</td>
+                                    <td>Zoom Room Hardware Calibration</td>
+                                    <td><span class="badge"
+                                            style="border: 1px solid var(--panel-border); color: var(--text-secondary);">New</span>
+                                    </td>
+                                    <td><span class="badge"
+                                            style="border: 1px solid var(--panel-border); color: var(--text-secondary);">Low</span>
+                                    </td>
+                                    <td><span
+                                            style="color: var(--text-secondary); font-style: italic;">Unassigned</span>
+                                    </td>
+                                    <td><button class="btn btn-ghost btn-sm"
+                                            onclick="showToast('Ticket claimed by you', 'success')">Claim</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
             <!-- VIEW: TICKET DETAIL -->
             <div id="ticket-view" class="view-section">
                 <div class="flex-between" style="margin-bottom: 12px;">
@@ -1623,6 +1893,8 @@
                             <button class="btn btn-primary" style="width: 100%; justify-content: center;"
                                 onclick="showToast('Ticket marked as resolved', 'success')">Resolve Issue</button>
                             <button class="btn btn-secondary" style="width: 100%; justify-content: center;"
+                                onclick="switchView('edit-ticket-view', document.querySelectorAll('.nav-item')[1])">✏️ Edit Ticket</button>
+                            <button class="btn btn-secondary" style="width: 100%; justify-content: center;"
                                 onclick="showToast('Reassignment flow started', 'info')">Reassign Ticket</button>
                             <button class="btn btn-secondary"
                                 style="width: 100%; justify-content: center; color: var(--danger-color); border-color: var(--danger-color);"
@@ -1667,11 +1939,152 @@
                 </div>
             </div>
 
+            <!-- VIEW: EDIT TICKET -->
+            <div id="edit-ticket-view" class="view-section">
+                <div class="flex-between mb-4">
+                    <div style="display: flex; align-items: center; gap: 16px;">
+                        <button class="icon-btn" onclick="switchView('ticket-view', document.querySelectorAll('.nav-item')[1])" title="Back to Incident">
+                            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                            </svg>
+                        </button>
+                        <div>
+                            <h1 style="margin-bottom: 4px;">Edit Incident / Request</h1>
+                            <div class="text-sm" style="color: var(--text-secondary);">Ticket ID: INC-1042 • Created Oct 24, 2026 by Jane Developer</div>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 12px;">
+                        <button class="btn btn-secondary" onclick="switchView('ticket-view', document.querySelectorAll('.nav-item')[1])">Cancel</button>
+                        <button class="btn btn-primary" onclick="showToast('Ticket updated successfully!', 'success'); switchView('ticket-view', document.querySelectorAll('.nav-item')[1])">Save Changes</button>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px;">
+                    <!-- Left Form Panel -->
+                    <div style="display: flex; flex-direction: column; gap: 24px;">
+                        <div class="panel" style="margin-bottom: 0; display: flex; flex-direction: column; gap: 20px;">
+                            <h3 style="font-size: 16px; border-bottom: 1px solid var(--panel-border); padding-bottom: 12px; margin-bottom: 0;">Issue Summary & Description</h3>
+                            
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                                <div>
+                                    <label class="form-label" style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-primary);">Ticket ID</label>
+                                    <input type="text" class="form-control" value="INC-1042" disabled style="width: 100%; padding: 10px 14px; font-family: monospace; font-weight: bold; opacity: 0.7;">
+                                </div>
+                                <div>
+                                    <label class="form-label" style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-primary);">Request Type</label>
+                                    <select class="form-control" style="width: 100%; padding: 10px 14px; background-color: var(--input-bg);">
+                                        <option selected>Break / Fix Incident</option>
+                                        <option>New Service Request</option>
+                                        <option>Access & Permission Change</option>
+                                        <option>Hardware Replacement</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="form-label" style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-primary);">Title / Summary</label>
+                                <input type="text" class="form-control" value="Production Build Pipeline Failing" style="width: 100%; padding: 10px 14px; font-weight: 500;">
+                            </div>
+
+                            <div>
+                                <label class="form-label" style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-primary);">Detailed Description</label>
+                                <textarea class="form-control" style="width: 100%; min-height: 150px; padding: 12px 14px; line-height: 1.6; background: var(--input-bg); resize: vertical;">The automated deployment pipeline to staging has been failing for the past hour. The error logs indicate a timeout when connecting to the internal artifact repository. This is blocking the release candidate for the new mobile app update.
+
+Please check network routing and repository instance health immediately.</textarea>
+                            </div>
+                        </div>
+
+                        <div class="panel" style="margin-bottom: 0; display: flex; flex-direction: column; gap: 16px;">
+                            <h3 style="font-size: 16px; border-bottom: 1px solid var(--panel-border); padding-bottom: 12px; margin-bottom: 0;">Resolution Work Log & Notes</h3>
+                            <div>
+                                <label class="form-label" style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-primary);">Internal Technician Notes</label>
+                                <textarea class="form-control" style="width: 100%; min-height: 100px; padding: 12px 14px; line-height: 1.6; background: var(--input-bg); resize: vertical;" placeholder="Add progress notes, root cause findings, or work done so far...">Investigating connectivity between staging Jenkins workers and Nexus repo. VPC security group rule updated to allow ingress on port 8081.</textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Metadata Panel -->
+                    <div style="display: flex; flex-direction: column; gap: 24px;">
+                        <div class="panel" style="margin-bottom: 0; display: flex; flex-direction: column; gap: 16px;">
+                            <h3 style="font-size: 14px; border-bottom: 1px solid var(--panel-border); padding-bottom: 12px; margin-bottom: 4px;">Status & Assignment</h3>
+                            
+                            <div>
+                                <label class="text-sm" style="color: var(--text-secondary); display: block; margin-bottom: 6px;">Workflow Status</label>
+                                <select class="form-control" style="width: 100%; padding: 8px 12px; background-color: var(--input-bg); font-weight: 600; border-color: var(--warning-color); color: var(--warning-color);">
+                                    <option>New / Open</option>
+                                    <option selected>In Progress</option>
+                                    <option>Pending Vendor</option>
+                                    <option>Resolved</option>
+                                    <option>Closed</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="text-sm" style="color: var(--text-secondary); display: block; margin-bottom: 6px;">Priority Level</label>
+                                <select class="form-control" style="width: 100%; padding: 8px 12px; background-color: var(--input-bg); font-weight: 600; border-color: var(--danger-color); color: var(--danger-color);">
+                                    <option selected>Critical (P1)</option>
+                                    <option>High (P2)</option>
+                                    <option>Medium (P3)</option>
+                                    <option>Low (P4)</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="text-sm" style="color: var(--text-secondary); display: block; margin-bottom: 6px;">Assigned Technician</label>
+                                <select class="form-control" style="width: 100%; padding: 8px 12px; background-color: var(--input-bg);">
+                                    <option selected>Chris Karki</option>
+                                    <option>Jane Developer</option>
+                                    <option>Arshdeep Mutti</option>
+                                    <option>DevOps Team</option>
+                                    <option>Unassigned</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="text-sm" style="color: var(--text-secondary); display: block; margin-bottom: 6px;">Category</label>
+                                <select class="form-control" style="width: 100%; padding: 8px 12px; background-color: var(--input-bg);">
+                                    <option selected>DevOps / Infrastructure</option>
+                                    <option>Hardware & Devices</option>
+                                    <option>Software Licenses</option>
+                                    <option>Network & Connectivity</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="text-sm" style="color: var(--text-secondary); display: block; margin-bottom: 6px;">SLA Resolution Target</label>
+                                <input type="text" class="form-control" value="4 Hours (Expires at 13:15 PM)" style="width: 100%; padding: 8px 12px; background-color: var(--input-bg);">
+                            </div>
+                        </div>
+
+                        <div class="panel" style="margin-bottom: 0;">
+                            <h3 style="font-size: 14px; border-bottom: 1px solid var(--panel-border); padding-bottom: 12px; margin-bottom: 12px;">Linked Assets & Logs</h3>
+                            <div style="display: flex; flex-direction: column; gap: 12px;">
+                                <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; background: var(--button-secondary-bg); border-radius: 6px; border: 1px solid var(--panel-border);">
+                                    <div>
+                                        <strong style="font-size: 13px; display: block; color: var(--text-primary);">VRT-Build-Server-01</strong>
+                                        <span class="text-sm" style="color: var(--text-secondary);">AWS EC2 t3.xlarge</span>
+                                    </div>
+                                    <button class="btn btn-secondary btn-sm" onclick="switchView('resource-view', document.querySelectorAll('.nav-item')[2])">View Asset</button>
+                                </div>
+                                <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; background: var(--button-secondary-bg); border-radius: 6px; border: 1px solid var(--panel-border);">
+                                    <div style="display: flex; align-items: center; gap: 8px;">
+                                        <span>📎</span>
+                                        <span style="font-size: 13px; font-family: monospace; color: var(--text-primary);">pipeline_err.log</span>
+                                    </div>
+                                    <span class="text-sm" style="color: var(--text-secondary);">14 KB</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- VIEW: RESOURCE MANAGEMENT -->
             <div id="resource-view" class="view-section">
                 <div class="flex-between mb-4">
                     <h1>Resources</h1>
-                    <button class="btn btn-primary" onclick="showToast('New resource form opened', 'info')">+ Add
+                    <button class="btn btn-primary"
+                        onclick="switchView('edit-resource-view', document.querySelectorAll('.nav-item')[2])">+ Add
                         Resource</button>
                 </div>
 
@@ -1705,7 +2118,8 @@
                                             style="border-color: var(--danger-color); color: var(--danger-color);">Incident
                                             Active</span></td>
                                     <td><button class="btn btn-secondary btn-sm"
-                                            onclick="showToast('Opening edit panel...', 'info')">Edit</button></td>
+                                            onclick="switchView('edit-resource-view', document.querySelectorAll('.nav-item')[2])">Edit</button>
+                                    </td>
                                 </tr>
                                 <tr class="clickable">
                                     <td style="font-weight: 500; color: var(--text-primary);">HW-LTP-4092</td>
@@ -1714,7 +2128,8 @@
                                     <td>Jane Developer</td>
                                     <td><span class="badge badge-status-resolved">In Use</span></td>
                                     <td><button class="btn btn-secondary btn-sm"
-                                            onclick="showToast('Opening edit panel...', 'info')">Edit</button></td>
+                                            onclick="switchView('edit-resource-view', document.querySelectorAll('.nav-item')[2])">Edit</button>
+                                    </td>
                                 </tr>
                                 <tr class="clickable">
                                     <td style="font-weight: 500; color: var(--text-primary);">SW-LIC-ADOBE-CC</td>
@@ -1725,7 +2140,8 @@
                                     </td>
                                     <td><span class="badge badge-status-resolved">In Stock</span></td>
                                     <td><button class="btn btn-secondary btn-sm"
-                                            onclick="showToast('Opening edit panel...', 'info')">Edit</button></td>
+                                            onclick="switchView('edit-resource-view', document.querySelectorAll('.nav-item')[2])">Edit</button>
+                                    </td>
                                 </tr>
                                 <tr class="clickable">
                                     <td style="font-weight: 500; color: var(--text-primary);">HW-MNT-2098</td>
@@ -1736,7 +2152,8 @@
                                     </td>
                                     <td><span class="badge badge-status-resolved">In Stock</span></td>
                                     <td><button class="btn btn-secondary btn-sm"
-                                            onclick="showToast('Opening edit panel...', 'info')">Edit</button></td>
+                                            onclick="switchView('edit-resource-view', document.querySelectorAll('.nav-item')[2])">Edit</button>
+                                    </td>
                                 </tr>
                                 <tr class="clickable">
                                     <td style="font-weight: 500; color: var(--text-primary);">VRT-DB-Prod-02</td>
@@ -1745,7 +2162,8 @@
                                     <td>Database Team</td>
                                     <td><span class="badge badge-status-resolved">Active</span></td>
                                     <td><button class="btn btn-secondary btn-sm"
-                                            onclick="showToast('Opening edit panel...', 'info')">Edit</button></td>
+                                            onclick="switchView('edit-resource-view', document.querySelectorAll('.nav-item')[2])">Edit</button>
+                                    </td>
                                 </tr>
                                 <tr class="clickable">
                                     <td style="font-weight: 500; color: var(--text-primary);">SW-LIC-OFFICE</td>
@@ -1754,7 +2172,8 @@
                                     <td>Hiten Lamba</td>
                                     <td><span class="badge badge-status-resolved">In Use</span></td>
                                     <td><button class="btn btn-secondary btn-sm"
-                                            onclick="showToast('Opening edit panel...', 'info')">Edit</button></td>
+                                            onclick="switchView('edit-resource-view', document.querySelectorAll('.nav-item')[2])">Edit</button>
+                                    </td>
                                 </tr>
                                 <tr class="clickable">
                                     <td style="font-weight: 500; color: var(--text-primary);">VRT-WEB-Prod-01</td>
@@ -1763,7 +2182,8 @@
                                     <td>DevOps Team</td>
                                     <td><span class="badge badge-status-resolved">Active</span></td>
                                     <td><button class="btn btn-secondary btn-sm"
-                                            onclick="showToast('Opening edit panel...', 'info')">Edit</button></td>
+                                            onclick="switchView('edit-resource-view', document.querySelectorAll('.nav-item')[2])">Edit</button>
+                                    </td>
                                 </tr>
                                 <tr class="clickable">
                                     <td style="font-weight: 500; color: var(--text-primary);">HW-MAC-5021</td>
@@ -1772,7 +2192,8 @@
                                     <td>Chris Karki</td>
                                     <td><span class="badge badge-status-resolved">In Use</span></td>
                                     <td><button class="btn btn-secondary btn-sm"
-                                            onclick="showToast('Opening edit panel...', 'info')">Edit</button></td>
+                                            onclick="switchView('edit-resource-view', document.querySelectorAll('.nav-item')[2])">Edit</button>
+                                    </td>
                                 </tr>
                                 <tr class="clickable">
                                     <td style="font-weight: 500; color: var(--text-primary);">SW-LIC-FIGMA</td>
@@ -1783,7 +2204,8 @@
                                     </td>
                                     <td><span class="badge badge-status-resolved">In Stock</span></td>
                                     <td><button class="btn btn-secondary btn-sm"
-                                            onclick="showToast('Opening edit panel...', 'info')">Edit</button></td>
+                                            onclick="switchView('edit-resource-view', document.querySelectorAll('.nav-item')[2])">Edit</button>
+                                    </td>
                                 </tr>
                                 <tr class="clickable">
                                     <td style="font-weight: 500; color: var(--text-primary);">NW-RTR-001</td>
@@ -1794,7 +2216,211 @@
                                             style="border-color: var(--warning-color); color: var(--warning-color);">Maintenance
                                             Needed</span></td>
                                     <td><button class="btn btn-secondary btn-sm"
-                                            onclick="showToast('Opening edit panel...', 'info')">Edit</button></td>
+                                            onclick="switchView('edit-resource-view', document.querySelectorAll('.nav-item')[2])">Edit</button>
+                                    </td>
+                                </tr>
+                                <tr class="clickable">
+                                    <td style="font-weight: 500; color: var(--text-primary);">HW-LTP-4105</td>
+                                    <td>Hardware</td>
+                                    <td>Apple MacBook Air M3</td>
+                                    <td>Katie Weng</td>
+                                    <td><span class="badge badge-status-resolved">In Use</span></td>
+                                    <td><button class="btn btn-secondary btn-sm"
+                                            onclick="switchView('edit-resource-view', document.querySelectorAll('.nav-item')[2])">Edit</button>
+                                    </td>
+                                </tr>
+                                <tr class="clickable">
+                                    <td style="font-weight: 500; color: var(--text-primary);">VRT-K8S-Clust-01</td>
+                                    <td>Virtual</td>
+                                    <td>AWS EKS Production Cluster</td>
+                                    <td>DevOps Team</td>
+                                    <td><span class="badge badge-status-resolved">Active</span></td>
+                                    <td><button class="btn btn-secondary btn-sm"
+                                            onclick="switchView('edit-resource-view', document.querySelectorAll('.nav-item')[2])">Edit</button>
+                                    </td>
+                                </tr>
+                                <tr class="clickable">
+                                    <td style="font-weight: 500; color: var(--text-primary);">SW-LIC-JETBRAINS</td>
+                                    <td>Software</td>
+                                    <td>JetBrains All Products Pack</td>
+                                    <td>Arshdeep Mutti</td>
+                                    <td><span class="badge badge-status-resolved">In Use</span></td>
+                                    <td><button class="btn btn-secondary btn-sm"
+                                            onclick="switchView('edit-resource-view', document.querySelectorAll('.nav-item')[2])">Edit</button>
+                                    </td>
+                                </tr>
+                                <tr class="clickable">
+                                    <td style="font-weight: 500; color: var(--text-primary);">NW-SW-CORE-02</td>
+                                    <td>Networking</td>
+                                    <td>Cisco Catalyst 9300 Switch</td>
+                                    <td>IT Infrastructure</td>
+                                    <td><span class="badge badge-status-resolved">Active</span></td>
+                                    <td><button class="btn btn-secondary btn-sm"
+                                            onclick="switchView('edit-resource-view', document.querySelectorAll('.nav-item')[2])">Edit</button>
+                                    </td>
+                                </tr>
+                                <tr class="clickable">
+                                    <td style="font-weight: 500; color: var(--text-primary);">HW-SRV-RACK-04</td>
+                                    <td>Hardware</td>
+                                    <td>Dell PowerEdge R750</td>
+                                    <td>Data Center Team</td>
+                                    <td><span class="badge badge-status-open"
+                                            style="border-color: var(--warning-color); color: var(--warning-color);">Maintenance Needed</span></td>
+                                    <td><button class="btn btn-secondary btn-sm"
+                                            onclick="switchView('edit-resource-view', document.querySelectorAll('.nav-item')[2])">Edit</button>
+                                    </td>
+                                </tr>
+                                <tr class="clickable">
+                                    <td style="font-weight: 500; color: var(--text-primary);">VRT-REDIS-Cache</td>
+                                    <td>Virtual</td>
+                                    <td>AWS ElastiCache Redis Cluster</td>
+                                    <td>Database Team</td>
+                                    <td><span class="badge badge-status-resolved">Active</span></td>
+                                    <td><button class="btn btn-secondary btn-sm"
+                                            onclick="switchView('edit-resource-view', document.querySelectorAll('.nav-item')[2])">Edit</button>
+                                    </td>
+                                </tr>
+                                <tr class="clickable">
+                                    <td style="font-weight: 500; color: var(--text-primary);">SW-LIC-DATADOG</td>
+                                    <td>Software</td>
+                                    <td>Datadog APM & Logs Suite</td>
+                                    <td>DevOps Team</td>
+                                    <td><span class="badge badge-status-resolved">Active</span></td>
+                                    <td><button class="btn btn-secondary btn-sm"
+                                            onclick="switchView('edit-resource-view', document.querySelectorAll('.nav-item')[2])">Edit</button>
+                                    </td>
+                                </tr>
+                                <tr class="clickable">
+                                    <td style="font-weight: 500; color: var(--text-primary);">HW-MNT-2110</td>
+                                    <td>Hardware</td>
+                                    <td>Dell UltraSharp 27" 4K Monitor</td>
+                                    <td>Prabhnoorjit Hans</td>
+                                    <td><span class="badge badge-status-resolved">In Use</span></td>
+                                    <td><button class="btn btn-secondary btn-sm"
+                                            onclick="switchView('edit-resource-view', document.querySelectorAll('.nav-item')[2])">Edit</button>
+                                    </td>
+                                </tr>
+                                <tr class="clickable">
+                                    <td style="font-weight: 500; color: var(--text-primary);">HW-LTP-4112</td>
+                                    <td>Hardware</td>
+                                    <td>Lenovo ThinkPad X1 Carbon Gen 11</td>
+                                    <td><span style="color: var(--text-secondary); font-style: italic;">Unassigned</span></td>
+                                    <td><span class="badge badge-status-resolved">In Stock</span></td>
+                                    <td><button class="btn btn-secondary btn-sm"
+                                            onclick="switchView('edit-resource-view', document.querySelectorAll('.nav-item')[2])">Edit</button>
+                                    </td>
+                                </tr>
+                                <tr class="clickable">
+                                    <td style="font-weight: 500; color: var(--text-primary);">VRT-AI-GPU-01</td>
+                                    <td>Virtual</td>
+                                    <td>AWS EC2 p4d.24xlarge (8x A100 GPU)</td>
+                                    <td>ML Engineering</td>
+                                    <td><span class="badge badge-status-open"
+                                            style="border-color: var(--danger-color); color: var(--danger-color);">High Load</span></td>
+                                    <td><button class="btn btn-secondary btn-sm"
+                                            onclick="switchView('edit-resource-view', document.querySelectorAll('.nav-item')[2])">Edit</button>
+                                    </td>
+                                </tr>
+                                <tr class="clickable">
+                                    <td style="font-weight: 500; color: var(--text-primary);">SW-LIC-SLACK</td>
+                                    <td>Software</td>
+                                    <td>Slack Enterprise Grid Plan</td>
+                                    <td>All Employees</td>
+                                    <td><span class="badge badge-status-resolved">Active</span></td>
+                                    <td><button class="btn btn-secondary btn-sm"
+                                            onclick="switchView('edit-resource-view', document.querySelectorAll('.nav-item')[2])">Edit</button>
+                                    </td>
+                                </tr>
+                                <tr class="clickable">
+                                    <td style="font-weight: 500; color: var(--text-primary);">NW-FW-PALO-01</td>
+                                    <td>Networking</td>
+                                    <td>Palo Alto Networks PA-440 Firewall</td>
+                                    <td>InfoSec Team</td>
+                                    <td><span class="badge badge-status-resolved">Active</span></td>
+                                    <td><button class="btn btn-secondary btn-sm"
+                                            onclick="switchView('edit-resource-view', document.querySelectorAll('.nav-item')[2])">Edit</button>
+                                    </td>
+                                </tr>
+                                <tr class="clickable">
+                                    <td style="font-weight: 500; color: var(--text-primary);">HW-CAM-LOGI-08</td>
+                                    <td>Hardware</td>
+                                    <td>Logitech Brio 4K Ultra HD Webcam</td>
+                                    <td>Sarah Jenkins</td>
+                                    <td><span class="badge badge-status-resolved">In Use</span></td>
+                                    <td><button class="btn btn-secondary btn-sm"
+                                            onclick="switchView('edit-resource-view', document.querySelectorAll('.nav-item')[2])">Edit</button>
+                                    </td>
+                                </tr>
+                                <tr class="clickable">
+                                    <td style="font-weight: 500; color: var(--text-primary);">VRT-CDN-CF-01</td>
+                                    <td>Virtual</td>
+                                    <td>AWS CloudFront Global CDN</td>
+                                    <td>Web Operations Team</td>
+                                    <td><span class="badge badge-status-resolved">Active</span></td>
+                                    <td><button class="btn btn-secondary btn-sm"
+                                            onclick="switchView('edit-resource-view', document.querySelectorAll('.nav-item')[2])">Edit</button>
+                                    </td>
+                                </tr>
+                                <tr class="clickable">
+                                    <td style="font-weight: 500; color: var(--text-primary);">SW-LIC-ZOOM</td>
+                                    <td>Software</td>
+                                    <td>Zoom Workplace Enterprise Suite</td>
+                                    <td>HR & Operations</td>
+                                    <td><span class="badge badge-status-resolved">Active</span></td>
+                                    <td><button class="btn btn-secondary btn-sm"
+                                            onclick="switchView('edit-resource-view', document.querySelectorAll('.nav-item')[2])">Edit</button>
+                                    </td>
+                                </tr>
+                                <tr class="clickable">
+                                    <td style="font-weight: 500; color: var(--text-primary);">HW-DOCK-DELL</td>
+                                    <td>Hardware</td>
+                                    <td>Dell WD19TBS Thunderbolt Docking Station</td>
+                                    <td><span style="color: var(--text-secondary); font-style: italic;">Unassigned</span></td>
+                                    <td><span class="badge badge-status-resolved">In Stock</span></td>
+                                    <td><button class="btn btn-secondary btn-sm"
+                                            onclick="switchView('edit-resource-view', document.querySelectorAll('.nav-item')[2])">Edit</button>
+                                    </td>
+                                </tr>
+                                <tr class="clickable">
+                                    <td style="font-weight: 500; color: var(--text-primary);">VRT-MQ-KAFKA</td>
+                                    <td>Virtual</td>
+                                    <td>Confluent Cloud Dedicated Kafka</td>
+                                    <td>Data Platform Team</td>
+                                    <td><span class="badge badge-status-resolved">Active</span></td>
+                                    <td><button class="btn btn-secondary btn-sm"
+                                            onclick="switchView('edit-resource-view', document.querySelectorAll('.nav-item')[2])">Edit</button>
+                                    </td>
+                                </tr>
+                                <tr class="clickable">
+                                    <td style="font-weight: 500; color: var(--text-primary);">NW-AP-MERAKI-12</td>
+                                    <td>Networking</td>
+                                    <td>Cisco Meraki MR46 Wi-Fi 6 AP</td>
+                                    <td>HQ Floor 3 East</td>
+                                    <td><span class="badge badge-status-open"
+                                            style="border-color: var(--warning-color); color: var(--warning-color);">Firmware Update</span></td>
+                                    <td><button class="btn btn-secondary btn-sm"
+                                            onclick="switchView('edit-resource-view', document.querySelectorAll('.nav-item')[2])">Edit</button>
+                                    </td>
+                                </tr>
+                                <tr class="clickable">
+                                    <td style="font-weight: 500; color: var(--text-primary);">SW-LIC-GITHUB</td>
+                                    <td>Software</td>
+                                    <td>GitHub Enterprise Cloud Organization</td>
+                                    <td>Engineering Team</td>
+                                    <td><span class="badge badge-status-resolved">Active</span></td>
+                                    <td><button class="btn btn-secondary btn-sm"
+                                            onclick="switchView('edit-resource-view', document.querySelectorAll('.nav-item')[2])">Edit</button>
+                                    </td>
+                                </tr>
+                                <tr class="clickable">
+                                    <td style="font-weight: 500; color: var(--text-primary);">HW-TAB-IPAD-03</td>
+                                    <td>Hardware</td>
+                                    <td>Apple iPad Pro 12.9" M2 with Pencil</td>
+                                    <td>Design Team</td>
+                                    <td><span class="badge badge-status-resolved">In Use</span></td>
+                                    <td><button class="btn btn-secondary btn-sm"
+                                            onclick="switchView('edit-resource-view', document.querySelectorAll('.nav-item')[2])">Edit</button>
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>
@@ -1806,7 +2432,8 @@
             <div id="kb-view" class="view-section">
                 <div class="flex-between mb-4">
                     <h1>Knowledge Base</h1>
-                    <button class="btn btn-primary" onclick="showToast('Article editor opened', 'info')">+ New
+                    <button class="btn btn-primary"
+                        onclick="switchView('edit-kb-article-view', document.querySelectorAll('.nav-item')[3])">+ New
                         Article</button>
                 </div>
 
@@ -1927,8 +2554,10 @@
                                                 d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z">
                                             </path>
                                         </svg> Share</button>
-                                    <button class="btn btn-secondary btn-sm"><svg width="14" height="14" fill="none"
-                                            stroke="currentColor" viewBox="0 0 24 24">
+                                    <button class="btn btn-secondary btn-sm"
+                                        onclick="switchView('edit-kb-article-view', document.querySelectorAll('.nav-item')[3])"><svg
+                                            width="14" height="14" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z">
                                             </path>
@@ -2121,7 +2750,350 @@
                 </div>
             </div>
 
-            <!-- VIEW: ESCALATION FLOW -->
+            <!-- VIEW: EDIT KB ARTICLE -->
+            <div id="edit-kb-article-view" class="view-section">
+                <div class="flex-between mb-4">
+                    <div style="display: flex; align-items: center; gap: 16px;">
+                        <button class="icon-btn"
+                            onclick="switchView('kb-view', document.querySelectorAll('.nav-item')[3])"
+                            title="Back to Knowledge Base">
+                            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                            </svg>
+                        </button>
+                        <div>
+                            <h1 style="margin-bottom: 4px;">Edit Article</h1>
+                            <div class="text-sm" style="color: var(--text-secondary);">Last saved 2 minutes ago by
+                                Prabhnoorjit Hans</div>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 12px;">
+                        <button class="btn btn-secondary"
+                            onclick="switchView('kb-view', document.querySelectorAll('.nav-item')[3])">Cancel</button>
+                        <button class="btn btn-primary"
+                            onclick="showToast('Article saved and published successfully!', 'success'); switchView('kb-view', document.querySelectorAll('.nav-item')[3])">Save
+                            Changes</button>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 3fr 1fr; gap: 24px;">
+                    <!-- Main Editor Panel -->
+                    <div class="panel" style="margin-bottom: 0; display: flex; flex-direction: column; gap: 20px;">
+                        <div>
+                            <label class="form-label"
+                                style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-primary);">Article
+                                Title</label>
+                            <input type="text" class="form-control"
+                                value="Troubleshooting Remote VPN Connectivity Drops"
+                                style="font-size: 16px; font-weight: 500; padding: 12px 16px; width: 100%;">
+                        </div>
+
+                        <!-- Formatting Toolbar -->
+                        <div>
+                            <label class="form-label"
+                                style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-primary);">Content
+                                Body (Markdown Supported)</label>
+                            <div
+                                style="display: flex; flex-wrap: wrap; gap: 6px; padding: 8px 12px; background: var(--button-secondary-bg); border: 1px solid var(--panel-border); border-bottom: none; border-radius: 8px 8px 0 0;">
+                                <button class="btn btn-secondary btn-sm" style="padding: 4px 10px; font-weight: bold;"
+                                    title="Bold">B</button>
+                                <button class="btn btn-secondary btn-sm" style="padding: 4px 10px; font-style: italic;"
+                                    title="Italic">I</button>
+                                <button class="btn btn-secondary btn-sm"
+                                    style="padding: 4px 10px; text-decoration: underline;" title="Underline">U</button>
+                                <div style="width: 1px; background: var(--panel-border); margin: 0 4px;"></div>
+                                <button class="btn btn-secondary btn-sm" style="padding: 4px 10px;"
+                                    title="Heading 1">H1</button>
+                                <button class="btn btn-secondary btn-sm" style="padding: 4px 10px;"
+                                    title="Heading 2">H2</button>
+                                <button class="btn btn-secondary btn-sm"
+                                    style="padding: 4px 10px; font-family: monospace;"
+                                    title="Code Block">&lt;/&gt;</button>
+                                <div style="width: 1px; background: var(--panel-border); margin: 0 4px;"></div>
+                                <button class="btn btn-secondary btn-sm" style="padding: 4px 10px;"
+                                    title="Bullet List">• List</button>
+                                <button class="btn btn-secondary btn-sm" style="padding: 4px 10px;"
+                                    title="Insert Link">🔗 Link</button>
+                                <button class="btn btn-secondary btn-sm" style="padding: 4px 10px;"
+                                    title="Attach File">📎 Attach</button>
+                            </div>
+                            <textarea class="form-control"
+                                style="width: 100%; min-height: 420px; font-family: monospace; font-size: 14px; line-height: 1.6; padding: 16px; border-radius: 0 0 8px 8px; resize: vertical; background: var(--input-bg);">## 1. Overview & Scope
+This guide addresses the common issue where end users experience frequent disconnects from the corporate VPN, specifically when utilizing split-tunneling on Windows 11 machines connecting via home ISPs.
+
+## 2. Resolution Steps
+
+**Step 1: Verify the client version.**
+Ensure the user is running the latest version of the VPN client (v4.2.1 or higher). Older versions have known compatibility issues with recent Windows OS updates.
+
+**Step 2: Check MTU Settings.**
+Often, home ISP routers fragment packets if the MTU is too high. Instruct the user or use remote management to lower the VPN adapter MTU to 1350.
+
+```cmd
+netsh interface ipv4 set subinterface "VPN Connection" mtu=1350 store=persistent
+```
+
+**Step 3: Update Network Drivers.**
+Check the linked hardware resource in ServiceLink. If the device is a Dell XPS model from 2025, push the latest Intel Wi-Fi driver update via the management console.
+
+## 3. Escalation
+If the issue persists after these steps, escalate the ticket to the Level 2 Network team and attach this KB article indicating steps already taken.</textarea>
+                        </div>
+                    </div>
+
+                    <!-- Right Metadata Sidebar -->
+                    <div style="display: flex; flex-direction: column; gap: 24px;">
+                        <div class="panel" style="margin-bottom: 0; display: flex; flex-direction: column; gap: 16px;">
+                            <h3
+                                style="font-size: 14px; border-bottom: 1px solid var(--panel-border); padding-bottom: 12px; margin-bottom: 4px;">
+                                Publishing Settings</h3>
+
+                            <div>
+                                <label class="text-sm"
+                                    style="color: var(--text-secondary); display: block; margin-bottom: 6px;">Category</label>
+                                <select class="form-control"
+                                    style="width: 100%; padding: 8px 12px; background-color: var(--input-bg);">
+                                    <option selected>Networking & VPN</option>
+                                    <option>Hardware & Policies</option>
+                                    <option>Software & Licenses</option>
+                                    <option>Security & Identity</option>
+                                    <option>HR & Onboarding</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="text-sm"
+                                    style="color: var(--text-secondary); display: block; margin-bottom: 6px;">Visibility</label>
+                                <select class="form-control"
+                                    style="width: 100%; padding: 8px 12px; background-color: var(--input-bg);">
+                                    <option selected>Public (All Users)</option>
+                                    <option>Internal Only (Technicians)</option>
+                                    <option>Draft / Hidden</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="text-sm"
+                                    style="color: var(--text-secondary); display: block; margin-bottom: 6px;">Author</label>
+                                <div
+                                    style="display: flex; align-items: center; gap: 10px; padding: 8px 12px; background: var(--button-secondary-bg); border-radius: 6px; border: 1px solid var(--panel-border);">
+                                    <div class="avatar" style="width: 24px; height: 24px; font-size: 10px;">PH</div>
+                                    <span
+                                        style="font-size: 13px; font-weight: 500; color: var(--text-primary);">Prabhnoorjit
+                                        Hans</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="panel" style="margin-bottom: 0; display: flex; flex-direction: column; gap: 16px;">
+                            <h3
+                                style="font-size: 14px; border-bottom: 1px solid var(--panel-border); padding-bottom: 12px; margin-bottom: 4px;">
+                                Tags & Keywords</h3>
+                            <div>
+                                <label class="text-sm"
+                                    style="color: var(--text-secondary); display: block; margin-bottom: 6px;">Add Tags
+                                    (comma separated)</label>
+                                <input type="text" class="form-control"
+                                    value="VPN, Networking, Windows11, Troubleshooting"
+                                    style="width: 100%; padding: 8px 12px; font-size: 13px;">
+                            </div>
+                            <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+                                <span class="badge"
+                                    style="background: var(--button-secondary-bg); border: 1px solid var(--panel-border);">#VPN
+                                    ✕</span>
+                                <span class="badge"
+                                    style="background: var(--button-secondary-bg); border: 1px solid var(--panel-border);">#Networking
+                                    ✕</span>
+                                <span class="badge"
+                                    style="background: var(--button-secondary-bg); border: 1px solid var(--panel-border);">#Windows11
+                                    ✕</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: EDIT RESOURCE -->
+            <div id="edit-resource-view" class="view-section">
+                <div class="flex-between mb-4">
+                    <div style="display: flex; align-items: center; gap: 16px;">
+                        <button class="icon-btn"
+                            onclick="switchView('resource-view', document.querySelectorAll('.nav-item')[2])"
+                            title="Back to Resources">
+                            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                            </svg>
+                        </button>
+                        <div>
+                            <h1 style="margin-bottom: 4px;">Edit Resource / Asset</h1>
+                            <div class="text-sm" style="color: var(--text-secondary);">Asset Tag: VRT-Build-Server-01 •
+                                Last audited 3 days ago</div>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 12px;">
+                        <button class="btn btn-secondary"
+                            onclick="switchView('resource-view', document.querySelectorAll('.nav-item')[2])">Cancel</button>
+                        <button class="btn btn-primary"
+                            onclick="showToast('Resource saved successfully!', 'success'); switchView('resource-view', document.querySelectorAll('.nav-item')[2])">Save
+                            Resource</button>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px;">
+                    <!-- Left Form Panel -->
+                    <div style="display: flex; flex-direction: column; gap: 24px;">
+                        <div class="panel" style="margin-bottom: 0; display: flex; flex-direction: column; gap: 20px;">
+                            <h3
+                                style="font-size: 16px; border-bottom: 1px solid var(--panel-border); padding-bottom: 12px; margin-bottom: 0;">
+                                Hardware & System Specifications</h3>
+
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                                <div>
+                                    <label class="form-label"
+                                        style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-primary);">Resource
+                                        Tag / ID</label>
+                                    <input type="text" class="form-control" value="VRT-Build-Server-01"
+                                        style="width: 100%; padding: 10px 14px; font-family: monospace; font-weight: bold;">
+                                </div>
+                                <div>
+                                    <label class="form-label"
+                                        style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-primary);">Asset
+                                        Category</label>
+                                    <select class="form-control"
+                                        style="width: 100%; padding: 10px 14px; background-color: var(--input-bg);">
+                                        <option selected>Virtual Server / Cloud</option>
+                                        <option>Hardware (Laptop / Desktop)</option>
+                                        <option>Software License / SaaS</option>
+                                        <option>Networking Equipment</option>
+                                        <option>Peripherals & Monitors</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                                <div>
+                                    <label class="form-label"
+                                        style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-primary);">Make
+                                        & Model / Instance Type</label>
+                                    <input type="text" class="form-control" value="AWS EC2 t3.xlarge (4 vCPU, 16GB RAM)"
+                                        style="width: 100%; padding: 10px 14px;">
+                                </div>
+                                <div>
+                                    <label class="form-label"
+                                        style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-primary);">Serial
+                                        Number / IP Address</label>
+                                    <input type="text" class="form-control" value="10.240.12.88 (i-08a9f2429bc0182)"
+                                        style="width: 100%; padding: 10px 14px; font-family: monospace;">
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="form-label"
+                                    style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-primary);">Configuration
+                                    & Maintenance Notes</label>
+                                <textarea class="form-control"
+                                    style="width: 100%; min-height: 140px; padding: 12px 14px; line-height: 1.6; background: var(--input-bg); resize: vertical;">Instance hosted in us-east-1a zone. Attached to VPC security group sg-091823ab with restricted SSH ingress. Automated EBS snapshots configured daily at 04:00 UTC via AWS Backup vault. Primary host for Jenkins CI build pipelines.</textarea>
+                            </div>
+                        </div>
+
+                        <div class="panel" style="margin-bottom: 0;">
+                            <h3
+                                style="font-size: 16px; border-bottom: 1px solid var(--panel-border); padding-bottom: 12px; margin-bottom: 16px;">
+                                Linked Tickets & Incidents</h3>
+                            <div
+                                style="display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 8px;">
+                                <div style="display: flex; align-items: center; gap: 12px;">
+                                    <span class="badge badge-priority-high">Critical</span>
+                                    <div>
+                                        <strong
+                                            style="color: var(--text-primary); display: block; font-size: 14px;">INC-1042:
+                                            Production Build Pipeline Failing</strong>
+                                        <span class="text-sm" style="color: var(--text-secondary);">Reported today at
+                                            09:15 AM • Assigned to Chris Karki</span>
+                                    </div>
+                                </div>
+                                <button class="btn btn-secondary btn-sm"
+                                    onclick="switchView('ticket-view', document.querySelectorAll('.nav-item')[1])">View
+                                    Incident</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Metadata Panel -->
+                    <div style="display: flex; flex-direction: column; gap: 24px;">
+                        <div class="panel" style="margin-bottom: 0; display: flex; flex-direction: column; gap: 16px;">
+                            <h3
+                                style="font-size: 14px; border-bottom: 1px solid var(--panel-border); padding-bottom: 12px; margin-bottom: 4px;">
+                                Allocation & Status</h3>
+
+                            <div>
+                                <label class="text-sm"
+                                    style="color: var(--text-secondary); display: block; margin-bottom: 6px;">Operational
+                                    Status</label>
+                                <select class="form-control"
+                                    style="width: 100%; padding: 8px 12px; background-color: var(--input-bg); border-color: var(--danger-color); color: var(--danger-color); font-weight: 600;">
+                                    <option>Active / In Use</option>
+                                    <option selected>Incident Active</option>
+                                    <option>Maintenance Needed</option>
+                                    <option>In Stock / Unassigned</option>
+                                    <option>Retired / Decommissioned</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="text-sm"
+                                    style="color: var(--text-secondary); display: block; margin-bottom: 6px;">Assigned
+                                    User / Team</label>
+                                <select class="form-control"
+                                    style="width: 100%; padding: 8px 12px; background-color: var(--input-bg);">
+                                    <option selected>DevOps Team</option>
+                                    <option>Jane Developer</option>
+                                    <option>Chris Karki</option>
+                                    <option>Arshdeep Mutti</option>
+                                    <option>Unassigned</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="text-sm"
+                                    style="color: var(--text-secondary); display: block; margin-bottom: 6px;">Provision
+                                    Date</label>
+                                <input type="date" class="form-control" value="2025-10-12"
+                                    style="width: 100%; padding: 8px 12px; background-color: var(--input-bg);">
+                            </div>
+
+                            <div>
+                                <label class="text-sm"
+                                    style="color: var(--text-secondary); display: block; margin-bottom: 6px;">Monthly
+                                    Cost / Amortization</label>
+                                <input type="text" class="form-control" value="$314.50 / month"
+                                    style="width: 100%; padding: 8px 12px; background-color: var(--input-bg);">
+                            </div>
+                        </div>
+
+                        <div class="panel" style="margin-bottom: 0;">
+                            <h3
+                                style="font-size: 14px; border-bottom: 1px solid var(--panel-border); padding-bottom: 12px; margin-bottom: 12px;">
+                                Quick Actions</h3>
+                            <div style="display: flex; flex-direction: column; gap: 8px;">
+                                <button class="btn btn-secondary" style="width: 100%; justify-content: center;"
+                                    onclick="showToast('Diagnostic reboot initiated...', 'info')">🔄 Reboot / Reset
+                                    Asset</button>
+                                <button class="btn btn-secondary" style="width: 100%; justify-content: center;"
+                                    onclick="showToast('Audit report downloaded', 'success')">📥 Download Audit
+                                    Log</button>
+                                <button class="btn btn-secondary"
+                                    style="width: 100%; justify-content: center; color: var(--danger-color); border-color: rgba(239,68,68,0.3);"
+                                    onclick="showToast('Asset marked for decommissioning', 'warning')">⚠️ Decommission
+                                    Asset</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- VIEW: ESCALATION FLOW -->
             <div id="escalation-view" class="view-section">
                 <div class="flex-between mb-4">
@@ -2383,43 +3355,43 @@
                         <div style="display: flex; align-items: center; justify-content: center; gap: 24px; flex: 1;">
                             <!-- CSS Donut -->
                             <div
-                                style="width: 120px; height: 120px; border-radius: 50%; background: conic-gradient(
+                                style="width: 160px; height: 160px; border-radius: 50%; background: conic-gradient(
                                 var(--accent-color) 0% 35%, 
                                 #a855f7 35% 61%, 
                                 var(--warning-color) 61% 82%, 
                                 #0ea5e9 82% 100%); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
                                 <div
-                                    style="width: 80px; height: 80px; border-radius: 50%; background: var(--panel-bg); display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                                    style="width: 110px; height: 110px; border-radius: 50%; background: var(--panel-bg); display: flex; flex-direction: column; align-items: center; justify-content: center;">
                                     <span
-                                        style="font-size: 20px; font-weight: 700; color: var(--text-primary); line-height: 1;">34</span>
-                                    <span style="font-size: 10px; color: var(--text-secondary);">open</span>
+                                        style="font-size: 28px; font-weight: 700; color: var(--text-primary); line-height: 1; margin-bottom: 2px;">34</span>
+                                    <span style="font-size: 12px; color: var(--text-secondary);">open</span>
                                 </div>
                             </div>
                             <!-- Legend -->
-                            <div style="display: flex; flex-direction: column; gap: 12px;">
+                            <div style="display: flex; flex-direction: column; gap: 16px;">
                                 <div
-                                    style="display: flex; align-items: center; gap: 8px; font-size: 11px; color: var(--text-secondary);">
+                                    style="display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--text-secondary);">
                                     <div
-                                        style="width: 8px; height: 8px; border-radius: 50%; background: var(--accent-color);">
+                                        style="width: 10px; height: 10px; border-radius: 50%; background: var(--accent-color);">
                                     </div>
                                     <span style="color: var(--text-primary);">In Progress</span> — 12 (35%)
                                 </div>
                                 <div
-                                    style="display: flex; align-items: center; gap: 8px; font-size: 11px; color: var(--text-secondary);">
-                                    <div style="width: 8px; height: 8px; border-radius: 50%; background: #a855f7;">
+                                    style="display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--text-secondary);">
+                                    <div style="width: 10px; height: 10px; border-radius: 50%; background: #a855f7;">
                                     </div>
                                     <span style="color: var(--text-primary);">Assigned</span> — 9 (26%)
                                 </div>
                                 <div
-                                    style="display: flex; align-items: center; gap: 8px; font-size: 11px; color: var(--text-secondary);">
+                                    style="display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--text-secondary);">
                                     <div
-                                        style="width: 8px; height: 8px; border-radius: 50%; background: var(--warning-color);">
+                                        style="width: 10px; height: 10px; border-radius: 50%; background: var(--warning-color);">
                                     </div>
                                     <span style="color: var(--text-primary);">Waiting on User</span> — 7 (21%)
                                 </div>
                                 <div
-                                    style="display: flex; align-items: center; gap: 8px; font-size: 11px; color: var(--text-secondary);">
-                                    <div style="width: 8px; height: 8px; border-radius: 50%; background: #0ea5e9;">
+                                    style="display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--text-secondary);">
+                                    <div style="width: 10px; height: 10px; border-radius: 50%; background: #0ea5e9;">
                                     </div>
                                     <span style="color: var(--text-primary);">New</span> — 6 (18%)
                                 </div>
