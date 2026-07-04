@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ticket Detail · ServiceLink</title>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@100;200;300;400;500;600;700&family=IBM+Plex+Sans:wght@100;200;300;400;500;600;700&family=Montserrat:wght@100;200;300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/main.css">
+    <script src="js/theme.js"></script>
+</head>
+
+<body data-page="ticket-detail">
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <header data-shell="topbar"></header>
+
+    <div class="app-layout">
+        <nav data-shell="sidebar"></nav>
+
+        <div class="main-content">
+            <div class="content-area">
+                <section class="view-section">
+                    <div class="flex-between" style="margin-bottom: 12px;">
+                        <h1>INC-1042: Production Build Pipeline Failing</h1>
+                        <div class="text-sm">Created: Oct 24, 2026 at 09:15 AM by <strong>Jane Developer</strong></div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 3fr 1fr; gap: 24px;">
+                        <!-- LEFT COLUMN -->
+                        <div style="display: flex; flex-direction: column; gap: 8px;">
+                            <div class="panel"
+                                style="padding: 16px 20px; background: var(--card-tint); margin-bottom: 0;">
+                                <div style="display: flex; align-items: flex-start; gap: 12px;">
+                                    <svg width="20" height="20" fill="none" stroke="var(--text-secondary)"
+                                        viewBox="0 0 24 24" style="margin-top: 2px; flex-shrink: 0;">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M4 6h16M4 12h16M4 18h7"></path>
+                                    </svg>
+                                    <p
+                                        style="color: var(--text-primary); line-height: 1.6; font-size: 14px; margin-bottom: 0;">
+                                        The automated deployment pipeline to staging has been failing for the past hour.
+                                        The
+                                        error logs
+                                        indicate a timeout when connecting to the internal artifact repository. This is
+                                        blocking
+                                        the
+                                        release candidate for the new mobile app update.
+                                        <br><br>Please check network routing and repository instance health immediately.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div style="display: flex; flex-direction: column;">
+                                <div style="margin-bottom: 8px; background: var(--input-bg); border: 1px solid var(--panel-border); border-radius: 8px; padding: 12px; transition: border-color 0.2s;"
+                                    tabindex="0" onfocusin="this.style.borderColor='var(--text-secondary)'"
+                                    onfocusout="this.style.borderColor='var(--panel-border)'">
+                                    <textarea class="comment-input"
+                                        style="border: none; padding: 0; min-height: 50px; margin-bottom: 12px; background: transparent; box-shadow: none;"
+                                        placeholder="Add a comment or internal note..."></textarea>
+                                    <div class="flex-between">
+                                        <label
+                                            style="display: inline-flex; align-items: center; gap: 6px; cursor: pointer; color: var(--warning-color); font-weight: 500; font-size: 12px; padding: 4px 10px; background: rgba(234, 179, 8, 0.1); border-radius: 50px;">
+                                            <input type="checkbox"
+                                                style="width: 14px; height: 14px; cursor: pointer; accent-color: var(--warning-color);">
+                                            Internal Note
+                                        </label>
+                                        <button class="btn btn-primary" style="padding: 6px 16px; font-size: 13px;"
+                                            onclick="showToast('Comment posted successfully', 'success')">Post</button>
+                                    </div>
+                                </div>
+
+                                <div class="comment-thread" style="gap: 12px;">
+                                    <div class="comment"
+                                        style="padding: 12px 16px; border-radius: 8px; background: var(--button-secondary-bg); border: 1px solid var(--panel-border);">
+                                        <div class="comment-header" style="margin-bottom: 8px;">
+                                            <div class="flex-row" style="gap: 8px;">
+                                                <div class="avatar" style="width: 20px; height: 20px; font-size: 9px;">
+                                                    CK
+                                                </div>
+                                                <strong style="color: var(--text-primary); font-size: 13px;">Chris Karki
+                                                    (Manager)</strong>
+                                                <span class="badge"
+                                                    style="background: rgba(234, 179, 8, 0.1); color: var(--warning-color); border: 1px solid rgba(234, 179, 8, 0.2); font-size: 10px; padding: 2px 6px;">Internal
+                                                    Note</span>
+                                            </div>
+                                            <span class="text-sm" style="font-size: 11px;">Today at 09:30 AM</span>
+                                        </div>
+                                        <p
+                                            style="color: var(--text-primary); margin: 0; font-size: 13px; line-height: 1.5;">
+                                            Checked the firewall logs, there seems to be a new rule blocking port 8081.
+                                            Reverting the recent network config update now.</p>
+                                    </div>
+
+                                    <div class="comment"
+                                        style="padding: 12px 16px; border-radius: 8px; border: 1px solid var(--panel-border);">
+                                        <div class="comment-header" style="margin-bottom: 8px;">
+                                            <div class="flex-row" style="gap: 8px;">
+                                                <div class="avatar"
+                                                    style="width: 20px; height: 20px; font-size: 9px; background: var(--panel-bg); border: 1px solid var(--panel-border);">
+                                                    SYS</div>
+                                                <strong style="color: var(--text-primary); font-size: 13px;">System
+                                                    Automated</strong>
+                                            </div>
+                                            <span class="text-sm" style="font-size: 11px;">Today at 09:20 AM</span>
+                                        </div>
+                                        <p
+                                            style="color: var(--text-secondary); margin: 0; font-size: 13px; font-style: italic;">
+                                            Ticket status changed from New to Assigned. Auto-assigned to Chris Karki
+                                            based
+                                            on category.</p>
+                                    </div>
+
+                                    <div class="comment"
+                                        style="padding: 12px 16px; border-radius: 8px; border: 1px solid var(--panel-border);">
+                                        <div class="comment-header" style="margin-bottom: 8px;">
+                                            <div class="flex-row" style="gap: 8px;">
+                                                <div class="avatar" style="width: 20px; height: 20px; font-size: 9px;">
+                                                    JD
+                                                </div>
+                                                <strong style="color: var(--text-primary); font-size: 13px;">Jane
+                                                    Developer</strong>
+                                            </div>
+                                            <span class="text-sm" style="font-size: 11px;">Today at 09:16 AM</span>
+                                        </div>
+                                        <p
+                                            style="color: var(--text-secondary); margin: 0; font-size: 13px; line-height: 1.5;">
+                                            This is causing a complete blocker for the Q3 feature release. I've
+                                            attempted to
+                                            re-run the pipeline three times and it fails at the exact same step every
+                                            time.
+                                            Logs are attached.</p>
+                                    </div>
+
+                                    <div class="comment"
+                                        style="padding: 12px 16px; border-radius: 8px; border: 1px solid var(--panel-border);">
+                                        <div class="comment-header" style="margin-bottom: 8px;">
+                                            <div class="flex-row" style="gap: 8px;">
+                                                <div class="avatar"
+                                                    style="width: 20px; height: 20px; font-size: 9px; background: var(--panel-bg); border: 1px solid var(--panel-border);">
+                                                    SYS</div>
+                                                <strong style="color: var(--text-primary); font-size: 13px;">System
+                                                    Automated</strong>
+                                            </div>
+                                            <span class="text-sm" style="font-size: 11px;">Today at 09:15 AM</span>
+                                        </div>
+                                        <p
+                                            style="color: var(--text-secondary); margin: 0; font-size: 13px; font-style: italic;">
+                                            Ticket <strong>INC-1042</strong> submitted via Service Portal.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- RIGHT COLUMN -->
+                        <div style="display: flex; flex-direction: column; gap: 16px;">
+                            <div class="panel"
+                                style="display: flex; flex-direction: column; gap: 12px; padding: 16px 20px; margin-bottom: 0;">
+                                <button class="btn btn-primary" style="width: 100%; justify-content: center;"
+                                    onclick="showToast('Ticket marked as resolved', 'success')">Resolve Issue</button>
+                                <button class="btn btn-secondary" style="width: 100%; justify-content: center;"
+                                    onclick="location.href='ticket-edit.html'">✏️
+                                    Edit Ticket</button>
+                                <button class="btn btn-secondary" style="width: 100%; justify-content: center;"
+                                    onclick="showToast('Reassignment flow started', 'info')">Reassign Ticket</button>
+                                <button class="btn btn-secondary"
+                                    style="width: 100%; justify-content: center; color: var(--danger-color); border-color: var(--danger-color);"
+                                    onclick="location.href='ticket-escalate.html'">Escalate
+                                    Ticket</button>
+                            </div>
+
+                            <div class="panel" style="padding: 16px 20px; margin-bottom: 0;">
+                                <div style="display: flex; flex-direction: column; gap: 16px;">
+                                    <div class="flex-between">
+                                        <span class="text-sm">Status</span>
+                                        <span class="badge badge-status-open">In Progress</span>
+                                    </div>
+                                    <div class="flex-between">
+                                        <span class="text-sm">Priority</span>
+                                        <span class="badge badge-priority-high">Critical</span>
+                                    </div>
+                                    <div style="border-top: 1px solid var(--panel-border); margin: 4px 0;"></div>
+                                    <div>
+                                        <div class="text-sm" style="margin-bottom: 4px;">Assignee</div>
+                                        <div style="font-weight: 500; color: var(--text-primary); font-size: 14px;">
+                                            Chris
+                                            Karki</div>
+                                    </div>
+                                    <div>
+                                        <div class="text-sm" style="margin-bottom: 4px;">Category</div>
+                                        <div style="font-weight: 500; color: var(--text-primary); font-size: 14px;">
+                                            DevOps /
+                                            Infrastructure</div>
+                                    </div>
+                                    <div>
+                                        <div class="text-sm" style="margin-bottom: 4px;">SLA Target</div>
+                                        <div style="font-weight: 500; color: var(--text-primary); font-size: 14px;">4
+                                            Hours
+                                            (Resolution)</div>
+                                    </div>
+                                    <div>
+                                        <div class="text-sm" style="margin-bottom: 8px;">Linked Resources</div>
+                                        <span class="badge"
+                                            style="border: 1px solid var(--panel-border); cursor: pointer;"
+                                            onclick="location.href='resources.html'">VRT-Build-Server-01</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/layout.js"></script>
+    <script src="js/app.js"></script>
+</body>
+
+</html>

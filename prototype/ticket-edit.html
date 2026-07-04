@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Ticket · ServiceLink</title>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@100;200;300;400;500;600;700&family=IBM+Plex+Sans:wght@100;200;300;400;500;600;700&family=Montserrat:wght@100;200;300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/main.css">
+    <script src="js/theme.js"></script>
+</head>
+
+<body data-page="ticket-edit">
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <header data-shell="topbar"></header>
+
+    <div class="app-layout">
+        <nav data-shell="sidebar"></nav>
+
+        <div class="main-content">
+            <div class="content-area">
+                <section class="view-section">
+                    <div class="flex-between mb-4">
+                        <div style="display: flex; align-items: center; gap: 16px;">
+                            <button class="icon-btn"
+                                onclick="location.href='ticket-detail.html'"
+                                title="Back to Incident">
+                                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                                </svg>
+                            </button>
+                            <div>
+                                <h1 style="margin-bottom: 4px;">Edit Incident / Request</h1>
+                                <div class="text-sm" style="color: var(--text-secondary);">Ticket ID: INC-1042 • Created
+                                    Oct
+                                    24, 2026 by Jane Developer</div>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 12px;">
+                            <button class="btn btn-secondary"
+                                onclick="location.href='ticket-detail.html'">Cancel</button>
+                            <button class="btn btn-primary"
+                                onclick="flash('Ticket updated successfully!', 'success', 'ticket-detail.html')[1])">Save
+                                Changes</button>
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px;">
+                        <!-- Left Form Panel -->
+                        <div style="display: flex; flex-direction: column; gap: 24px;">
+                            <div class="panel"
+                                style="margin-bottom: 0; display: flex; flex-direction: column; gap: 20px;">
+                                <h3
+                                    style="font-size: 16px; border-bottom: 1px solid var(--panel-border); padding-bottom: 12px; margin-bottom: 0;">
+                                    Issue Summary & Description</h3>
+
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                                    <div>
+                                        <label class="form-label"
+                                            style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-primary);">Ticket
+                                            ID</label>
+                                        <input type="text" class="form-control" value="INC-1042" disabled
+                                            style="width: 100%; padding: 10px 14px; font-family: monospace; font-weight: bold; opacity: 0.7;">
+                                    </div>
+                                    <div>
+                                        <label class="form-label"
+                                            style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-primary);">Request
+                                            Type</label>
+                                        <select class="form-control"
+                                            style="width: 100%; padding: 10px 14px; background-color: var(--input-bg);">
+                                            <option selected>Break / Fix Incident</option>
+                                            <option>New Service Request</option>
+                                            <option>Access & Permission Change</option>
+                                            <option>Hardware Replacement</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label class="form-label"
+                                        style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-primary);">Title
+                                        / Summary</label>
+                                    <input type="text" class="form-control" value="Production Build Pipeline Failing"
+                                        style="width: 100%; padding: 10px 14px; font-weight: 500;">
+                                </div>
+
+                                <div>
+                                    <label class="form-label"
+                                        style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-primary);">Detailed
+                                        Description</label>
+                                    <textarea class="form-control"
+                                        style="width: 100%; min-height: 150px; padding: 12px 14px; line-height: 1.6; background: var(--input-bg); resize: vertical;">The automated deployment pipeline to staging has been failing for the past hour. The error logs indicate a timeout when connecting to the internal artifact repository. This is blocking the release candidate for the new mobile app update.
+
+                    Please check network routing and repository instance health immediately.</textarea>
+                                </div>
+                            </div>
+
+                            <div class="panel"
+                                style="margin-bottom: 0; display: flex; flex-direction: column; gap: 16px;">
+                                <h3
+                                    style="font-size: 16px; border-bottom: 1px solid var(--panel-border); padding-bottom: 12px; margin-bottom: 0;">
+                                    Resolution Work Log & Notes</h3>
+                                <div>
+                                    <label class="form-label"
+                                        style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-primary);">Internal
+                                        Technician Notes</label>
+                                    <textarea class="form-control"
+                                        style="width: 100%; min-height: 100px; padding: 12px 14px; line-height: 1.6; background: var(--input-bg); resize: vertical;"
+                                        placeholder="Add progress notes, root cause findings, or work done so far...">Investigating connectivity between staging Jenkins workers and Nexus repo. VPC security group rule updated to allow ingress on port 8081.</textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right Metadata Panel -->
+                        <div style="display: flex; flex-direction: column; gap: 24px;">
+                            <div class="panel"
+                                style="margin-bottom: 0; display: flex; flex-direction: column; gap: 16px;">
+                                <h3
+                                    style="font-size: 14px; border-bottom: 1px solid var(--panel-border); padding-bottom: 12px; margin-bottom: 4px;">
+                                    Status & Assignment</h3>
+
+                                <div>
+                                    <label class="text-sm"
+                                        style="color: var(--text-secondary); display: block; margin-bottom: 6px;">Workflow
+                                        Status</label>
+                                    <select class="form-control"
+                                        style="width: 100%; padding: 8px 12px; background-color: var(--input-bg); font-weight: 600; border-color: var(--warning-color); color: var(--warning-color);">
+                                        <option>New / Open</option>
+                                        <option selected>In Progress</option>
+                                        <option>Pending Vendor</option>
+                                        <option>Resolved</option>
+                                        <option>Closed</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label class="text-sm"
+                                        style="color: var(--text-secondary); display: block; margin-bottom: 6px;">Priority
+                                        Level</label>
+                                    <select class="form-control"
+                                        style="width: 100%; padding: 8px 12px; background-color: var(--input-bg); font-weight: 600; border-color: var(--danger-color); color: var(--danger-color);">
+                                        <option selected>Critical (P1)</option>
+                                        <option>High (P2)</option>
+                                        <option>Medium (P3)</option>
+                                        <option>Low (P4)</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label class="text-sm"
+                                        style="color: var(--text-secondary); display: block; margin-bottom: 6px;">Assigned
+                                        Technician</label>
+                                    <select class="form-control"
+                                        style="width: 100%; padding: 8px 12px; background-color: var(--input-bg);">
+                                        <option selected>Chris Karki</option>
+                                        <option>Jane Developer</option>
+                                        <option>Arshdeep Mutti</option>
+                                        <option>DevOps Team</option>
+                                        <option>Unassigned</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label class="text-sm"
+                                        style="color: var(--text-secondary); display: block; margin-bottom: 6px;">Category</label>
+                                    <select class="form-control"
+                                        style="width: 100%; padding: 8px 12px; background-color: var(--input-bg);">
+                                        <option selected>DevOps / Infrastructure</option>
+                                        <option>Hardware & Devices</option>
+                                        <option>Software Licenses</option>
+                                        <option>Network & Connectivity</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label class="text-sm"
+                                        style="color: var(--text-secondary); display: block; margin-bottom: 6px;">SLA
+                                        Resolution Target</label>
+                                    <input type="text" class="form-control" value="4 Hours (Expires at 13:15 PM)"
+                                        style="width: 100%; padding: 8px 12px; background-color: var(--input-bg);">
+                                </div>
+                            </div>
+
+                            <div class="panel" style="margin-bottom: 0;">
+                                <h3
+                                    style="font-size: 14px; border-bottom: 1px solid var(--panel-border); padding-bottom: 12px; margin-bottom: 12px;">
+                                    Linked Resources & Logs</h3>
+                                <div style="display: flex; flex-direction: column; gap: 12px;">
+                                    <div
+                                        style="display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; background: var(--button-secondary-bg); border-radius: 6px; border: 1px solid var(--panel-border);">
+                                        <div>
+                                            <strong
+                                                style="font-size: 13px; display: block; color: var(--text-primary);">VRT-Build-Server-01</strong>
+                                            <span class="text-sm" style="color: var(--text-secondary);">AWS EC2
+                                                t3.xlarge</span>
+                                        </div>
+                                        <button class="btn btn-secondary btn-sm"
+                                            onclick="location.href='resources.html'">View
+                                            Resource</button>
+                                    </div>
+                                    <div
+                                        style="display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; background: var(--button-secondary-bg); border-radius: 6px; border: 1px solid var(--panel-border);">
+                                        <div style="display: flex; align-items: center; gap: 8px;">
+                                            <span>📎</span>
+                                            <span
+                                                style="font-size: 13px; font-family: monospace; color: var(--text-primary);">pipeline_err.log</span>
+                                        </div>
+                                        <span class="text-sm" style="color: var(--text-secondary);">14 KB</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/layout.js"></script>
+    <script src="js/app.js"></script>
+</body>
+
+</html>

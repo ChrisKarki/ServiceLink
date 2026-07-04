@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team · ServiceLink</title>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@100;200;300;400;500;600;700&family=IBM+Plex+Sans:wght@100;200;300;400;500;600;700&family=Montserrat:wght@100;200;300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/main.css">
+    <script src="js/theme.js"></script>
+</head>
+
+<body data-page="team">
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <header data-shell="topbar"></header>
+
+    <div class="app-layout">
+        <nav data-shell="sidebar"></nav>
+
+        <div class="main-content">
+            <div class="content-area">
+                <section class="view-section">
+                    <div class="flex-between mb-4">
+                        <h1>Team</h1>
+                        <button class="btn btn-primary"
+                            onclick="showToast('Invite link sent to clipboard', 'success')">+
+                            Invite User</button>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 250px 1fr; gap: 24px;">
+                        <!-- Admin Sidebar -->
+                        <div style="display: flex; flex-direction: column; gap: 16px;">
+                            <div class="panel" style="padding: 16px; margin-bottom: 0;">
+                                <ul
+                                    style="list-style: none; display: flex; flex-direction: column; gap: 8px; font-size: 14px; color: var(--text-secondary);">
+                                    <li class="category-item category-admin active" onclick="selectCategory(this)">User
+                                        Management</li>
+                                    <li class="category-item category-admin" onclick="selectCategory(this)">Role
+                                        Permissions
+                                    </li>
+                                    <li class="category-item category-admin" onclick="selectCategory(this)">SLA
+                                        Configurations</li>
+                                    <li class="category-item category-admin" onclick="selectCategory(this)">SSO &
+                                        Identity
+                                    </li>
+                                    <li class="category-item category-admin" onclick="selectCategory(this)">Audit Logs
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <div class="panel" style="padding: 16px;">
+                                <h3
+                                    style="font-size: 13px; margin-bottom: 12px; color: var(--text-secondary); text-transform: uppercase;">
+                                    System Health</h3>
+                                <div
+                                    style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px;">
+                                    <span>API Status</span>
+                                    <span style="color: var(--success-color);">Operational</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; font-size: 13px;">
+                                    <span>License Usage</span>
+                                    <span>45 / 50</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Admin Main Content -->
+                        <div class="panel" style="padding: 0; margin: 0; height: fit-content;">
+                            <div class="table-wrapper">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Email</th>
+                                            <th>Role</th>
+                                            <th>Status</th>
+                                            <th>Last Login</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td style="font-weight: 500; color: var(--text-primary);">Chris Karki</td>
+                                            <td style="color: var(--text-secondary);">chris@example.com</td>
+                                            <td>
+                                                <select class="form-control"
+                                                    style="padding: 4px 8px; font-size: 13px; width: auto;"
+                                                    onchange="showToast('Role updated to ' + this.value, 'success')">
+                                                    <option>Administrator</option>
+                                                    <option selected>Manager</option>
+                                                    <option>Technician</option>
+                                                    <option>End User</option>
+                                                </select>
+                                            </td>
+                                            <td><span class="badge badge-status-resolved">Active</span></td>
+                                            <td class="text-sm">Just now</td>
+                                            <td><button class="btn btn-secondary btn-sm"
+                                                    onclick="showToast('Opening edit panel...', 'info')">Edit</button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="font-weight: 500; color: var(--text-primary);">Arshdeep Mutti
+                                            </td>
+                                            <td style="color: var(--text-secondary);">arshdeep@example.com</td>
+                                            <td>
+                                                <select class="form-control"
+                                                    style="padding: 4px 8px; font-size: 13px; width: auto;"
+                                                    onchange="showToast('Role updated to ' + this.value, 'success')">
+                                                    <option>Administrator</option>
+                                                    <option>Manager</option>
+                                                    <option selected>Technician</option>
+                                                    <option>End User</option>
+                                                </select>
+                                            </td>
+                                            <td><span class="badge badge-status-resolved">Active</span></td>
+                                            <td class="text-sm">2 hours ago</td>
+                                            <td><button class="btn btn-secondary btn-sm"
+                                                    onclick="showToast('Opening edit panel...', 'info')">Edit</button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="font-weight: 500; color: var(--text-primary);">Katie Weng</td>
+                                            <td style="color: var(--text-secondary);">katie@example.com</td>
+                                            <td>
+                                                <select class="form-control"
+                                                    style="padding: 4px 8px; font-size: 13px; width: auto;"
+                                                    onchange="showToast('Role updated to ' + this.value, 'success')">
+                                                    <option>Administrator</option>
+                                                    <option>Manager</option>
+                                                    <option selected>Technician</option>
+                                                    <option>End User</option>
+                                                </select>
+                                            </td>
+                                            <td><span class="badge"
+                                                    style="border: 1px solid var(--warning-color); color: var(--warning-color);">Away</span>
+                                            </td>
+                                            <td class="text-sm">1 day ago</td>
+                                            <td><button class="btn btn-secondary btn-sm"
+                                                    onclick="showToast('Opening edit panel...', 'info')">Edit</button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="font-weight: 500; color: var(--text-primary);">Unknown User</td>
+                                            <td style="color: var(--text-secondary);">newguy@example.com</td>
+                                            <td>
+                                                <select class="form-control"
+                                                    style="padding: 4px 8px; font-size: 13px; width: auto;"
+                                                    onchange="showToast('Role updated to ' + this.value, 'success')">
+                                                    <option>Administrator</option>
+                                                    <option>Manager</option>
+                                                    <option>Technician</option>
+                                                    <option selected>End User</option>
+                                                </select>
+                                            </td>
+                                            <td><span class="badge badge-priority-high">Suspended</span></td>
+                                            <td class="text-sm">Never</td>
+                                            <td><button class="btn btn-secondary btn-sm"
+                                                    onclick="showToast('User Activated', 'success')">Activate</button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="font-weight: 500; color: var(--text-primary);">Hiten Lamba</td>
+                                            <td style="color: var(--text-secondary);">hiten@example.com</td>
+                                            <td>
+                                                <select class="form-control"
+                                                    style="padding: 4px 8px; font-size: 13px; width: auto;"
+                                                    onchange="showToast('Role updated to ' + this.value, 'success')">
+                                                    <option>Administrator</option>
+                                                    <option>Manager</option>
+                                                    <option selected>Technician</option>
+                                                    <option>End User</option>
+                                                </select>
+                                            </td>
+                                            <td><span class="badge badge-status-resolved">Active</span></td>
+                                            <td class="text-sm">4 hours ago</td>
+                                            <td><button class="btn btn-secondary btn-sm"
+                                                    onclick="showToast('Opening edit panel...', 'info')">Edit</button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="font-weight: 500; color: var(--text-primary);">John Doe</td>
+                                            <td style="color: var(--text-secondary);">john.doe@example.com</td>
+                                            <td>
+                                                <select class="form-control"
+                                                    style="padding: 4px 8px; font-size: 13px; width: auto;"
+                                                    onchange="showToast('Role updated to ' + this.value, 'success')">
+                                                    <option>Administrator</option>
+                                                    <option>Manager</option>
+                                                    <option>Technician</option>
+                                                    <option selected>End User</option>
+                                                </select>
+                                            </td>
+                                            <td><span class="badge badge-status-resolved">Active</span></td>
+                                            <td class="text-sm">3 days ago</td>
+                                            <td><button class="btn btn-secondary btn-sm"
+                                                    onclick="showToast('Opening edit panel...', 'info')">Edit</button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="font-weight: 500; color: var(--text-primary);">Jane Smith</td>
+                                            <td style="color: var(--text-secondary);">jane.smith@example.com</td>
+                                            <td>
+                                                <select class="form-control"
+                                                    style="padding: 4px 8px; font-size: 13px; width: auto;"
+                                                    onchange="showToast('Role updated to ' + this.value, 'success')">
+                                                    <option>Administrator</option>
+                                                    <option>Manager</option>
+                                                    <option>Technician</option>
+                                                    <option selected>End User</option>
+                                                </select>
+                                            </td>
+                                            <td><span class="badge badge-status-resolved">Active</span></td>
+                                            <td class="text-sm">5 hours ago</td>
+                                            <td><button class="btn btn-secondary btn-sm"
+                                                    onclick="showToast('Opening edit panel...', 'info')">Edit</button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="font-weight: 500; color: var(--text-primary);">Bob Jenkins</td>
+                                            <td style="color: var(--text-secondary);">bob.j@example.com</td>
+                                            <td>
+                                                <select class="form-control"
+                                                    style="padding: 4px 8px; font-size: 13px; width: auto;"
+                                                    onchange="showToast('Role updated to ' + this.value, 'success')">
+                                                    <option>Administrator</option>
+                                                    <option>Manager</option>
+                                                    <option>Technician</option>
+                                                    <option selected>End User</option>
+                                                </select>
+                                            </td>
+                                            <td><span class="badge badge-status-resolved">Active</span></td>
+                                            <td class="text-sm">2 days ago</td>
+                                            <td><button class="btn btn-secondary btn-sm"
+                                                    onclick="showToast('Opening edit panel...', 'info')">Edit</button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="font-weight: 500; color: var(--text-primary);">Alice Cooper</td>
+                                            <td style="color: var(--text-secondary);">alice.c@example.com</td>
+                                            <td>
+                                                <select class="form-control"
+                                                    style="padding: 4px 8px; font-size: 13px; width: auto;"
+                                                    onchange="showToast('Role updated to ' + this.value, 'success')">
+                                                    <option>Administrator</option>
+                                                    <option>Manager</option>
+                                                    <option>Technician</option>
+                                                    <option selected>End User</option>
+                                                </select>
+                                            </td>
+                                            <td><span class="badge badge-status-resolved">Active</span></td>
+                                            <td class="text-sm">1 week ago</td>
+                                            <td><button class="btn btn-secondary btn-sm"
+                                                    onclick="showToast('Opening edit panel...', 'info')">Edit</button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="font-weight: 500; color: var(--text-primary);">Mark System</td>
+                                            <td style="color: var(--text-secondary);">mark.system@example.com</td>
+                                            <td>
+                                                <select class="form-control"
+                                                    style="padding: 4px 8px; font-size: 13px; width: auto;"
+                                                    onchange="showToast('Role updated to ' + this.value, 'success')">
+                                                    <option>Administrator</option>
+                                                    <option>Manager</option>
+                                                    <option selected>Technician</option>
+                                                    <option>End User</option>
+                                                </select>
+                                            </td>
+                                            <td><span class="badge"
+                                                    style="border: 1px solid var(--warning-color); color: var(--warning-color);">Away</span>
+                                            </td>
+                                            <td class="text-sm">3 weeks ago</td>
+                                            <td><button class="btn btn-secondary btn-sm"
+                                                    onclick="showToast('Opening edit panel...', 'info')">Edit</button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="font-weight: 500; color: var(--text-primary);">DevOps Service
+                                                Account
+                                            </td>
+                                            <td style="color: var(--text-secondary);">svc_devops@example.com</td>
+                                            <td>
+                                                <select class="form-control"
+                                                    style="padding: 4px 8px; font-size: 13px; width: auto;"
+                                                    onchange="showToast('Role updated to ' + this.value, 'success')">
+                                                    <option selected>Administrator</option>
+                                                    <option>Manager</option>
+                                                    <option>Technician</option>
+                                                    <option>End User</option>
+                                                </select>
+                                            </td>
+                                            <td><span class="badge badge-status-resolved">Active</span></td>
+                                            <td class="text-sm">System</td>
+                                            <td><button class="btn btn-secondary btn-sm"
+                                                    onclick="showToast('Opening edit panel...', 'info')">Edit</button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/layout.js"></script>
+    <script src="js/app.js"></script>
+</body>
+
+</html>

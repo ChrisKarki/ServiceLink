@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Knowledge Base · ServiceLink</title>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@100;200;300;400;500;600;700&family=IBM+Plex+Sans:wght@100;200;300;400;500;600;700&family=Montserrat:wght@100;200;300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/main.css">
+    <script src="js/theme.js"></script>
+</head>
+
+<body data-page="knowledge-base">
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <header data-shell="topbar"></header>
+
+    <div class="app-layout">
+        <nav data-shell="sidebar"></nav>
+
+        <div class="main-content">
+            <div class="content-area">
+                <section class="view-section">
+                    <div class="flex-between mb-4">
+                        <h1>Knowledge Base</h1>
+                        <button class="btn btn-primary"
+                            onclick="location.href='kb-article-edit.html'">+
+                            New
+                            Article</button>
+                    </div>
+
+                    <div style="margin-bottom: 32px;">
+                        <div style="display: flex; background: var(--panel-bg); border: 1px solid var(--panel-border); border-radius: 50px; padding: 6px; box-shadow: 0 8px 24px rgba(0,0,0,0.1); transition: border-color 0.2s;"
+                            onmouseover="this.style.borderColor='var(--accent-color)'"
+                            onmouseout="this.style.borderColor='var(--panel-border)'">
+                            <div style="position: relative; flex: 1; display: flex; align-items: center;">
+                                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                    style="position: absolute; left: 20px; color: var(--text-secondary);">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                </svg>
+                                <input type="text"
+                                    placeholder="Search the Knowledge Base for errors, policies, or how-to guides..."
+                                    style="width: 100%; background: transparent; border: none; color: var(--text-primary); font-size: 15px; padding: 12px 12px 12px 52px; outline: none; font-family: inherit;">
+                            </div>
+                            <div style="width: 1px; background: var(--panel-border); margin: 8px 0;"></div>
+                            <div style="position: relative; display: flex; align-items: center;">
+                                <select
+                                    style="background: transparent; border: none; color: var(--text-secondary); font-size: 14px; padding: 12px 40px 12px 20px; outline: none; font-family: inherit; cursor: pointer; appearance: none; -webkit-appearance: none;">
+                                    <option>All Categories</option>
+                                    <option>Networking & VPN</option>
+                                    <option>Hardware & Policies</option>
+                                    <option>Software & Licenses</option>
+                                    <option>Security</option>
+                                </select>
+                                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                    style="position: absolute; right: 16px; pointer-events: none; color: var(--text-secondary);">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M19 9l-7 7-7-7"></path>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 250px 1fr; gap: 24px;">
+                        <!-- KB Sidebar -->
+                        <div style="display: flex; flex-direction: column; gap: 32px;">
+                            <div>
+                                <h3
+                                    style="font-size: 12px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px; color: var(--text-secondary); font-weight: 600;">
+                                    Browse Categories</h3>
+                                <div style="display: flex; flex-direction: column; gap: 4px;">
+                                    <div class="category-item category-kb active" onclick="selectCategory(this)"
+                                        style="display: flex; justify-content: space-between; align-items: center; border-radius: 50px; padding: 10px 16px;">
+                                        <span style="font-size: 14px;">Networking & VPN</span>
+                                        <span
+                                            style="background: var(--chip-bg-strong); padding: 2px 8px; border-radius: 50px; font-size: 11px; font-weight: 600;">12</span>
+                                    </div>
+                                    <div class="category-item category-kb" onclick="selectCategory(this)"
+                                        style="display: flex; justify-content: space-between; align-items: center; border-radius: 50px; padding: 10px 16px;">
+                                        <span style="font-size: 14px;">Hardware & Policies</span>
+                                        <span
+                                            style="background: var(--chip-bg); padding: 2px 8px; border-radius: 50px; font-size: 11px; font-weight: 600;">8</span>
+                                    </div>
+                                    <div class="category-item category-kb" onclick="selectCategory(this)"
+                                        style="display: flex; justify-content: space-between; align-items: center; border-radius: 50px; padding: 10px 16px;">
+                                        <span style="font-size: 14px;">Software & Licenses</span>
+                                        <span
+                                            style="background: var(--chip-bg); padding: 2px 8px; border-radius: 50px; font-size: 11px; font-weight: 600;">24</span>
+                                    </div>
+                                    <div class="category-item category-kb" onclick="selectCategory(this)"
+                                        style="display: flex; justify-content: space-between; align-items: center; border-radius: 50px; padding: 10px 16px;">
+                                        <span style="font-size: 14px;">Security & Identity</span>
+                                        <span
+                                            style="background: var(--chip-bg); padding: 2px 8px; border-radius: 50px; font-size: 11px; font-weight: 600;">15</span>
+                                    </div>
+                                    <div class="category-item category-kb" onclick="selectCategory(this)"
+                                        style="display: flex; justify-content: space-between; align-items: center; border-radius: 50px; padding: 10px 16px;">
+                                        <span style="font-size: 14px;">HR & Onboarding</span>
+                                        <span
+                                            style="background: var(--chip-bg); padding: 2px 8px; border-radius: 50px; font-size: 11px; font-weight: 600;">5</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <h3
+                                    style="font-size: 12px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px; color: var(--text-secondary); font-weight: 600;">
+                                    Popular Tags</h3>
+                                <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                                    <span class="badge"
+                                        style="background: var(--button-secondary-bg); color: var(--text-primary); padding: 6px 16px; border-radius: 50px; font-size: 13px; cursor: pointer; transition: background 0.2s, border-color 0.2s; border: 1px solid transparent;"
+                                        onmouseover="this.style.borderColor='var(--accent-color)'"
+                                        onmouseout="this.style.borderColor='transparent'">#VPN</span>
+                                    <span class="badge"
+                                        style="background: var(--button-secondary-bg); color: var(--text-primary); padding: 6px 16px; border-radius: 50px; font-size: 13px; cursor: pointer; transition: background 0.2s, border-color 0.2s; border: 1px solid transparent;"
+                                        onmouseover="this.style.borderColor='var(--accent-color)'"
+                                        onmouseout="this.style.borderColor='transparent'">#macOS</span>
+                                    <span class="badge"
+                                        style="background: var(--button-secondary-bg); color: var(--text-primary); padding: 6px 16px; border-radius: 50px; font-size: 13px; cursor: pointer; transition: background 0.2s, border-color 0.2s; border: 1px solid transparent;"
+                                        onmouseover="this.style.borderColor='var(--accent-color)'"
+                                        onmouseout="this.style.borderColor='transparent'">#Hardware</span>
+                                    <span class="badge"
+                                        style="background: var(--button-secondary-bg); color: var(--text-primary); padding: 6px 16px; border-radius: 50px; font-size: 13px; cursor: pointer; transition: background 0.2s, border-color 0.2s; border: 1px solid transparent;"
+                                        onmouseover="this.style.borderColor='var(--accent-color)'"
+                                        onmouseout="this.style.borderColor='transparent'">#Onboarding</span>
+                                    <span class="badge"
+                                        style="background: var(--button-secondary-bg); color: var(--text-primary); padding: 6px 16px; border-radius: 50px; font-size: 13px; cursor: pointer; transition: background 0.2s, border-color 0.2s; border: 1px solid transparent;"
+                                        onmouseover="this.style.borderColor='var(--accent-color)'"
+                                        onmouseout="this.style.borderColor='transparent'">#Security</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- KB Content Area -->
+                        <div style="display: flex; flex-direction: column; gap: 24px;">
+                            <div class="text-sm">Showing top results in <strong>Networking & VPN</strong></div>
+
+                            <div class="panel" style="margin-bottom: 0;">
+                                <div class="flex-between" style="margin-bottom: 16px;">
+                                    <h1 style="font-size: 28px;">Troubleshooting Remote VPN Connectivity Drops</h1>
+                                    <div class="flex-row gap-2">
+                                        <button class="btn btn-secondary btn-sm"><svg width="14" height="14" fill="none"
+                                                stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z">
+                                                </path>
+                                            </svg> Share</button>
+                                        <button class="btn btn-secondary btn-sm"
+                                            onclick="location.href='kb-article-edit.html'"><svg
+                                                width="14" height="14" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z">
+                                                </path>
+                                            </svg> Edit</button>
+                                    </div>
+                                </div>
+
+                                <div class="kb-meta"
+                                    style="display: flex; gap: 24px; color: var(--text-secondary); border-bottom: 1px solid var(--panel-border); padding-bottom: 24px; margin-bottom: 24px; font-size: 13px;">
+                                    <div class="flex-row">
+                                        <div class="avatar" style="width: 24px; height: 24px; font-size: 10px;">PH</div>
+                                        <strong style="color: var(--text-primary);">Prabhnoorjit Hans</strong>
+                                    </div>
+                                    <div class="flex-row">Published: <strong style="color: var(--text-primary);">Aug 12,
+                                            2026</strong></div>
+                                    <div class="flex-row">Updated: <strong style="color: var(--text-primary);">2 weeks
+                                            ago</strong></div>
+                                    <div class="flex-row">Views: <strong
+                                            style="color: var(--text-primary);">1,402</strong>
+                                    </div>
+                                    <div class="flex-row">Visibility: <span
+                                            class="badge badge-status-resolved">Public</span></div>
+                                </div>
+
+                                <div class="kb-article"
+                                    style="line-height: 1.7; color: var(--text-secondary); font-size: 14px;">
+                                    <div
+                                        style="background: var(--button-secondary-bg); border-left: 4px solid var(--accent-color); padding: 16px; border-radius: 0 6px 6px 0; margin-bottom: 24px;">
+                                        <strong
+                                            style="color: var(--text-primary); display: block; margin-bottom: 8px;">Table
+                                            of
+                                            Contents</strong>
+                                        <ul style="list-style: none; padding-left: 0; color: var(--accent-color);">
+                                            <li style="margin-bottom: 4px; cursor: pointer;">1. Overview & Scope</li>
+                                            <li style="margin-bottom: 4px; cursor: pointer;">2. Resolution Steps
+                                                (Windows
+                                                11)</li>
+                                            <li style="margin-bottom: 4px; cursor: pointer;">3. Advanced MTU Adjustments
+                                            </li>
+                                            <li style="margin-bottom: 4px; cursor: pointer;">4. Escalation Path</li>
+                                        </ul>
+                                    </div>
+
+                                    <h2
+                                        style="margin-top: 24px; color: var(--text-primary); border-bottom: 1px solid var(--panel-border); padding-bottom: 8px;">
+                                        1. Overview & Scope</h2>
+                                    <p style="margin-bottom: 16px;">This guide addresses the common issue where end
+                                        users
+                                        experience
+                                        frequent disconnects from the corporate VPN, specifically when utilizing
+                                        split-tunneling on
+                                        Windows 11 machines connecting via home ISPs.</p>
+
+                                    <h2
+                                        style="margin-top: 24px; color: var(--text-primary); border-bottom: 1px solid var(--panel-border); padding-bottom: 8px;">
+                                        2. Resolution Steps</h2>
+                                    <p style="margin-bottom: 16px;"><strong>Step 1: Verify the client
+                                            version.</strong><br>Ensure
+                                        the user is running the latest version of the VPN client (v4.2.1 or higher).
+                                        Older
+                                        versions
+                                        have known compatibility issues with recent Windows OS updates.</p>
+
+                                    <p style="margin-bottom: 16px;"><strong>Step 2: Check MTU
+                                            Settings.</strong><br>Often,
+                                        home ISP
+                                        routers fragment packets if the MTU is too high. Instruct the user or use remote
+                                        management
+                                        to lower the VPN adapter MTU to 1350.</p>
+                                    <pre
+                                        style="background: var(--input-bg); padding: 16px; border-radius: 6px; border: 1px solid var(--panel-border); margin: 16px 0; color: var(--text-primary); font-family: monospace; overflow-x: auto;"><code>netsh interface ipv4 set subinterface "VPN Connection" mtu=1350 store=persistent</code></pre>
+
+                                    <p style="margin-bottom: 16px;"><strong>Step 3: Update Network
+                                            Drivers.</strong><br>Check the
+                                        linked hardware resource in ServiceLink. If the device is a Dell XPS model from
+                                        2025, push
+                                        the latest Intel Wi-Fi driver update via the management console.</p>
+
+                                    <h2
+                                        style="margin-top: 24px; color: var(--text-primary); border-bottom: 1px solid var(--panel-border); padding-bottom: 8px;">
+                                        3. Escalation</h2>
+                                    <p style="margin-bottom: 16px;">If the issue persists after these steps, escalate
+                                        the
+                                        ticket to
+                                        the Level 2 Network team and attach this KB article indicating steps already
+                                        taken.
+                                    </p>
+                                </div>
+
+                                <div
+                                    style="border-top: 1px solid var(--panel-border); margin-top: 32px; padding-top: 24px; display: flex; justify-content: space-between; align-items: center;">
+                                    <div class="kb-tags" style="display: flex; gap: 8px;">
+                                        <span class="badge"
+                                            style="border: 1px solid var(--panel-border); color: var(--text-secondary);">#VPN</span>
+                                        <span class="badge"
+                                            style="border: 1px solid var(--panel-border); color: var(--text-secondary);">#Networking</span>
+                                        <span class="badge"
+                                            style="border: 1px solid var(--panel-border); color: var(--text-secondary);">#Windows11</span>
+                                    </div>
+                                    <div class="flex-row" style="color: var(--text-secondary); font-size: 14px;">
+                                        Was this article helpful?
+                                        <button class="btn btn-secondary btn-sm">Yes (42)</button>
+                                        <button class="btn btn-secondary btn-sm">No (3)</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="panel" style="margin-bottom: 0;">
+                                <h1 style="font-size: 28px; margin-bottom: 16px;">Requesting New Hardware via
+                                    ServiceLink
+                                </h1>
+
+                                <div class="kb-meta"
+                                    style="display: flex; gap: 24px; color: var(--text-secondary); border-bottom: 1px solid var(--panel-border); padding-bottom: 24px; margin-bottom: 24px; font-size: 13px;">
+                                    <div class="flex-row">
+                                        <div class="avatar" style="width: 24px; height: 24px; font-size: 10px;">KW</div>
+                                        <strong style="color: var(--text-primary);">Katie Weng</strong>
+                                    </div>
+                                    <div class="flex-row">Published: <strong style="color: var(--text-primary);">Jul 05,
+                                            2026</strong></div>
+                                    <div class="flex-row">Visibility: <span
+                                            class="badge badge-status-resolved">Public</span></div>
+                                </div>
+
+                                <div class="kb-article"
+                                    style="line-height: 1.7; color: var(--text-secondary); font-size: 14px;">
+                                    <h2 style="margin-top: 24px;">Policy Update</h2>
+                                    <p style="margin-bottom: 16px;">As of Q3 2026, all hardware requests must go through
+                                        the
+                                        standard ServiceLink portal to ensure proper inventory tracking and manager
+                                        approval
+                                        workflows.</p>
+
+                                    <h2 style="margin-top: 24px;">Submission Process</h2>
+                                    <p style="margin-bottom: 16px;"><strong>Step 1:</strong> Navigate to the "Create
+                                        Ticket"
+                                        view in the left sidebar.</p>
+                                    <p style="margin-bottom: 16px;"><strong>Step 2:</strong> Under Category, select
+                                        "Hardware Request". This will automatically trigger the manager approval
+                                        workflow.
+                                    </p>
+                                    <p style="margin-bottom: 16px;"><strong>Step 3:</strong> Specify the exact hardware
+                                        model required. If it's standard issue (e.g. Dell XPS, MacBook Pro 14"), it will
+                                        be
+                                        auto-approved. Non-standard equipment requires Director level sign-off.</p>
+                                </div>
+
+                                <div class="kb-tags" style="display: flex; gap: 8px; margin-top: 32px;">
+                                    <span class="badge"
+                                        style="border: 1px solid var(--panel-border); color: var(--text-secondary);">#Hardware</span>
+                                    <span class="badge"
+                                        style="border: 1px solid var(--panel-border); color: var(--text-secondary);">#Policy</span>
+                                    <span class="badge"
+                                        style="border: 1px solid var(--panel-border); color: var(--text-secondary);">#Onboarding</span>
+                                </div>
+                            </div>
+
+                            <div class="panel" style="margin-bottom: 0;">
+                                <h1 style="font-size: 28px; margin-bottom: 16px;">Resolving Zoom Audio Issues on Mac
+                                </h1>
+
+                                <div class="kb-meta"
+                                    style="display: flex; gap: 24px; color: var(--text-secondary); border-bottom: 1px solid var(--panel-border); padding-bottom: 24px; margin-bottom: 24px; font-size: 13px;">
+                                    <div class="flex-row">
+                                        <div class="avatar" style="width: 24px; height: 24px; font-size: 10px;">AM</div>
+                                        <strong style="color: var(--text-primary);">Arshdeep Mutti</strong>
+                                    </div>
+                                    <div class="flex-row">Published: <strong style="color: var(--text-primary);">Mar 22,
+                                            2026</strong></div>
+                                    <div class="flex-row">Visibility: <span
+                                            class="badge badge-status-resolved">Public</span></div>
+                                </div>
+
+                                <div class="kb-article"
+                                    style="line-height: 1.7; color: var(--text-secondary); font-size: 14px;">
+                                    <h2 style="margin-top: 24px;">Symptom</h2>
+                                    <p style="margin-bottom: 16px;">Users on macOS Sonoma frequently report that Zoom
+                                        cannot
+                                        capture audio from their microphone, even if the correct microphone is selected
+                                        in
+                                        Zoom settings.</p>
+
+                                    <h2 style="margin-top: 24px;">Resolution</h2>
+                                    <p style="margin-bottom: 16px;"><strong>Step 1:</strong> Have the user open
+                                        <em>System
+                                            Settings &gt; Privacy &amp; Security &gt; Microphone</em>.
+                                    </p>
+                                    <p style="margin-bottom: 16px;"><strong>Step 2:</strong> Ensure the toggle next to
+                                        <strong>zoom.us</strong> is turned ON.
+                                    </p>
+                                    <p style="margin-bottom: 16px;"><strong>Step 3:</strong> If the toggle is missing,
+                                        the
+                                        user must reinstall Zoom to trigger the system prompt for microphone access
+                                        again.
+                                    </p>
+                                    <p style="margin-bottom: 16px;"><strong>Step 4:</strong> Check the "Core Audio"
+                                        service
+                                        if the above fails by running <code>sudo killall coreaudiod</code> in the
+                                        Terminal
+                                        to reset the macOS audio daemon.</p>
+                                </div>
+
+                                <div class="kb-tags" style="display: flex; gap: 8px; margin-top: 32px;">
+                                    <span class="badge"
+                                        style="border: 1px solid var(--panel-border); color: var(--text-secondary);">#macOS</span>
+                                    <span class="badge"
+                                        style="border: 1px solid var(--panel-border); color: var(--text-secondary);">#Zoom</span>
+                                    <span class="badge"
+                                        style="border: 1px solid var(--panel-border); color: var(--text-secondary);">#Audio</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/layout.js"></script>
+    <script src="js/app.js"></script>
+</body>
+
+</html>

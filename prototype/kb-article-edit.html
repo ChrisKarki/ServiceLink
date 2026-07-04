@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit KB Article · ServiceLink</title>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@100;200;300;400;500;600;700&family=IBM+Plex+Sans:wght@100;200;300;400;500;600;700&family=Montserrat:wght@100;200;300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/main.css">
+    <script src="js/theme.js"></script>
+</head>
+
+<body data-page="kb-article-edit">
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <header data-shell="topbar"></header>
+
+    <div class="app-layout">
+        <nav data-shell="sidebar"></nav>
+
+        <div class="main-content">
+            <div class="content-area">
+                <section class="view-section">
+                    <div class="flex-between mb-4">
+                        <div style="display: flex; align-items: center; gap: 16px;">
+                            <button class="icon-btn"
+                                onclick="location.href='knowledge-base.html'"
+                                title="Back to Knowledge Base">
+                                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                                </svg>
+                            </button>
+                            <div>
+                                <h1 style="margin-bottom: 4px;">Edit Article</h1>
+                                <div class="text-sm" style="color: var(--text-secondary);">Last saved 2 minutes ago by
+                                    Prabhnoorjit Hans</div>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 12px;">
+                            <button class="btn btn-secondary"
+                                onclick="location.href='knowledge-base.html'">Cancel</button>
+                            <button class="btn btn-primary"
+                                onclick="flash('Article saved and published successfully!', 'success', 'knowledge-base.html')[3])">Save
+                                Changes</button>
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 3fr 1fr; gap: 24px;">
+                        <!-- Main Editor Panel -->
+                        <div class="panel" style="margin-bottom: 0; display: flex; flex-direction: column; gap: 20px;">
+                            <div>
+                                <label class="form-label"
+                                    style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-primary);">Article
+                                    Title</label>
+                                <input type="text" class="form-control"
+                                    value="Troubleshooting Remote VPN Connectivity Drops"
+                                    style="font-size: 16px; font-weight: 500; padding: 12px 16px; width: 100%;">
+                            </div>
+
+                            <!-- Formatting Toolbar -->
+                            <div>
+                                <label class="form-label"
+                                    style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-primary);">Content
+                                    Body (Markdown Supported)</label>
+                                <div
+                                    style="display: flex; flex-wrap: wrap; gap: 6px; padding: 8px 12px; background: var(--button-secondary-bg); border: 1px solid var(--panel-border); border-bottom: none; border-radius: 8px 8px 0 0;">
+                                    <button class="btn btn-secondary btn-sm"
+                                        style="padding: 4px 10px; font-weight: bold;" title="Bold">B</button>
+                                    <button class="btn btn-secondary btn-sm"
+                                        style="padding: 4px 10px; font-style: italic;" title="Italic">I</button>
+                                    <button class="btn btn-secondary btn-sm"
+                                        style="padding: 4px 10px; text-decoration: underline;"
+                                        title="Underline">U</button>
+                                    <div style="width: 1px; background: var(--panel-border); margin: 0 4px;"></div>
+                                    <button class="btn btn-secondary btn-sm" style="padding: 4px 10px;"
+                                        title="Heading 1">H1</button>
+                                    <button class="btn btn-secondary btn-sm" style="padding: 4px 10px;"
+                                        title="Heading 2">H2</button>
+                                    <button class="btn btn-secondary btn-sm"
+                                        style="padding: 4px 10px; font-family: monospace;"
+                                        title="Code Block">&lt;/&gt;</button>
+                                    <div style="width: 1px; background: var(--panel-border); margin: 0 4px;"></div>
+                                    <button class="btn btn-secondary btn-sm" style="padding: 4px 10px;"
+                                        title="Bullet List">• List</button>
+                                    <button class="btn btn-secondary btn-sm" style="padding: 4px 10px;"
+                                        title="Insert Link">🔗 Link</button>
+                                    <button class="btn btn-secondary btn-sm" style="padding: 4px 10px;"
+                                        title="Attach File">📎 Attach</button>
+                                </div>
+                                <textarea class="form-control"
+                                    style="width: 100%; min-height: 420px; font-family: monospace; font-size: 14px; line-height: 1.6; padding: 16px; border-radius: 0 0 8px 8px; resize: vertical; background: var(--input-bg);">## 1. Overview & Scope
+                    This guide addresses the common issue where end users experience frequent disconnects from the corporate VPN, specifically when utilizing split-tunneling on Windows 11 machines connecting via home ISPs.
+
+                    ## 2. Resolution Steps
+
+                    **Step 1: Verify the client version.**
+                    Ensure the user is running the latest version of the VPN client (v4.2.1 or higher). Older versions have known compatibility issues with recent Windows OS updates.
+
+                    **Step 2: Check MTU Settings.**
+                    Often, home ISP routers fragment packets if the MTU is too high. Instruct the user or use remote management to lower the VPN adapter MTU to 1350.
+
+                    ```cmd
+                    netsh interface ipv4 set subinterface "VPN Connection" mtu=1350 store=persistent
+                    ```
+
+                    **Step 3: Update Network Drivers.**
+                    Check the linked hardware resource in ServiceLink. If the device is a Dell XPS model from 2025, push the latest Intel Wi-Fi driver update via the management console.
+
+                    ## 3. Escalation
+                    If the issue persists after these steps, escalate the ticket to the Level 2 Network team and attach this KB article indicating steps already taken.</textarea>
+                            </div>
+                        </div>
+
+                        <!-- Right Metadata Sidebar -->
+                        <div style="display: flex; flex-direction: column; gap: 24px;">
+                            <div class="panel"
+                                style="margin-bottom: 0; display: flex; flex-direction: column; gap: 16px;">
+                                <h3
+                                    style="font-size: 14px; border-bottom: 1px solid var(--panel-border); padding-bottom: 12px; margin-bottom: 4px;">
+                                    Publishing Settings</h3>
+
+                                <div>
+                                    <label class="text-sm"
+                                        style="color: var(--text-secondary); display: block; margin-bottom: 6px;">Category</label>
+                                    <select class="form-control"
+                                        style="width: 100%; padding: 8px 12px; background-color: var(--input-bg);">
+                                        <option selected>Networking & VPN</option>
+                                        <option>Hardware & Policies</option>
+                                        <option>Software & Licenses</option>
+                                        <option>Security & Identity</option>
+                                        <option>HR & Onboarding</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label class="text-sm"
+                                        style="color: var(--text-secondary); display: block; margin-bottom: 6px;">Visibility</label>
+                                    <select class="form-control"
+                                        style="width: 100%; padding: 8px 12px; background-color: var(--input-bg);">
+                                        <option selected>Public (All Users)</option>
+                                        <option>Internal Only (Technicians)</option>
+                                        <option>Draft / Hidden</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label class="text-sm"
+                                        style="color: var(--text-secondary); display: block; margin-bottom: 6px;">Author</label>
+                                    <div
+                                        style="display: flex; align-items: center; gap: 10px; padding: 8px 12px; background: var(--button-secondary-bg); border-radius: 6px; border: 1px solid var(--panel-border);">
+                                        <div class="avatar" style="width: 24px; height: 24px; font-size: 10px;">PH</div>
+                                        <span
+                                            style="font-size: 13px; font-weight: 500; color: var(--text-primary);">Prabhnoorjit
+                                            Hans</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="panel"
+                                style="margin-bottom: 0; display: flex; flex-direction: column; gap: 16px;">
+                                <h3
+                                    style="font-size: 14px; border-bottom: 1px solid var(--panel-border); padding-bottom: 12px; margin-bottom: 4px;">
+                                    Tags & Keywords</h3>
+                                <div>
+                                    <label class="text-sm"
+                                        style="color: var(--text-secondary); display: block; margin-bottom: 6px;">Add
+                                        Tags
+                                        (comma separated)</label>
+                                    <input type="text" class="form-control"
+                                        value="VPN, Networking, Windows11, Troubleshooting"
+                                        style="width: 100%; padding: 8px 12px; font-size: 13px;">
+                                </div>
+                                <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+                                    <span class="badge"
+                                        style="background: var(--button-secondary-bg); border: 1px solid var(--panel-border);">#VPN
+                                        ✕</span>
+                                    <span class="badge"
+                                        style="background: var(--button-secondary-bg); border: 1px solid var(--panel-border);">#Networking
+                                        ✕</span>
+                                    <span class="badge"
+                                        style="background: var(--button-secondary-bg); border: 1px solid var(--panel-border);">#Windows11
+                                        ✕</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/layout.js"></script>
+    <script src="js/app.js"></script>
+</body>
+
+</html>

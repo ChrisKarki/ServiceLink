@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resources · ServiceLink</title>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@100;200;300;400;500;600;700&family=IBM+Plex+Sans:wght@100;200;300;400;500;600;700&family=Montserrat:wght@100;200;300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/main.css">
+    <script src="js/theme.js"></script>
+</head>
+
+<body data-page="resources">
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <header data-shell="topbar"></header>
+
+    <div class="app-layout">
+        <nav data-shell="sidebar"></nav>
+
+        <div class="main-content">
+            <div class="content-area">
+                <section class="view-section">
+                    <div class="flex-between mb-4">
+                        <h1>Resources</h1>
+                        <button class="btn btn-primary"
+                            onclick="location.href='resource-edit.html'">+ Add
+                            Resource</button>
+                    </div>
+
+                    <div class="filter-bar">
+                        <div class="filter-pill active" onclick="selectFilter(this)">All Resources</div>
+                        <div class="filter-pill" onclick="selectFilter(this)">Hardware</div>
+                        <div class="filter-pill" onclick="selectFilter(this)">Software</div>
+                        <div class="filter-pill" onclick="selectFilter(this)">Virtual</div>
+                    </div>
+
+                    <div class="panel" style="padding: 0;">
+                        <div class="table-wrapper">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Resource Tag</th>
+                                        <th>Type</th>
+                                        <th>Make & Model</th>
+                                        <th>Assigned User</th>
+                                        <th>Status</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="clickable">
+                                        <td style="font-weight: 500; color: var(--text-primary);">VRT-Build-Server-01
+                                        </td>
+                                        <td>Virtual</td>
+                                        <td>AWS EC2 t3.xlarge</td>
+                                        <td>DevOps Team</td>
+                                        <td><span class="badge badge-status-open"
+                                                style="border-color: var(--danger-color); color: var(--danger-color);">Incident
+                                                Active</span></td>
+                                        <td><button class="btn btn-secondary btn-sm"
+                                                onclick="location.href='resource-edit.html'">Edit</button>
+                                        </td>
+                                    </tr>
+                                    <tr class="clickable">
+                                        <td style="font-weight: 500; color: var(--text-primary);">HW-LTP-4092</td>
+                                        <td>Hardware</td>
+                                        <td>Dell XPS 15 2025</td>
+                                        <td>Jane Developer</td>
+                                        <td><span class="badge badge-status-resolved">In Use</span></td>
+                                        <td><button class="btn btn-secondary btn-sm"
+                                                onclick="location.href='resource-edit.html'">Edit</button>
+                                        </td>
+                                    </tr>
+                                    <tr class="clickable">
+                                        <td style="font-weight: 500; color: var(--text-primary);">SW-LIC-ADOBE-CC</td>
+                                        <td>Software</td>
+                                        <td>Adobe Creative Cloud</td>
+                                        <td><span
+                                                style="color: var(--text-secondary); font-style: italic;">Unassigned</span>
+                                        </td>
+                                        <td><span class="badge badge-status-resolved">In Stock</span></td>
+                                        <td><button class="btn btn-secondary btn-sm"
+                                                onclick="location.href='resource-edit.html'">Edit</button>
+                                        </td>
+                                    </tr>
+                                    <tr class="clickable">
+                                        <td style="font-weight: 500; color: var(--text-primary);">HW-MNT-2098</td>
+                                        <td>Hardware</td>
+                                        <td>LG 34" Ultrawide</td>
+                                        <td><span
+                                                style="color: var(--text-secondary); font-style: italic;">Unassigned</span>
+                                        </td>
+                                        <td><span class="badge badge-status-resolved">In Stock</span></td>
+                                        <td><button class="btn btn-secondary btn-sm"
+                                                onclick="location.href='resource-edit.html'">Edit</button>
+                                        </td>
+                                    </tr>
+                                    <tr class="clickable">
+                                        <td style="font-weight: 500; color: var(--text-primary);">VRT-DB-Prod-02</td>
+                                        <td>Virtual</td>
+                                        <td>AWS RDS PostgreSQL</td>
+                                        <td>Database Team</td>
+                                        <td><span class="badge badge-status-resolved">Active</span></td>
+                                        <td><button class="btn btn-secondary btn-sm"
+                                                onclick="location.href='resource-edit.html'">Edit</button>
+                                        </td>
+                                    </tr>
+                                    <tr class="clickable">
+                                        <td style="font-weight: 500; color: var(--text-primary);">SW-LIC-OFFICE</td>
+                                        <td>Software</td>
+                                        <td>Microsoft Office 365 E3</td>
+                                        <td>Hiten Lamba</td>
+                                        <td><span class="badge badge-status-resolved">In Use</span></td>
+                                        <td><button class="btn btn-secondary btn-sm"
+                                                onclick="location.href='resource-edit.html'">Edit</button>
+                                        </td>
+                                    </tr>
+                                    <tr class="clickable">
+                                        <td style="font-weight: 500; color: var(--text-primary);">VRT-WEB-Prod-01</td>
+                                        <td>Virtual</td>
+                                        <td>AWS EC2 c5.2xlarge</td>
+                                        <td>DevOps Team</td>
+                                        <td><span class="badge badge-status-resolved">Active</span></td>
+                                        <td><button class="btn btn-secondary btn-sm"
+                                                onclick="location.href='resource-edit.html'">Edit</button>
+                                        </td>
+                                    </tr>
+                                    <tr class="clickable">
+                                        <td style="font-weight: 500; color: var(--text-primary);">HW-MAC-5021</td>
+                                        <td>Hardware</td>
+                                        <td>Apple MacBook Pro M3 Max</td>
+                                        <td>Chris Karki</td>
+                                        <td><span class="badge badge-status-resolved">In Use</span></td>
+                                        <td><button class="btn btn-secondary btn-sm"
+                                                onclick="location.href='resource-edit.html'">Edit</button>
+                                        </td>
+                                    </tr>
+                                    <tr class="clickable">
+                                        <td style="font-weight: 500; color: var(--text-primary);">SW-LIC-FIGMA</td>
+                                        <td>Software</td>
+                                        <td>Figma Professional Plan</td>
+                                        <td><span
+                                                style="color: var(--text-secondary); font-style: italic;">Unassigned</span>
+                                        </td>
+                                        <td><span class="badge badge-status-resolved">In Stock</span></td>
+                                        <td><button class="btn btn-secondary btn-sm"
+                                                onclick="location.href='resource-edit.html'">Edit</button>
+                                        </td>
+                                    </tr>
+                                    <tr class="clickable">
+                                        <td style="font-weight: 500; color: var(--text-primary);">NW-RTR-001</td>
+                                        <td>Networking</td>
+                                        <td>Cisco Meraki MX100</td>
+                                        <td>IT Infrastructure</td>
+                                        <td><span class="badge badge-status-open"
+                                                style="border-color: var(--warning-color); color: var(--warning-color);">Maintenance
+                                                Needed</span></td>
+                                        <td><button class="btn btn-secondary btn-sm"
+                                                onclick="location.href='resource-edit.html'">Edit</button>
+                                        </td>
+                                    </tr>
+                                    <tr class="clickable">
+                                        <td style="font-weight: 500; color: var(--text-primary);">HW-LTP-4105</td>
+                                        <td>Hardware</td>
+                                        <td>Apple MacBook Air M3</td>
+                                        <td>Katie Weng</td>
+                                        <td><span class="badge badge-status-resolved">In Use</span></td>
+                                        <td><button class="btn btn-secondary btn-sm"
+                                                onclick="location.href='resource-edit.html'">Edit</button>
+                                        </td>
+                                    </tr>
+                                    <tr class="clickable">
+                                        <td style="font-weight: 500; color: var(--text-primary);">VRT-K8S-Clust-01</td>
+                                        <td>Virtual</td>
+                                        <td>AWS EKS Production Cluster</td>
+                                        <td>DevOps Team</td>
+                                        <td><span class="badge badge-status-resolved">Active</span></td>
+                                        <td><button class="btn btn-secondary btn-sm"
+                                                onclick="location.href='resource-edit.html'">Edit</button>
+                                        </td>
+                                    </tr>
+                                    <tr class="clickable">
+                                        <td style="font-weight: 500; color: var(--text-primary);">SW-LIC-JETBRAINS</td>
+                                        <td>Software</td>
+                                        <td>JetBrains All Products Pack</td>
+                                        <td>Arshdeep Mutti</td>
+                                        <td><span class="badge badge-status-resolved">In Use</span></td>
+                                        <td><button class="btn btn-secondary btn-sm"
+                                                onclick="location.href='resource-edit.html'">Edit</button>
+                                        </td>
+                                    </tr>
+                                    <tr class="clickable">
+                                        <td style="font-weight: 500; color: var(--text-primary);">NW-SW-CORE-02</td>
+                                        <td>Networking</td>
+                                        <td>Cisco Catalyst 9300 Switch</td>
+                                        <td>IT Infrastructure</td>
+                                        <td><span class="badge badge-status-resolved">Active</span></td>
+                                        <td><button class="btn btn-secondary btn-sm"
+                                                onclick="location.href='resource-edit.html'">Edit</button>
+                                        </td>
+                                    </tr>
+                                    <tr class="clickable">
+                                        <td style="font-weight: 500; color: var(--text-primary);">HW-SRV-RACK-04</td>
+                                        <td>Hardware</td>
+                                        <td>Dell PowerEdge R750</td>
+                                        <td>Data Center Team</td>
+                                        <td><span class="badge badge-status-open"
+                                                style="border-color: var(--warning-color); color: var(--warning-color);">Maintenance
+                                                Needed</span></td>
+                                        <td><button class="btn btn-secondary btn-sm"
+                                                onclick="location.href='resource-edit.html'">Edit</button>
+                                        </td>
+                                    </tr>
+                                    <tr class="clickable">
+                                        <td style="font-weight: 500; color: var(--text-primary);">VRT-REDIS-Cache</td>
+                                        <td>Virtual</td>
+                                        <td>AWS ElastiCache Redis Cluster</td>
+                                        <td>Database Team</td>
+                                        <td><span class="badge badge-status-resolved">Active</span></td>
+                                        <td><button class="btn btn-secondary btn-sm"
+                                                onclick="location.href='resource-edit.html'">Edit</button>
+                                        </td>
+                                    </tr>
+                                    <tr class="clickable">
+                                        <td style="font-weight: 500; color: var(--text-primary);">SW-LIC-DATADOG</td>
+                                        <td>Software</td>
+                                        <td>Datadog APM & Logs Suite</td>
+                                        <td>DevOps Team</td>
+                                        <td><span class="badge badge-status-resolved">Active</span></td>
+                                        <td><button class="btn btn-secondary btn-sm"
+                                                onclick="location.href='resource-edit.html'">Edit</button>
+                                        </td>
+                                    </tr>
+                                    <tr class="clickable">
+                                        <td style="font-weight: 500; color: var(--text-primary);">HW-MNT-2110</td>
+                                        <td>Hardware</td>
+                                        <td>Dell UltraSharp 27" 4K Monitor</td>
+                                        <td>Prabhnoorjit Hans</td>
+                                        <td><span class="badge badge-status-resolved">In Use</span></td>
+                                        <td><button class="btn btn-secondary btn-sm"
+                                                onclick="location.href='resource-edit.html'">Edit</button>
+                                        </td>
+                                    </tr>
+                                    <tr class="clickable">
+                                        <td style="font-weight: 500; color: var(--text-primary);">HW-LTP-4112</td>
+                                        <td>Hardware</td>
+                                        <td>Lenovo ThinkPad X1 Carbon Gen 11</td>
+                                        <td><span
+                                                style="color: var(--text-secondary); font-style: italic;">Unassigned</span>
+                                        </td>
+                                        <td><span class="badge badge-status-resolved">In Stock</span></td>
+                                        <td><button class="btn btn-secondary btn-sm"
+                                                onclick="location.href='resource-edit.html'">Edit</button>
+                                        </td>
+                                    </tr>
+                                    <tr class="clickable">
+                                        <td style="font-weight: 500; color: var(--text-primary);">VRT-AI-GPU-01</td>
+                                        <td>Virtual</td>
+                                        <td>AWS EC2 p4d.24xlarge (8x A100 GPU)</td>
+                                        <td>ML Engineering</td>
+                                        <td><span class="badge badge-status-open"
+                                                style="border-color: var(--danger-color); color: var(--danger-color);">High
+                                                Load</span></td>
+                                        <td><button class="btn btn-secondary btn-sm"
+                                                onclick="location.href='resource-edit.html'">Edit</button>
+                                        </td>
+                                    </tr>
+                                    <tr class="clickable">
+                                        <td style="font-weight: 500; color: var(--text-primary);">SW-LIC-SLACK</td>
+                                        <td>Software</td>
+                                        <td>Slack Enterprise Grid Plan</td>
+                                        <td>All Employees</td>
+                                        <td><span class="badge badge-status-resolved">Active</span></td>
+                                        <td><button class="btn btn-secondary btn-sm"
+                                                onclick="location.href='resource-edit.html'">Edit</button>
+                                        </td>
+                                    </tr>
+                                    <tr class="clickable">
+                                        <td style="font-weight: 500; color: var(--text-primary);">NW-FW-PALO-01</td>
+                                        <td>Networking</td>
+                                        <td>Palo Alto Networks PA-440 Firewall</td>
+                                        <td>InfoSec Team</td>
+                                        <td><span class="badge badge-status-resolved">Active</span></td>
+                                        <td><button class="btn btn-secondary btn-sm"
+                                                onclick="location.href='resource-edit.html'">Edit</button>
+                                        </td>
+                                    </tr>
+                                    <tr class="clickable">
+                                        <td style="font-weight: 500; color: var(--text-primary);">HW-CAM-LOGI-08</td>
+                                        <td>Hardware</td>
+                                        <td>Logitech Brio 4K Ultra HD Webcam</td>
+                                        <td>Sarah Jenkins</td>
+                                        <td><span class="badge badge-status-resolved">In Use</span></td>
+                                        <td><button class="btn btn-secondary btn-sm"
+                                                onclick="location.href='resource-edit.html'">Edit</button>
+                                        </td>
+                                    </tr>
+                                    <tr class="clickable">
+                                        <td style="font-weight: 500; color: var(--text-primary);">VRT-CDN-CF-01</td>
+                                        <td>Virtual</td>
+                                        <td>AWS CloudFront Global CDN</td>
+                                        <td>Web Operations Team</td>
+                                        <td><span class="badge badge-status-resolved">Active</span></td>
+                                        <td><button class="btn btn-secondary btn-sm"
+                                                onclick="location.href='resource-edit.html'">Edit</button>
+                                        </td>
+                                    </tr>
+                                    <tr class="clickable">
+                                        <td style="font-weight: 500; color: var(--text-primary);">SW-LIC-ZOOM</td>
+                                        <td>Software</td>
+                                        <td>Zoom Workplace Enterprise Suite</td>
+                                        <td>HR & Operations</td>
+                                        <td><span class="badge badge-status-resolved">Active</span></td>
+                                        <td><button class="btn btn-secondary btn-sm"
+                                                onclick="location.href='resource-edit.html'">Edit</button>
+                                        </td>
+                                    </tr>
+                                    <tr class="clickable">
+                                        <td style="font-weight: 500; color: var(--text-primary);">HW-DOCK-DELL</td>
+                                        <td>Hardware</td>
+                                        <td>Dell WD19TBS Thunderbolt Docking Station</td>
+                                        <td><span
+                                                style="color: var(--text-secondary); font-style: italic;">Unassigned</span>
+                                        </td>
+                                        <td><span class="badge badge-status-resolved">In Stock</span></td>
+                                        <td><button class="btn btn-secondary btn-sm"
+                                                onclick="location.href='resource-edit.html'">Edit</button>
+                                        </td>
+                                    </tr>
+                                    <tr class="clickable">
+                                        <td style="font-weight: 500; color: var(--text-primary);">VRT-MQ-KAFKA</td>
+                                        <td>Virtual</td>
+                                        <td>Confluent Cloud Dedicated Kafka</td>
+                                        <td>Data Platform Team</td>
+                                        <td><span class="badge badge-status-resolved">Active</span></td>
+                                        <td><button class="btn btn-secondary btn-sm"
+                                                onclick="location.href='resource-edit.html'">Edit</button>
+                                        </td>
+                                    </tr>
+                                    <tr class="clickable">
+                                        <td style="font-weight: 500; color: var(--text-primary);">NW-AP-MERAKI-12</td>
+                                        <td>Networking</td>
+                                        <td>Cisco Meraki MR46 Wi-Fi 6 AP</td>
+                                        <td>HQ Floor 3 East</td>
+                                        <td><span class="badge badge-status-open"
+                                                style="border-color: var(--warning-color); color: var(--warning-color);">Firmware
+                                                Update</span></td>
+                                        <td><button class="btn btn-secondary btn-sm"
+                                                onclick="location.href='resource-edit.html'">Edit</button>
+                                        </td>
+                                    </tr>
+                                    <tr class="clickable">
+                                        <td style="font-weight: 500; color: var(--text-primary);">SW-LIC-GITHUB</td>
+                                        <td>Software</td>
+                                        <td>GitHub Enterprise Cloud Organization</td>
+                                        <td>Engineering Team</td>
+                                        <td><span class="badge badge-status-resolved">Active</span></td>
+                                        <td><button class="btn btn-secondary btn-sm"
+                                                onclick="location.href='resource-edit.html'">Edit</button>
+                                        </td>
+                                    </tr>
+                                    <tr class="clickable">
+                                        <td style="font-weight: 500; color: var(--text-primary);">HW-TAB-IPAD-03</td>
+                                        <td>Hardware</td>
+                                        <td>Apple iPad Pro 12.9" M2 with Pencil</td>
+                                        <td>Design Team</td>
+                                        <td><span class="badge badge-status-resolved">In Use</span></td>
+                                        <td><button class="btn btn-secondary btn-sm"
+                                                onclick="location.href='resource-edit.html'">Edit</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/layout.js"></script>
+    <script src="js/app.js"></script>
+</body>
+
+</html>

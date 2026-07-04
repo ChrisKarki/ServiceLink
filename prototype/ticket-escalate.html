@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Escalation & SLA · ServiceLink</title>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@100;200;300;400;500;600;700&family=IBM+Plex+Sans:wght@100;200;300;400;500;600;700&family=Montserrat:wght@100;200;300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/main.css">
+    <script src="js/theme.js"></script>
+</head>
+
+<body data-page="ticket-escalate">
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <header data-shell="topbar"></header>
+
+    <div class="app-layout">
+        <nav data-shell="sidebar"></nav>
+
+        <div class="main-content">
+            <div class="content-area">
+                <section class="view-section">
+                    <div class="flex-between mb-4">
+                        <h1>Automated Escalation & SLA Flow</h1>
+                        <button class="btn btn-secondary"
+                            style="border-color: var(--danger-color); color: var(--danger-color);">Trigger Manual
+                            Escalation</button>
+                    </div>
+                    <p class="text-sm mb-4">Live tracking of automated SLA enforcement and active escalation pathways
+                        for
+                        high priority incidents.</p>
+
+                    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px;">
+                        <div class="panel">
+                            <div class="flow-container"
+                                style="padding: 20px 0; align-items: flex-start; margin-left: 40px;">
+                                <div
+                                    style="display: flex; align-items: center; gap: 24px; position: relative; margin-bottom: 32px; width: 100%;">
+                                    <div
+                                        style="width: 16px; height: 16px; border-radius: 50%; background: var(--success-color); z-index: 2; box-shadow: 0 0 0 4px var(--button-secondary-bg);">
+                                    </div>
+                                    <div
+                                        style="position: absolute; left: 7px; top: 16px; bottom: -32px; width: 2px; background: var(--success-color); z-index: 1;">
+                                    </div>
+                                    <div class="flow-node"
+                                        style="text-align: left; width: 100%; border-color: var(--success-color);">
+                                        <strong style="color: var(--text-primary);">New Ticket Submitted (Priority:
+                                            High)</strong>
+                                        <div class="text-sm mt-2">09:15 AM - Ticket INC-1042 entered system.</div>
+                                    </div>
+                                </div>
+
+                                <div
+                                    style="display: flex; align-items: center; gap: 24px; position: relative; margin-bottom: 32px; width: 100%;">
+                                    <div
+                                        style="width: 16px; height: 16px; border-radius: 50%; background: var(--success-color); z-index: 2; box-shadow: 0 0 0 4px var(--button-secondary-bg);">
+                                    </div>
+                                    <div
+                                        style="position: absolute; left: 7px; top: 16px; bottom: -32px; width: 2px; background: var(--warning-color); z-index: 1;">
+                                    </div>
+                                    <div class="flow-node"
+                                        style="text-align: left; width: 100%; border-color: var(--success-color);">
+                                        <strong style="color: var(--text-primary);">Auto-Assigned & In Progress</strong>
+                                        <div class="text-sm mt-2">09:20 AM - Assigned to Hiten Lamba. SLA timer started
+                                            (4h
+                                            Resolution).</div>
+                                    </div>
+                                </div>
+
+                                <div
+                                    style="display: flex; align-items: center; gap: 24px; position: relative; margin-bottom: 32px; width: 100%;">
+                                    <div
+                                        style="width: 16px; height: 16px; border-radius: 50%; background: var(--danger-color); z-index: 2; box-shadow: 0 0 0 4px rgba(255,107,107,0.2);">
+                                    </div>
+                                    <div
+                                        style="position: absolute; left: 7px; top: 16px; bottom: -32px; width: 2px; background: transparent; border-left: 2px dashed var(--panel-border); z-index: 1;">
+                                    </div>
+                                    <div class="flow-node escalated" style="text-align: left; width: 100%;">
+                                        <strong style="color: var(--danger-color);">SLA Breached / Escalated to
+                                            L2</strong>
+                                        <div class="text-sm mt-2">01:20 PM - 4h threshold crossed. Automated webhook
+                                            sent to
+                                            On-Call Manager (PagerDuty).</div>
+                                    </div>
+                                </div>
+
+                                <div
+                                    style="display: flex; align-items: center; gap: 24px; position: relative; width: 100%;">
+                                    <div
+                                        style="width: 16px; height: 16px; border-radius: 50%; background: var(--panel-border); z-index: 2; box-shadow: 0 0 0 4px var(--button-secondary-bg);">
+                                    </div>
+                                    <div class="flow-node" style="text-align: left; width: 100%; opacity: 0.5;">
+                                        <strong style="color: var(--text-primary);">Resolution & Post-Mortem</strong>
+                                        <div class="text-sm mt-2">Pending - Awaiting resolution by Level 2 team.</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; flex-direction: column; gap: 24px;">
+                            <div class="panel">
+                                <h3
+                                    style="font-size: 14px; margin-bottom: 16px; border-bottom: 1px solid var(--panel-border); padding-bottom: 12px;">
+                                    Active Policies</h3>
+                                <div class="text-sm" style="margin-bottom: 8px;"><strong>Standard SLA (High):</strong> 4
+                                    Hours</div>
+                                <div class="text-sm" style="margin-bottom: 8px;"><strong>Escalation Target:</strong>
+                                    Level 2
+                                    Network Team</div>
+                                <div class="text-sm"><strong>Notifications:</strong> Email to assigned Technician and Manager
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/layout.js"></script>
+    <script src="js/app.js"></script>
+</body>
+
+</html>

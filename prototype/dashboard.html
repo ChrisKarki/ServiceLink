@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard · ServiceLink</title>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@100;200;300;400;500;600;700&family=IBM+Plex+Sans:wght@100;200;300;400;500;600;700&family=Montserrat:wght@100;200;300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/main.css">
+    <script src="js/theme.js"></script>
+</head>
+
+<body data-page="dashboard">
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <header data-shell="topbar"></header>
+
+    <div class="app-layout">
+        <nav data-shell="sidebar"></nav>
+
+        <div class="main-content">
+            <div class="content-area">
+                <section class="view-section">
+                    <div class="flex-between mb-4">
+                        <h1>Dashboard</h1>
+                        <button class="btn btn-primary" style="display: flex; align-items: center; gap: 8px;"
+                            onclick="showToast('Dashboard customization mode enabled', 'success')">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4">
+                                </path>
+                            </svg>
+                            Customize Layout
+                        </button>
+                    </div>
+
+                    <div
+                        style="display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 16px; margin-bottom: 16px;">
+                        <div style="display: flex; flex-direction: column; height: 100%;">
+                            <div class="sla-tracker"
+                                style="margin-top: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px;">
+                                <div class="sla-card">
+                                    <div class="text-sm">My Open Tickets</div>
+                                    <div class="sla-value">5</div>
+                                    <div class="text-sm">Needs attention</div>
+                                </div>
+                                <div class="sla-card">
+                                    <div class="text-sm">Team Unassigned</div>
+                                    <div class="sla-value">12</div>
+                                    <div class="text-sm" style="color: var(--warning-color);">Waiting in queue</div>
+                                </div>
+                                <div class="sla-card">
+                                    <div class="text-sm">Resolved Today</div>
+                                    <div class="sla-value">34</div>
+                                    <div class="text-sm" style="color: var(--success-color);">+12% from yesterday</div>
+                                </div>
+                                <div class="sla-card">
+                                    <div class="text-sm">Avg Resolution Time</div>
+                                    <div class="sla-value">1.4h</div>
+                                    <div class="text-sm" style="color: var(--success-color);">-0.2h from avg</div>
+                                </div>
+                            </div>
+
+                            <!-- Chart placeholder -->
+                            <div class="panel"
+                                style="margin-top: 16px; flex: 1; display: flex; flex-direction: column; justify-content: flex-end; padding: 16px 24px; border: 1px solid var(--panel-border); background: var(--panel-bg); margin-bottom: 0; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                                <div
+                                    style="font-weight: 600; margin-bottom: auto; font-size: 15px; display: flex; justify-content: space-between; align-items: center;">
+                                    Ticket Volume
+                                </div>
+                                <div
+                                    style="display: flex; align-items: flex-end; justify-content: space-between; flex: 1; min-height: 140px; padding-top: 20px; position: relative;">
+                                    <div
+                                        style="position: absolute; top: 20%; left: 0; right: 0; border-top: 1px dashed var(--panel-border); opacity: 0.5; z-index: 0;">
+                                    </div>
+                                    <div
+                                        style="position: absolute; top: 50%; left: 0; right: 0; border-top: 1px dashed var(--panel-border); opacity: 0.5; z-index: 0;">
+                                    </div>
+                                    <div
+                                        style="position: absolute; bottom: 24px; left: 0; right: 0; border-top: 1px dashed var(--panel-border); opacity: 0.5; z-index: 0;">
+                                    </div>
+
+                                    <div
+                                        style="display: flex; flex-direction: column; align-items: center; gap: 8px; flex: 1; z-index: 1; height: 100%; justify-content: flex-end;">
+                                        <div style="font-size: 10px; font-weight: 600; color: var(--text-secondary);">12
+                                        </div>
+                                        <div style="width: 36px; height: 28%; background: linear-gradient(180deg, var(--accent-color) 0%, rgba(37,99,235,0.2) 100%); border-radius: 6px 6px 0 0; cursor: pointer; transition: filter 0.2s, height 0.5s ease-out;"
+                                            onmouseover="this.style.filter='brightness(1.2)'"
+                                            onmouseout="this.style.filter='none'"></div>
+                                        <div class="text-sm"
+                                            style="font-size: 11px; font-weight: 500; color: var(--text-secondary);">Mon
+                                        </div>
+                                    </div>
+                                    <div
+                                        style="display: flex; flex-direction: column; align-items: center; gap: 8px; flex: 1; z-index: 1; height: 100%; justify-content: flex-end;">
+                                        <div style="font-size: 10px; font-weight: 600; color: var(--text-secondary);">18
+                                        </div>
+                                        <div style="width: 36px; height: 42%; background: linear-gradient(180deg, var(--accent-color) 0%, rgba(37,99,235,0.2) 100%); border-radius: 6px 6px 0 0; cursor: pointer; transition: filter 0.2s, height 0.5s ease-out;"
+                                            onmouseover="this.style.filter='brightness(1.2)'"
+                                            onmouseout="this.style.filter='none'"></div>
+                                        <div class="text-sm"
+                                            style="font-size: 11px; font-weight: 500; color: var(--text-secondary);">Tue
+                                        </div>
+                                    </div>
+                                    <div
+                                        style="display: flex; flex-direction: column; align-items: center; gap: 8px; flex: 1; z-index: 1; height: 100%; justify-content: flex-end;">
+                                        <div style="font-size: 10px; font-weight: 600; color: var(--text-primary);">30
+                                        </div>
+                                        <div style="width: 36px; height: 70%; background: linear-gradient(180deg, var(--accent-color) 0%, rgba(37,99,235,0.2) 100%); border-radius: 6px 6px 0 0; cursor: pointer; transition: filter 0.2s, height 0.5s ease-out;"
+                                            onmouseover="this.style.filter='brightness(1.2)'"
+                                            onmouseout="this.style.filter='none'"></div>
+                                        <div class="text-sm"
+                                            style="font-size: 11px; font-weight: 500; color: var(--text-secondary);">Wed
+                                        </div>
+                                    </div>
+                                    <div
+                                        style="display: flex; flex-direction: column; align-items: center; gap: 8px; flex: 1; z-index: 1; height: 100%; justify-content: flex-end;">
+                                        <div style="font-size: 10px; font-weight: 600; color: var(--text-secondary);">14
+                                        </div>
+                                        <div style="width: 36px; height: 33%; background: linear-gradient(180deg, var(--accent-color) 0%, rgba(37,99,235,0.2) 100%); border-radius: 6px 6px 0 0; cursor: pointer; transition: filter 0.2s, height 0.5s ease-out;"
+                                            onmouseover="this.style.filter='brightness(1.2)'"
+                                            onmouseout="this.style.filter='none'"></div>
+                                        <div class="text-sm"
+                                            style="font-size: 11px; font-weight: 500; color: var(--text-secondary);">Thu
+                                        </div>
+                                    </div>
+                                    <div
+                                        style="display: flex; flex-direction: column; align-items: center; gap: 8px; flex: 1; z-index: 1; height: 100%; justify-content: flex-end;">
+                                        <div style="font-size: 10px; font-weight: 600; color: var(--text-primary);">24
+                                        </div>
+                                        <div style="width: 36px; height: 56%; background: linear-gradient(180deg, var(--accent-color) 0%, rgba(37,99,235,0.2) 100%); border-radius: 6px 6px 0 0; cursor: pointer; transition: filter 0.2s, height 0.5s ease-out;"
+                                            onmouseover="this.style.filter='brightness(1.2)'"
+                                            onmouseout="this.style.filter='none'"></div>
+                                        <div class="text-sm"
+                                            style="font-size: 11px; font-weight: 500; color: var(--text-secondary);">Fri
+                                        </div>
+                                    </div>
+                                    <div
+                                        style="display: flex; flex-direction: column; align-items: center; gap: 8px; flex: 1; z-index: 1; height: 100%; justify-content: flex-end;">
+                                        <div style="font-size: 10px; font-weight: 600; color: var(--text-secondary);">6
+                                        </div>
+                                        <div style="width: 36px; height: 14%; background: linear-gradient(180deg, var(--accent-color) 0%, rgba(37,99,235,0.2) 100%); border-radius: 6px 6px 0 0; cursor: pointer; transition: filter 0.2s, height 0.5s ease-out;"
+                                            onmouseover="this.style.filter='brightness(1.2)'"
+                                            onmouseout="this.style.filter='none'"></div>
+                                        <div class="text-sm"
+                                            style="font-size: 11px; font-weight: 500; color: var(--text-secondary);">Sat
+                                        </div>
+                                    </div>
+                                    <div
+                                        style="display: flex; flex-direction: column; align-items: center; gap: 8px; flex: 1; z-index: 1; height: 100%; justify-content: flex-end;">
+                                        <div style="font-size: 10px; font-weight: 600; color: var(--text-secondary);">11
+                                        </div>
+                                        <div style="width: 36px; height: 26%; background: linear-gradient(180deg, var(--accent-color) 0%, rgba(37,99,235,0.2) 100%); border-radius: 6px 6px 0 0; cursor: pointer; transition: filter 0.2s, height 0.5s ease-out;"
+                                            onmouseover="this.style.filter='brightness(1.2)'"
+                                            onmouseout="this.style.filter='none'"></div>
+                                        <div class="text-sm"
+                                            style="font-size: 11px; font-weight: 500; color: var(--text-secondary);">Sun
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="panel"
+                            style="margin: 0; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); background: var(--panel-bg);">
+                            <div class="flex-between"
+                                style="margin-bottom: 24px; border-bottom: 1px solid var(--panel-border); padding-bottom: 16px;">
+                                <h3 style="font-size: 15px; font-weight: 600;">Live Activity Feed</h3>
+                                <span class="badge"
+                                    style="background: rgba(37,99,235,0.1); color: var(--accent-color); border: 1px solid rgba(37,99,235,0.2); padding: 4px 12px; font-weight: 600;">
+                                    <div
+                                        style="width:6px;height:6px;border-radius:50%;background:var(--accent-color);display:inline-block;margin-right:6px;box-shadow: 0 0 0 rgba(37,99,235,0.4);animation: pulse 2s infinite;">
+                                    </div>Live
+                                </span>
+                            </div>
+                            <div style="display: flex; flex-direction: column; gap: 24px;">
+                                <div style="display: flex; gap: 16px; align-items: flex-start;">
+                                    <div class="avatar"
+                                        style="width: 36px; height: 36px; font-size: 12px; flex-shrink: 0; background: var(--button-secondary-bg); color: var(--text-primary); border: 1px solid var(--panel-border);">
+                                        HL</div>
+                                    <div>
+                                        <div class="text-sm" style="line-height: 1.5; color: var(--text-primary);">
+                                            <strong>Hiten Lamba</strong> resolved ticket
+                                            <a href="#"
+                                                style="color: var(--accent-color); text-decoration: none; font-weight: 500;">INC-1038</a>
+                                        </div>
+                                        <div
+                                            style="font-size: 12px; color: var(--text-secondary); margin-top: 6px; display: flex; align-items: center; gap: 6px;">
+                                            <svg width="12" height="12" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                            </svg>
+                                            10 mins ago
+                                        </div>
+                                    </div>
+                                </div>
+                                <div style="display: flex; gap: 16px; align-items: flex-start;">
+                                    <div class="avatar"
+                                        style="width: 36px; height: 36px; font-size: 12px; flex-shrink: 0; background: rgba(234,179,8,0.1); color: var(--warning-color); border: 1px solid rgba(234,179,8,0.3);">
+                                        SY</div>
+                                    <div>
+                                        <div class="text-sm" style="line-height: 1.5; color: var(--text-primary);">
+                                            <strong>System</strong> escalated ticket <a href="#"
+                                                style="color: var(--warning-color); text-decoration: none; font-weight: 500;">INC-0992</a>
+                                        </div>
+                                        <div
+                                            style="font-size: 12px; color: var(--text-secondary); margin-top: 6px; display: flex; align-items: center; gap: 6px;">
+                                            <svg width="12" height="12" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                            </svg>
+                                            45 mins ago
+                                        </div>
+                                    </div>
+                                </div>
+                                <div style="display: flex; gap: 16px; align-items: flex-start;">
+                                    <div class="avatar"
+                                        style="width: 36px; height: 36px; font-size: 12px; flex-shrink: 0; background: var(--button-secondary-bg); color: var(--text-primary); border: 1px solid var(--panel-border);">
+                                        JD</div>
+                                    <div>
+                                        <div class="text-sm" style="line-height: 1.5; color: var(--text-primary);">
+                                            <strong>Jane Developer</strong> created request <a href="#"
+                                                style="color: var(--accent-color); text-decoration: none; font-weight: 500;">REQ-2053</a>
+                                        </div>
+                                        <div
+                                            style="font-size: 12px; color: var(--text-secondary); margin-top: 6px; display: flex; align-items: center; gap: 6px;">
+                                            <svg width="12" height="12" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                            </svg>
+                                            1 hour ago
+                                        </div>
+                                    </div>
+                                </div>
+                                <div style="display: flex; gap: 16px; align-items: flex-start;">
+                                    <div class="avatar"
+                                        style="width: 36px; height: 36px; font-size: 12px; flex-shrink: 0; background: var(--button-secondary-bg); color: var(--text-primary); border: 1px solid var(--panel-border);">
+                                        KW</div>
+                                    <div>
+                                        <div class="text-sm" style="line-height: 1.5; color: var(--text-primary);">
+                                            <strong>Katie Weng</strong> updated
+                                            article <a href="#"
+                                                style="color: var(--text-primary); text-decoration: underline; font-weight: 500;">Hardware
+                                                Policy</a>
+                                        </div>
+                                        <div
+                                            style="font-size: 12px; color: var(--text-secondary); margin-top: 6px; display: flex; align-items: center; gap: 6px;">
+                                            <svg width="12" height="12" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                            </svg>
+                                            3 hours ago
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex-between mb-4">
+                        <h2>Recent Tickets</h2>
+                        <div class="filter-bar" style="margin-bottom: 0;">
+                            <div class="filter-pill active" onclick="selectFilter(this)">All Open</div>
+                            <div class="filter-pill" onclick="selectFilter(this)">Unassigned</div>
+                            <div class="filter-pill" onclick="selectFilter(this)">High Priority</div>
+                            <div class="filter-pill" onclick="selectFilter(this)">SLA Breach</div>
+                        </div>
+                    </div>
+
+                    <div class="panel" style="padding: 0;">
+                        <div class="table-wrapper">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Title</th>
+                                        <th>Status</th>
+                                        <th>Priority</th>
+                                        <th>Assignee</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="clickable"
+                                        onclick="if (event.target.tagName !== 'BUTTON') location.href='ticket-detail.html'[2])">
+                                        <td style="font-weight: 500; color: var(--text-primary);">INC-1042</td>
+                                        <td>Production Build Pipeline Failing</td>
+                                        <td><span class="badge badge-status-open">In Progress</span></td>
+                                        <td><span class="badge badge-priority-high">Critical</span></td>
+                                        <td>Chris Karki</td>
+                                        <td><button class="btn btn-secondary btn-sm"
+                                                onclick="showToast('Ticket re-assigned')">Reassign</button></td>
+                                    </tr>
+                                    <tr class="clickable">
+                                        <td style="font-weight: 500; color: var(--text-primary);">REQ-2055</td>
+                                        <td>Request Adobe Creative Cloud License</td>
+                                        <td><span class="badge"
+                                                style="border: 1px solid var(--panel-border); color: var(--text-secondary);">New</span>
+                                        </td>
+                                        <td><span class="badge"
+                                                style="border: 1px solid var(--panel-border); color: var(--text-secondary);">Low</span>
+                                        </td>
+                                        <td><span
+                                                style="color: var(--text-secondary); font-style: italic;">Unassigned</span>
+                                        </td>
+                                        <td><button class="btn btn-ghost btn-sm"
+                                                onclick="showToast('Ticket claimed by you', 'success')">Claim</button>
+                                        </td>
+                                    </tr>
+                                    <tr class="clickable">
+                                        <td style="font-weight: 500; color: var(--text-primary);">INC-1041</td>
+                                        <td>VPN Connection Dropping</td>
+                                        <td><span class="badge badge-status-resolved">Resolved</span></td>
+                                        <td><span class="badge"
+                                                style="border: 1px solid var(--warning-color); color: var(--warning-color);">Medium</span>
+                                        </td>
+                                        <td>Jane Developer</td>
+                                        <td><button class="btn btn-secondary btn-sm"
+                                                onclick="location.href='ticket-edit.html'">Edit</button>
+                                        </td>
+                                    </tr>
+                                    <tr class="clickable">
+                                        <td style="font-weight: 500; color: var(--text-primary);">REQ-2054</td>
+                                        <td>New Monitor Setup for Engineering</td>
+                                        <td><span class="badge"
+                                                style="border: 1px solid var(--panel-border); color: var(--text-secondary);">New</span>
+                                        </td>
+                                        <td><span class="badge"
+                                                style="border: 1px solid var(--panel-border); color: var(--text-secondary);">Low</span>
+                                        </td>
+                                        <td><span
+                                                style="color: var(--text-secondary); font-style: italic;">Unassigned</span>
+                                        </td>
+                                        <td><button class="btn btn-ghost btn-sm"
+                                                onclick="showToast('Ticket claimed by you', 'success')">Claim</button>
+                                        </td>
+                                    </tr>
+                                    <tr class="clickable">
+                                        <td style="font-weight: 500; color: var(--text-primary);">INC-1040</td>
+                                        <td>Email Sync Issue on Mobile</td>
+                                        <td><span class="badge badge-status-open">In Progress</span></td>
+                                        <td><span class="badge"
+                                                style="border: 1px solid var(--warning-color); color: var(--warning-color);">Medium</span>
+                                        </td>
+                                        <td>Arshdeep Mutti</td>
+                                        <td><button class="btn btn-secondary btn-sm"
+                                                onclick="location.href='ticket-edit.html'">Edit</button>
+                                        </td>
+                                    </tr>
+                                    <tr class="clickable">
+                                        <td style="font-weight: 500; color: var(--text-primary);">INC-1039</td>
+                                        <td>Printer Network Configuration</td>
+                                        <td><span class="badge badge-status-resolved">Resolved</span></td>
+                                        <td><span class="badge"
+                                                style="border: 1px solid var(--panel-border); color: var(--text-secondary);">Low</span>
+                                        </td>
+                                        <td>Hiten Lamba</td>
+                                        <td><button class="btn btn-secondary btn-sm"
+                                                onclick="location.href='ticket-edit.html'">Edit</button>
+                                        </td>
+                                    </tr>
+                                    <tr class="clickable">
+                                        <td style="font-weight: 500; color: var(--text-primary);">REQ-2053</td>
+                                        <td>Access to GitHub Organization</td>
+                                        <td><span class="badge badge-status-open">In Progress</span></td>
+                                        <td><span class="badge"
+                                                style="border: 1px solid var(--panel-border); color: var(--text-secondary);">Low</span>
+                                        </td>
+                                        <td>Katie Weng</td>
+                                        <td><button class="btn btn-secondary btn-sm"
+                                                onclick="location.href='ticket-edit.html'">Edit</button>
+                                        </td>
+                                    </tr>
+                                    <tr class="clickable">
+                                        <td style="font-weight: 500; color: var(--text-primary);">INC-1038</td>
+                                        <td>Database Read Replica Lag</td>
+                                        <td><span class="badge badge-status-resolved">Resolved</span></td>
+                                        <td><span class="badge badge-priority-high">Critical</span></td>
+                                        <td>Jane Developer</td>
+                                        <td><button class="btn btn-secondary btn-sm"
+                                                onclick="location.href='ticket-edit.html'">Edit</button>
+                                        </td>
+                                    </tr>
+                                    <tr class="clickable">
+                                        <td style="font-weight: 500; color: var(--text-primary);">REQ-2052</td>
+                                        <td>Increase S3 Bucket Storage Limit</td>
+                                        <td><span class="badge"
+                                                style="border: 1px solid var(--panel-border); color: var(--text-secondary);">New</span>
+                                        </td>
+                                        <td><span class="badge"
+                                                style="border: 1px solid var(--warning-color); color: var(--warning-color);">Medium</span>
+                                        </td>
+                                        <td><span
+                                                style="color: var(--text-secondary); font-style: italic;">Unassigned</span>
+                                        </td>
+                                        <td><button class="btn btn-ghost btn-sm"
+                                                onclick="showToast('Ticket claimed by you', 'success')">Claim</button>
+                                        </td>
+                                    </tr>
+                                    <tr class="clickable">
+                                        <td style="font-weight: 500; color: var(--text-primary);">INC-1037</td>
+                                        <td>SSO Integration Failing for Jira</td>
+                                        <td><span class="badge badge-status-open">In Progress</span></td>
+                                        <td><span class="badge badge-priority-high">High</span></td>
+                                        <td>Chris Karki</td>
+                                        <td><button class="btn btn-secondary btn-sm"
+                                                onclick="location.href='ticket-edit.html'">Edit</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/layout.js"></script>
+    <script src="js/app.js"></script>
+</body>
+
+</html>

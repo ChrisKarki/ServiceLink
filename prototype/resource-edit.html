@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Resource · ServiceLink</title>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@100;200;300;400;500;600;700&family=IBM+Plex+Sans:wght@100;200;300;400;500;600;700&family=Montserrat:wght@100;200;300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/main.css">
+    <script src="js/theme.js"></script>
+</head>
+
+<body data-page="resource-edit">
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <header data-shell="topbar"></header>
+
+    <div class="app-layout">
+        <nav data-shell="sidebar"></nav>
+
+        <div class="main-content">
+            <div class="content-area">
+                <section class="view-section">
+                    <div class="flex-between mb-4">
+                        <div style="display: flex; align-items: center; gap: 16px;">
+                            <button class="icon-btn"
+                                onclick="location.href='resources.html'"
+                                title="Back to Resources">
+                                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                                </svg>
+                            </button>
+                            <div>
+                                <h1 style="margin-bottom: 4px;">Edit Resource</h1>
+                                <div class="text-sm" style="color: var(--text-secondary);">Resource Tag:
+                                    VRT-Build-Server-01
+                                    •
+                                    Last audited 3 days ago</div>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 12px;">
+                            <button class="btn btn-secondary"
+                                onclick="location.href='resources.html'">Cancel</button>
+                            <button class="btn btn-primary"
+                                onclick="flash('Resource saved successfully!', 'success', 'resources.html')[2])">Save
+                                Resource</button>
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px;">
+                        <!-- Left Form Panel -->
+                        <div style="display: flex; flex-direction: column; gap: 24px;">
+                            <div class="panel"
+                                style="margin-bottom: 0; display: flex; flex-direction: column; gap: 20px;">
+                                <h3
+                                    style="font-size: 16px; border-bottom: 1px solid var(--panel-border); padding-bottom: 12px; margin-bottom: 0;">
+                                    Hardware & System Specifications</h3>
+
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                                    <div>
+                                        <label class="form-label"
+                                            style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-primary);">Resource
+                                            Tag / ID</label>
+                                        <input type="text" class="form-control" value="VRT-Build-Server-01"
+                                            style="width: 100%; padding: 10px 14px; font-family: monospace; font-weight: bold;">
+                                    </div>
+                                    <div>
+                                        <label class="form-label"
+                                            style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-primary);">Resource
+                                            Category</label>
+                                        <select class="form-control"
+                                            style="width: 100%; padding: 10px 14px; background-color: var(--input-bg);">
+                                            <option selected>Virtual Server / Cloud</option>
+                                            <option>Hardware (Laptop / Desktop)</option>
+                                            <option>Software License / SaaS</option>
+                                            <option>Networking Equipment</option>
+                                            <option>Peripherals & Monitors</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                                    <div>
+                                        <label class="form-label"
+                                            style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-primary);">Make
+                                            & Model / Instance Type</label>
+                                        <input type="text" class="form-control"
+                                            value="AWS EC2 t3.xlarge (4 vCPU, 16GB RAM)"
+                                            style="width: 100%; padding: 10px 14px;">
+                                    </div>
+                                    <div>
+                                        <label class="form-label"
+                                            style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-primary);">Serial
+                                            Number / IP Address</label>
+                                        <input type="text" class="form-control" value="10.240.12.88 (i-08a9f2429bc0182)"
+                                            style="width: 100%; padding: 10px 14px; font-family: monospace;">
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label class="form-label"
+                                        style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-primary);">Configuration
+                                        & Maintenance Notes</label>
+                                    <textarea class="form-control"
+                                        style="width: 100%; min-height: 140px; padding: 12px 14px; line-height: 1.6; background: var(--input-bg); resize: vertical;">Instance hosted in us-east-1a zone. Attached to VPC security group sg-091823ab with restricted SSH ingress. Automated EBS snapshots configured daily at 04:00 UTC via AWS Backup vault. Primary host for Jenkins CI build pipelines.</textarea>
+                                </div>
+                            </div>
+
+                            <div class="panel" style="margin-bottom: 0;">
+                                <h3
+                                    style="font-size: 16px; border-bottom: 1px solid var(--panel-border); padding-bottom: 12px; margin-bottom: 16px;">
+                                    Linked Tickets & Incidents</h3>
+                                <div
+                                    style="display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 8px;">
+                                    <div style="display: flex; align-items: center; gap: 12px;">
+                                        <span class="badge badge-priority-high">Critical</span>
+                                        <div>
+                                            <strong
+                                                style="color: var(--text-primary); display: block; font-size: 14px;">INC-1042:
+                                                Production Build Pipeline Failing</strong>
+                                            <span class="text-sm" style="color: var(--text-secondary);">Reported today
+                                                at
+                                                09:15 AM • Assigned to Chris Karki</span>
+                                        </div>
+                                    </div>
+                                    <button class="btn btn-secondary btn-sm"
+                                        onclick="location.href='ticket-detail.html'">View
+                                        Incident</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right Metadata Panel -->
+                        <div style="display: flex; flex-direction: column; gap: 24px;">
+                            <div class="panel"
+                                style="margin-bottom: 0; display: flex; flex-direction: column; gap: 16px;">
+                                <h3
+                                    style="font-size: 14px; border-bottom: 1px solid var(--panel-border); padding-bottom: 12px; margin-bottom: 4px;">
+                                    Allocation & Status</h3>
+
+                                <div>
+                                    <label class="text-sm"
+                                        style="color: var(--text-secondary); display: block; margin-bottom: 6px;">Operational
+                                        Status</label>
+                                    <select class="form-control"
+                                        style="width: 100%; padding: 8px 12px; background-color: var(--input-bg); border-color: var(--danger-color); color: var(--danger-color); font-weight: 600;">
+                                        <option>Active / In Use</option>
+                                        <option selected>Incident Active</option>
+                                        <option>Maintenance Needed</option>
+                                        <option>In Stock / Unassigned</option>
+                                        <option>Retired / Decommissioned</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label class="text-sm"
+                                        style="color: var(--text-secondary); display: block; margin-bottom: 6px;">Assigned
+                                        User / Team</label>
+                                    <select class="form-control"
+                                        style="width: 100%; padding: 8px 12px; background-color: var(--input-bg);">
+                                        <option selected>DevOps Team</option>
+                                        <option>Jane Developer</option>
+                                        <option>Chris Karki</option>
+                                        <option>Arshdeep Mutti</option>
+                                        <option>Unassigned</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label class="text-sm"
+                                        style="color: var(--text-secondary); display: block; margin-bottom: 6px;">Provision
+                                        Date</label>
+                                    <input type="date" class="form-control" value="2025-10-12"
+                                        style="width: 100%; padding: 8px 12px; background-color: var(--input-bg);">
+                                </div>
+
+                                <div>
+                                    <label class="text-sm"
+                                        style="color: var(--text-secondary); display: block; margin-bottom: 6px;">Monthly
+                                        Cost / Amortization</label>
+                                    <input type="text" class="form-control" value="$314.50 / month"
+                                        style="width: 100%; padding: 8px 12px; background-color: var(--input-bg);">
+                                </div>
+                            </div>
+
+                            <div class="panel" style="margin-bottom: 0;">
+                                <h3
+                                    style="font-size: 14px; border-bottom: 1px solid var(--panel-border); padding-bottom: 12px; margin-bottom: 12px;">
+                                    Quick Actions</h3>
+                                <div style="display: flex; flex-direction: column; gap: 8px;">
+                                    <button class="btn btn-secondary" style="width: 100%; justify-content: center;"
+                                        onclick="showToast('Diagnostic reboot initiated...', 'info')">🔄 Reboot / Reset
+                                        Resource</button>
+                                    <button class="btn btn-secondary" style="width: 100%; justify-content: center;"
+                                        onclick="showToast('Audit report downloaded', 'success')">📥 Download Audit
+                                        Log</button>
+                                    <button class="btn btn-secondary"
+                                        style="width: 100%; justify-content: center; color: var(--danger-color); border-color: rgba(239,68,68,0.3);"
+                                        onclick="showToast('Resource marked for decommissioning', 'warning')">⚠️
+                                        Decommission
+                                        Resource</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/layout.js"></script>
+    <script src="js/app.js"></script>
+</body>
+
+</html>
