@@ -5,7 +5,7 @@
    in Phase 4 implementation.
    =========================================================== */
 "use strict";
-
+//
 var STATES     = ["New","Assigned","In Progress","Waiting on User","Resolved","Closed"];
 var UNRESOLVED = ["New","Assigned","In Progress","Waiting on User"];
 var PRIORITY_RANK = { Critical:0, High:1, Medium:2, Low:3 };
