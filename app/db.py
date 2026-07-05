@@ -68,3 +68,12 @@ def execute(sql, params=()):
         return result
     finally:
         conn.close()
+
+def get_connection():
+    """Raw pooled connection for multi-statement transactions.
+
+    Used by services that must commit several statements atomically
+    (e.g. audit.log_action writing AuditLog + AuditLogChange together).
+    Caller is responsible for commit/rollback and close().
+    """
+    return _get_pool().get_connection()
