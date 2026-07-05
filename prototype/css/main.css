@@ -17,6 +17,14 @@
     --chip-bg: rgba(255, 255, 255, 0.05);
     --chip-bg-strong: rgba(255, 255, 255, 0.1);
     --card-tint: rgba(255, 255, 255, 0.03);
+    
+    /* Dropdown specific variables */
+    --dropdown-bg: rgba(10, 10, 10, 0.85);
+    --dropdown-border: rgba(255, 255, 255, 0.08);
+    --dropdown-divider: rgba(255, 255, 255, 0.06);
+    --dropdown-item-hover: rgba(255, 255, 255, 0.04);
+    --dropdown-item-border: rgba(255, 255, 255, 0.04);
+    --dropdown-shadow: 0 16px 40px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
 * {
@@ -354,44 +362,55 @@ h6 {
     top: 100%;
     right: 0;
     margin-top: 14px;
-    background: var(--panel-bg);
-    border: 1px solid var(--panel-border);
-    border-radius: 6px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-    width: 320px;
+    background: var(--dropdown-bg);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--dropdown-border);
+    border-radius: 12px;
+    box-shadow: var(--dropdown-shadow);
+    width: 280px;
     opacity: 0;
     visibility: hidden;
-    transform: translateY(4px);
-    transition: all 0.2s ease;
+    transform: translateY(8px) scale(0.98);
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
     z-index: 100;
+    overflow: hidden;
 }
 
 .dropdown.active {
     opacity: 1;
     visibility: visible;
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
 }
 
 .dropdown-header {
-    padding: 12px 16px;
-    border-bottom: 1px solid var(--panel-border);
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--dropdown-divider);
     font-weight: 600;
-    font-size: 14px;
+    font-size: 13px;
+    color: var(--text-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
 .dropdown-item {
-    padding: 10px 16px;
-    border-bottom: 1px solid var(--panel-border);
+    padding: 12px 18px;
+    border-bottom: 1px solid var(--dropdown-item-border);
     cursor: pointer;
-    font-size: 14px;
-    transition: background 0.2s;
+    font-size: 13px;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: background 0.2s, color 0.2s;
 }
 
 .dropdown-item:hover {
-    background: var(--button-secondary-bg);
+    background: var(--dropdown-item-hover);
+    color: var(--text-primary);
 }
 
 .dropdown-item:last-child {
@@ -1066,6 +1085,14 @@ body.auth-page .theme-corner {
     --chip-bg: rgba(0, 0, 0, 0.06);
     --chip-bg-strong: rgba(0, 0, 0, 0.1);
     --card-tint: rgba(0, 0, 0, 0.025);
+
+    /* Light Theme Dropdown Variables */
+    --dropdown-bg: rgba(255, 255, 255, 0.85);
+    --dropdown-border: rgba(0, 0, 0, 0.08);
+    --dropdown-divider: rgba(0, 0, 0, 0.06);
+    --dropdown-item-hover: rgba(0, 0, 0, 0.03);
+    --dropdown-item-border: rgba(0, 0, 0, 0.04);
+    --dropdown-shadow: 0 16px 40px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.8);
 }
 
 /* Theme toggle: show the icon for the mode you can switch to */

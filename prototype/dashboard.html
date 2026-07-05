@@ -286,8 +286,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr class="clickable"
-                                        onclick="if (event.target.tagName !== 'BUTTON') location.href='ticket-detail.html'[2])">
+                                    <tr class="clickable">
                                         <td style="font-weight: 500; color: var(--text-primary);">INC-1042</td>
                                         <td>Production Build Pipeline Failing</td>
                                         <td><span class="badge badge-status-open">In Progress</span></td>
@@ -423,6 +422,15 @@
 
     <script src="js/layout.js"></script>
     <script src="js/app.js"></script>
+    <script>
+        document.querySelectorAll('.clickable').forEach(row => {
+            row.addEventListener('click', function(e) {
+                if (e.target.tagName !== 'BUTTON' && e.target.tagName !== 'SELECT' && e.target.tagName !== 'A') {
+                    location.href = 'ticket-detail.html';
+                }
+            });
+        });
+    </script>
 </body>
 
 </html>

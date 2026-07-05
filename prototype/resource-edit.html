@@ -8,6 +8,171 @@
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@100;200;300;400;500;600;700&family=IBM+Plex+Sans:wght@100;200;300;400;500;600;700&family=Montserrat:wght@100;200;300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/main.css">
     <script src="js/theme.js"></script>
+    <style>
+        /* Breadcrumb */
+        .kb-breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+
+        .kb-breadcrumb a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .kb-breadcrumb a:hover {
+            color: var(--text-primary);
+        }
+
+        .kb-breadcrumb .separator {
+            color: var(--text-secondary);
+            opacity: 0.5;
+        }
+
+        .kb-breadcrumb .current {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        /* Infrastructure Dashboard Layout */
+        .resource-header-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 24px;
+            margin-bottom: 28px;
+            flex-wrap: wrap;
+        }
+
+        .resource-title {
+            font-size: 26px;
+            font-weight: 700;
+            line-height: 1.2;
+            color: var(--text-primary);
+            margin: 0;
+            font-family: monospace;
+        }
+
+        .metrics-grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .metric-card {
+            background: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 14px;
+            padding: 22px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .metric-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .metric-icon-box {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: var(--button-secondary-bg);
+            border: 1px solid var(--panel-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent-color);
+        }
+
+        .dashboard-grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 32px;
+            align-items: start;
+        }
+
+        .section-heading {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .card-box {
+            background: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 12px;
+            padding: 22px;
+            margin-bottom: 24px;
+        }
+
+        .card-box-tint {
+            background: var(--card-tint);
+            border: 1px solid var(--panel-border);
+            border-radius: 12px;
+            padding: 22px;
+            margin-bottom: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--text-primary);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px 14px;
+            background: var(--input-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 15px;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+        }
+
+        .spec-grid-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .spec-grid-row:last-child {
+            margin-bottom: 0;
+        }
+    </style>
 </head>
 
 <body data-page="resource-edit">
@@ -22,185 +187,207 @@
         <div class="main-content">
             <div class="content-area">
                 <section class="view-section">
-                    <div class="flex-between mb-4">
+                    <!-- Breadcrumb -->
+                    <div class="kb-breadcrumb">
+                        <a href="resources.html">Resources</a>
+                        <span class="separator">/</span>
+                        <a href="resource-view.html">VRT-Build-Server-01</a>
+                        <span class="separator">/</span>
+                        <span class="current">Edit Resource</span>
+                    </div>
+
+                    <!-- Header Banner -->
+                    <div class="resource-header-bar">
                         <div style="display: flex; align-items: center; gap: 16px;">
-                            <button class="icon-btn"
-                                onclick="location.href='resources.html'"
-                                title="Back to Resources">
+                            <button class="icon-btn" onclick="location.href='resource-view.html'" title="Back to Resource">
                                 <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
                                 </svg>
                             </button>
                             <div>
-                                <h1 style="margin-bottom: 4px;">Edit Resource</h1>
-                                <div class="text-sm" style="color: var(--text-secondary);">Resource Tag:
-                                    VRT-Build-Server-01
-                                    •
-                                    Last audited 3 days ago</div>
+                                <div style="margin-bottom: 6px;">
+                                    <span style="color: var(--accent-color); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Virtual Server / Cloud • Edit Mode</span>
+                                </div>
+                                <h1 class="resource-title">Edit: VRT-BUILD-SERVER-01</h1>
                             </div>
                         </div>
-                        <div style="display: flex; gap: 12px;">
-                            <button class="btn btn-secondary"
-                                onclick="location.href='resources.html'">Cancel</button>
-                            <button class="btn btn-primary"
-                                onclick="flash('Resource saved successfully!', 'success', 'resources.html')[2])">Save
-                                Resource</button>
+
+                        <!-- Top Right Action Controls -->
+                        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                            <button class="btn btn-secondary" onclick="location.href='resource-view.html'">Cancel</button>
+                            <button class="btn btn-primary" style="display: flex; align-items: center; gap: 8px;" onclick="flash('Resource saved successfully!', 'success', 'resource-view.html')">
+                                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                </svg>
+                                Save Resource
+                            </button>
                         </div>
                     </div>
 
-                    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px;">
-                        <!-- Left Form Panel -->
-                        <div style="display: flex; flex-direction: column; gap: 24px;">
-                            <div class="panel"
-                                style="margin-bottom: 0; display: flex; flex-direction: column; gap: 20px;">
-                                <h3
-                                    style="font-size: 16px; border-bottom: 1px solid var(--panel-border); padding-bottom: 12px; margin-bottom: 0;">
-                                    Hardware & System Specifications</h3>
+                    <!-- 3-Card Metrics & Settings Overview Grid -->
+                    <div class="metrics-grid-3">
+                        <!-- Card 1: Operational Status Selector -->
+                        <div class="metric-card">
+                            <div class="metric-header">
+                                <span>Operational Status</span>
+                                <div class="metric-icon-box" style="color: var(--danger-color); background: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.2);">
+                                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <select class="form-control" style="font-weight: 700; font-size: 16px; border-color: var(--danger-color); color: var(--danger-color); background-color: var(--input-bg);">
+                                    <option>Active / In Use</option>
+                                    <option selected>Incident Active (Alert)</option>
+                                    <option>Maintenance Mode</option>
+                                    <option>Offline / Disconnected</option>
+                                    <option>Decommissioned</option>
+                                </select>
+                                <span class="text-sm" style="color: var(--text-secondary); display: block; margin-top: 8px;">Triggered by linked incident INC-1042</span>
+                            </div>
+                        </div>
 
-                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-                                    <div>
-                                        <label class="form-label"
-                                            style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-primary);">Resource
-                                            Tag / ID</label>
-                                        <input type="text" class="form-control" value="VRT-Build-Server-01"
-                                            style="width: 100%; padding: 10px 14px; font-family: monospace; font-weight: bold;">
+                        <!-- Card 2: Ownership & Team Assignment -->
+                        <div class="metric-card">
+                            <div class="metric-header">
+                                <span>Assigned Team &amp; Owner</span>
+                                <div class="metric-icon-box">
+                                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <select class="form-control" style="font-weight: 600;">
+                                    <option selected>DevOps Team (Infrastructure &amp; Cloud)</option>
+                                    <option>Platform Engineering Team</option>
+                                    <option>QA &amp; Automation Team</option>
+                                    <option>IT Operations &amp; Security</option>
+                                </select>
+                                <span class="text-sm" style="color: var(--text-secondary); display: block; margin-top: 8px;">Department: Cloud Infrastructure</span>
+                            </div>
+                        </div>
+
+                        <!-- Card 3: Cost & Cloud Region Setting -->
+                        <div class="metric-card">
+                            <div class="metric-header">
+                                <span>Monthly Cost &amp; Region</span>
+                                <div class="metric-icon-box">
+                                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <input type="text" class="form-control" value="$314.50" style="font-weight: 700; font-size: 16px;">
+                                </div>
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <input type="text" class="form-control" value="us-east-1a" style="font-family: monospace; font-weight: 600;">
+                                </div>
+                            </div>
+                            <span class="text-sm" style="color: var(--text-secondary); display: block; margin-top: 2px;">Provider: Amazon Web Services (AWS)</span>
+                        </div>
+                    </div>
+
+                    <!-- Balanced 2-Column Infrastructure Grid -->
+                    <div class="dashboard-grid-2">
+                        <!-- LEFT COLUMN: Specs & Configuration -->
+                        <div>
+                            <div class="section-heading">Hardware &amp; System Specifications</div>
+                            <div class="card-box">
+                                <div class="spec-grid-row">
+                                    <div class="form-group" style="margin-bottom: 0;">
+                                        <label class="form-label">Resource Tag / ID</label>
+                                        <input type="text" class="form-control" value="VRT-Build-Server-01" style="font-family: monospace; font-weight: bold;">
                                     </div>
-                                    <div>
-                                        <label class="form-label"
-                                            style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-primary);">Resource
-                                            Category</label>
-                                        <select class="form-control"
-                                            style="width: 100%; padding: 10px 14px; background-color: var(--input-bg);">
+                                    <div class="form-group" style="margin-bottom: 0;">
+                                        <label class="form-label">Resource Category</label>
+                                        <select class="form-control">
                                             <option selected>Virtual Server / Cloud</option>
                                             <option>Hardware (Laptop / Desktop)</option>
                                             <option>Software License / SaaS</option>
                                             <option>Networking Equipment</option>
-                                            <option>Peripherals & Monitors</option>
+                                            <option>Peripherals &amp; Monitors</option>
                                         </select>
                                     </div>
                                 </div>
 
-                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-                                    <div>
-                                        <label class="form-label"
-                                            style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-primary);">Make
-                                            & Model / Instance Type</label>
-                                        <input type="text" class="form-control"
-                                            value="AWS EC2 t3.xlarge (4 vCPU, 16GB RAM)"
-                                            style="width: 100%; padding: 10px 14px;">
+                                <div class="spec-grid-row" style="margin-top: 20px;">
+                                    <div class="form-group" style="margin-bottom: 0;">
+                                        <label class="form-label">Make &amp; Model / Instance Type</label>
+                                        <input type="text" class="form-control" value="AWS EC2 t3.xlarge (4 vCPU, 16GB RAM)">
                                     </div>
-                                    <div>
-                                        <label class="form-label"
-                                            style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-primary);">Serial
-                                            Number / IP Address</label>
-                                        <input type="text" class="form-control" value="10.240.12.88 (i-08a9f2429bc0182)"
-                                            style="width: 100%; padding: 10px 14px; font-family: monospace;">
+                                    <div class="form-group" style="margin-bottom: 0;">
+                                        <label class="form-label">Serial Number / IP Address</label>
+                                        <input type="text" class="form-control" value="10.240.12.88 (i-08a9f2429bc0182)" style="font-family: monospace;">
                                     </div>
-                                </div>
-
-                                <div>
-                                    <label class="form-label"
-                                        style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-primary);">Configuration
-                                        & Maintenance Notes</label>
-                                    <textarea class="form-control"
-                                        style="width: 100%; min-height: 140px; padding: 12px 14px; line-height: 1.6; background: var(--input-bg); resize: vertical;">Instance hosted in us-east-1a zone. Attached to VPC security group sg-091823ab with restricted SSH ingress. Automated EBS snapshots configured daily at 04:00 UTC via AWS Backup vault. Primary host for Jenkins CI build pipelines.</textarea>
                                 </div>
                             </div>
 
-                            <div class="panel" style="margin-bottom: 0;">
-                                <h3
-                                    style="font-size: 16px; border-bottom: 1px solid var(--panel-border); padding-bottom: 12px; margin-bottom: 16px;">
-                                    Linked Tickets & Incidents</h3>
-                                <div
-                                    style="display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 8px;">
-                                    <div style="display: flex; align-items: center; gap: 12px;">
-                                        <span class="badge badge-priority-high">Critical</span>
-                                        <div>
-                                            <strong
-                                                style="color: var(--text-primary); display: block; font-size: 14px;">INC-1042:
-                                                Production Build Pipeline Failing</strong>
-                                            <span class="text-sm" style="color: var(--text-secondary);">Reported today
-                                                at
-                                                09:15 AM • Assigned to Chris Karki</span>
-                                        </div>
-                                    </div>
-                                    <button class="btn btn-secondary btn-sm"
-                                        onclick="location.href='ticket-detail.html'">View
-                                        Incident</button>
+                            <div class="section-heading">Configuration &amp; Maintenance Notes</div>
+                            <div class="card-box-tint">
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label class="form-label">Host Notes &amp; Security Rules</label>
+                                    <textarea class="form-control" style="min-height: 150px; line-height: 1.6; resize: vertical;">Instance hosted in us-east-1a zone. Attached to VPC security group sg-091823ab with restricted SSH ingress. Automated EBS snapshots configured daily at 04:00 UTC via AWS Backup vault. Primary host for Jenkins CI build pipelines.</textarea>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Right Metadata Panel -->
-                        <div style="display: flex; flex-direction: column; gap: 24px;">
-                            <div class="panel"
-                                style="margin-bottom: 0; display: flex; flex-direction: column; gap: 16px;">
-                                <h3
-                                    style="font-size: 14px; border-bottom: 1px solid var(--panel-border); padding-bottom: 12px; margin-bottom: 4px;">
-                                    Allocation & Status</h3>
-
-                                <div>
-                                    <label class="text-sm"
-                                        style="color: var(--text-secondary); display: block; margin-bottom: 6px;">Operational
-                                        Status</label>
-                                    <select class="form-control"
-                                        style="width: 100%; padding: 8px 12px; background-color: var(--input-bg); border-color: var(--danger-color); color: var(--danger-color); font-weight: 600;">
-                                        <option>Active / In Use</option>
-                                        <option selected>Incident Active</option>
-                                        <option>Maintenance Needed</option>
-                                        <option>In Stock / Unassigned</option>
-                                        <option>Retired / Decommissioned</option>
-                                    </select>
+                        <!-- RIGHT COLUMN: Linked Incidents & Lifecycle Management -->
+                        <div>
+                            <div class="section-heading">Linked Tickets &amp; Incidents</div>
+                            <div class="card-box" style="padding: 16px; display: flex; flex-direction: column; gap: 14px;">
+                                <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 10px;">
+                                    <div style="display: flex; align-items: center; gap: 12px;">
+                                        <div style="width: 34px; height: 34px; border-radius: 8px; background: rgba(239, 68, 68, 0.15); display: flex; align-items: center; justify-content: center; color: var(--danger-color);">
+                                            <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <strong style="color: var(--text-primary); display: block; font-size: 14px;">INC-1042: Production Build Pipeline Failing</strong>
+                                            <span class="text-sm" style="color: var(--text-secondary);">Critical • Assigned to Chris Karki</span>
+                                        </div>
+                                    </div>
+                                    <button class="btn btn-secondary btn-sm" onclick="location.href='ticket-detail.html'">View</button>
                                 </div>
 
-                                <div>
-                                    <label class="text-sm"
-                                        style="color: var(--text-secondary); display: block; margin-bottom: 6px;">Assigned
-                                        User / Team</label>
-                                    <select class="form-control"
-                                        style="width: 100%; padding: 8px 12px; background-color: var(--input-bg);">
-                                        <option selected>DevOps Team</option>
-                                        <option>Jane Developer</option>
-                                        <option>Chris Karki</option>
-                                        <option>Arshdeep Mutti</option>
-                                        <option>Unassigned</option>
-                                    </select>
-                                </div>
-
-                                <div>
-                                    <label class="text-sm"
-                                        style="color: var(--text-secondary); display: block; margin-bottom: 6px;">Provision
-                                        Date</label>
-                                    <input type="date" class="form-control" value="2025-10-12"
-                                        style="width: 100%; padding: 8px 12px; background-color: var(--input-bg);">
-                                </div>
-
-                                <div>
-                                    <label class="text-sm"
-                                        style="color: var(--text-secondary); display: block; margin-bottom: 6px;">Monthly
-                                        Cost / Amortization</label>
-                                    <input type="text" class="form-control" value="$314.50 / month"
-                                        style="width: 100%; padding: 8px 12px; background-color: var(--input-bg);">
-                                </div>
+                                <button class="btn btn-secondary" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 13px;" onclick="showToast('Incident link modal opened', 'info')">
+                                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                    </svg>
+                                    Link Another Ticket / Incident
+                                </button>
                             </div>
 
-                            <div class="panel" style="margin-bottom: 0;">
-                                <h3
-                                    style="font-size: 14px; border-bottom: 1px solid var(--panel-border); padding-bottom: 12px; margin-bottom: 12px;">
-                                    Quick Actions</h3>
-                                <div style="display: flex; flex-direction: column; gap: 8px;">
-                                    <button class="btn btn-secondary" style="width: 100%; justify-content: center;"
-                                        onclick="showToast('Diagnostic reboot initiated...', 'info')">🔄 Reboot / Reset
-                                        Resource</button>
-                                    <button class="btn btn-secondary" style="width: 100%; justify-content: center;"
-                                        onclick="showToast('Audit report downloaded', 'success')">📥 Download Audit
-                                        Log</button>
-                                    <button class="btn btn-secondary"
-                                        style="width: 100%; justify-content: center; color: var(--danger-color); border-color: rgba(239,68,68,0.3);"
-                                        onclick="showToast('Resource marked for decommissioning', 'warning')">⚠️
-                                        Decommission
-                                        Resource</button>
+                            <div class="section-heading">Lifecycle &amp; Provisioning</div>
+                            <div class="card-box">
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px;">
+                                    <div class="form-group" style="margin-bottom: 0;">
+                                        <label class="form-label">Provisioned Date</label>
+                                        <input type="date" class="form-control" value="2025-10-12">
+                                    </div>
+                                    <div class="form-group" style="margin-bottom: 0;">
+                                        <label class="form-label">Audit Frequency</label>
+                                        <select class="form-control">
+                                            <option selected>Monthly Audit</option>
+                                            <option>Quarterly Audit</option>
+                                            <option>Annual Audit</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div style="padding-top: 8px;">
+                                    <label class="form-label" style="color: var(--danger-color);">Decommission Asset</label>
+                                    <p class="text-sm" style="color: var(--text-secondary); margin-bottom: 12px;">Permanently retire this infrastructure component and release associated cloud IPs and storage.</p>
+                                    <button class="btn btn-secondary" style="color: var(--danger-color); border-color: rgba(239, 68, 68, 0.4); width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px;" onclick="showToast('Resource marked for decommissioning', 'warning')">
+                                        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                        </svg>
+                                        Initiate Decommission Protocol
+                                    </button>
                                 </div>
                             </div>
                         </div>
