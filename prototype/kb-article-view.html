@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KB Article · ServiceLink</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@100;200;300;400;500;600;700&family=IBM+Plex+Sans:wght@100;200;300;400;500;600;700&family=Montserrat:wght@100;200;300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="css/main.css">
+    <script src="js/theme.js"></script>
+    <style>
+        /* Breadcrumb */
+        .kb-breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+
+        .kb-breadcrumb a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .kb-breadcrumb a:hover {
+            color: var(--text-primary);
+        }
+
+        .kb-breadcrumb .separator {
+            color: var(--text-secondary);
+            opacity: 0.5;
+        }
+
+        .kb-breadcrumb .current {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        /* Article Layout */
+        .kb-article-layout {
+            display: grid;
+            grid-template-columns: 280px 1fr 48px;
+            gap: 32px;
+            align-items: start;
+        }
+
+        /* Table of Contents */
+        .kb-toc {
+            position: sticky;
+            top: 16px;
+        }
+
+        .kb-toc h3 {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-primary);
+            text-transform: uppercase;
+            margin-bottom: 20px;
+            letter-spacing: 0.5px;
+        }
+
+        .kb-toc-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .kb-toc-item {
+            font-size: 14px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 8px 16px;
+            border-radius: 8px;
+            transition: background 0.15s, color 0.15s;
+            line-height: 1.5;
+            white-space: normal;
+            word-break: break-word;
+        }
+
+        .kb-toc-item:hover {
+            background: var(--button-secondary-bg);
+            color: var(--text-primary);
+        }
+
+        .kb-toc-item.active {
+            background: rgba(96, 165, 250, 0.1);
+            color: var(--accent-color);
+            font-weight: 600;
+        }
+
+        .kb-toc-sub {
+            list-style: none;
+            padding: 8px 0 0 8px;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .kb-toc-sub li {
+            font-size: 14px;
+            color: var(--text-secondary);
+            padding: 6px 12px;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: color 0.15s, background 0.15s;
+            line-height: 1.5;
+            white-space: normal;
+            word-break: break-word;
+        }
+
+        .kb-toc-sub li:hover {
+            color: var(--text-primary);
+            background: var(--button-secondary-bg);
+        }
+
+        /* Article Body */
+        .kb-article-body {
+            min-width: 0;
+        }
+
+        .kb-article-body h1.kb-article-title {
+            font-size: 23px;
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 16px;
+            text-transform: uppercase;
+        }
+
+        .kb-reading-time {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 14px;
+            border-radius: 50px;
+            border: 1px solid var(--panel-border);
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 32px;
+        }
+
+        .kb-reading-time svg {
+            opacity: 0.6;
+        }
+
+        .kb-section-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+            margin-top: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .kb-step-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-primary);
+            display: block;
+            margin-bottom: 6px;
+            margin-top: 8px;
+        }
+
+        .kb-section-title:first-of-type {
+            margin-top: 24px;
+        }
+
+        .kb-article-text {
+            font-size: 16px;
+            line-height: 1.75;
+            color: var(--text-secondary);
+        }
+
+        .kb-article-text p {
+            margin-bottom: 16px;
+        }
+
+        .kb-article-text strong {
+            color: var(--text-primary);
+        }
+
+        /* Pro Tip callout */
+        .kb-pro-tip {
+            background: rgba(245, 158, 11, 0.08);
+            border: 1px solid rgba(245, 158, 11, 0.2);
+            border-radius: 10px;
+            padding: 20px 24px;
+            margin: 24px 0;
+        }
+
+        .kb-pro-tip-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            font-size: 13px;
+            font-weight: 700;
+            color: #f59e0b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .kb-pro-tip-header svg {
+            color: #f59e0b;
+        }
+
+        .kb-pro-tip p {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        /* Related Articles */
+        .kb-related {
+            margin-top: 48px;
+            padding-top: 32px;
+            border-top: 1px solid var(--panel-border);
+        }
+
+        .kb-related h3 {
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+        }
+
+        .kb-related-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+
+        .kb-related-card {
+            background: var(--button-secondary-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 8px;
+            padding: 16px;
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s;
+        }
+
+        .kb-related-card:hover {
+            border-color: var(--border-strong);
+            background: var(--button-secondary-hover);
+        }
+
+        .kb-related-card .card-title {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-primary);
+            line-height: 1.4;
+            margin: 0;
+        }
+
+        .kb-related-card .card-type {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        /* Side action bar */
+        .kb-side-actions {
+            position: sticky;
+            top: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .kb-side-action-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background: var(--button-secondary-bg);
+            border: 1px solid var(--panel-border);
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s, border-color 0.2s, color 0.2s;
+        }
+
+        .kb-side-action-btn:hover {
+            background: var(--button-secondary-hover);
+            border-color: var(--border-strong);
+            color: var(--text-primary);
+        }
+    </style>
+</head>
+
+<body data-page="kb-article-view">
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <header data-shell="topbar"></header>
+
+    <div class="app-layout">
+        <nav data-shell="sidebar"></nav>
+
+        <div class="main-content">
+            <div class="content-area">
+                <section class="view-section">
+
+                    <!-- Article Layout: TOC | Content | Side Actions -->
+                    <div class="kb-article-layout">
+
+                        <!-- Sidebar -->
+                        <aside class="kb-toc">
+                            <div
+                                style="padding-bottom: 16px; border-bottom: 1px solid var(--panel-border); margin-bottom: 16px;">
+                                <!-- Category label -->
+                                <div style="margin-bottom: 16px;">
+                                    <span
+                                        style="color: var(--accent-color); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Networking
+                                        &amp; VPN</span>
+                                </div>
+
+                                <!-- Author & Job Title -->
+                                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+                                    <div
+                                        style="width: 36px; height: 36px; border-radius: 50%; background: rgba(96, 165, 250, 0.15); display: flex; align-items: center; justify-content: center; color: var(--accent-color); font-size: 14px; font-weight: 600;">
+                                        AC</div>
+                                    <div>
+                                        <div style="color: var(--text-primary); font-size: 15px; font-weight: 600;">Alex
+                                            Chen</div>
+                                        <div style="color: var(--text-secondary); font-size: 14px;">Network Engineer
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Updated Date & Time -->
+                                <div
+                                    style="color: var(--text-secondary); font-size: 14px; display: flex; align-items: center; gap: 6px; margin-bottom: 8px;">
+                                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                        style="opacity: 0.7;">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
+                                        </path>
+                                    </svg>
+                                    <span>Updated Aug 15, 2026, 10:30 AM</span>
+                                </div>
+
+                                <!-- Reading time -->
+                                <div
+                                    style="display: flex; align-items: center; gap: 6px; color: var(--text-secondary); font-size: 15px;">
+                                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                        style="opacity: 0.7;">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                    <span>5 min read</span>
+                                </div>
+                            </div>
+
+                            <h3 style="margin-top: 0; padding-top: 0; border: none;">Table of Contents</h3>
+                            <ul class="kb-toc-list">
+                                <li class="kb-toc-item active" onclick="scrollToSection('overview')">1. Overview &amp;
+                                    Scope</li>
+                                <li class="kb-toc-item" onclick="scrollToSection('resolution')">2. Resolution Steps
+                                    <ul class="kb-toc-sub">
+                                        <li onclick="event.stopPropagation(); scrollToSection('step1')">Step 1: Verify
+                                            the client version.</li>
+                                        <li onclick="event.stopPropagation(); scrollToSection('step2')">Step 2: Check
+                                            MTU Settings.</li>
+                                        <li onclick="event.stopPropagation(); scrollToSection('step3')">Step 3: Update
+                                            Network Drivers.</li>
+                                    </ul>
+                                </li>
+                                <li class="kb-toc-item" onclick="scrollToSection('mtu')">3. Advanced MTU Adjustments
+                                </li>
+                                <li class="kb-toc-item" onclick="scrollToSection('escalation')">4. Escalation Path</li>
+                            </ul>
+                        </aside>
+
+                        <!-- Main Article Content -->
+                        <div class="kb-article-body">
+                            <h1 class="kb-article-title">Troubleshooting Remote VPN Connectivity Drops</h1>
+
+                            <!-- Section 1 -->
+                            <h2 class="kb-section-title" id="overview">1. Overview &amp; Scope</h2>
+                            <div class="kb-article-text">
+                                <p>This guide addresses the common issue where end users experience frequent disconnects
+                                    from the corporate VPN, specifically when utilizing split-tunneling on Windows 11
+                                    machines connecting via home ISPs.</p>
+                            </div>
+
+                            <!-- Section 2 -->
+                            <h2 class="kb-section-title" id="resolution">2. Resolution Steps</h2>
+                            <div class="kb-article-text">
+                                <p id="step1"><span class="kb-step-title">Step 1: Verify the client
+                                        version.</span>Ensure the user is running the latest version of the VPN client
+                                    (v4.2 or higher). Older versions have known compatibility issues with recent Windows
+                                    OS updates. You can verify this by having the user right-click the VPN icon in their
+                                    system tray, select 'About', and read the version number aloud. If they are on a
+                                    version older than v4.2, guide them through the standard software update process via
+                                    the Company Portal.</p>
+
+                                <p id="step2"><span class="kb-step-title">Step 2: Check MTU Settings.</span>Often, home
+                                    ISP routers fragment packets if the MTU is too high. Instruct the user or use remote
+                                    management to lower the VPN adapter MTU to 1350. This is especially prevalent with
+                                    fiber internet connections using generic ISP-provided gateway devices. You can use
+                                    PowerShell to make this adjustment quickly:
+                                    <code>netsh interface ipv4 set subinterface "Ethernet" mtu=1350 store=persistent</code>.
+                                    Be sure to replace "Ethernet" with the actual name of the VPN virtual adapter.</p>
+
+                                <!-- Pro Tip -->
+                                <div class="kb-pro-tip">
+                                    <div class="kb-pro-tip-header">
+                                        <svg width="16" height="16" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z">
+                                            </path>
+                                        </svg>
+                                        Pro Tip
+                                    </div>
+                                    <p>Always verify the user's home network signal strength before adjusting MTU
+                                        settings. Poor Wi-Fi can often mimic VPN instability and cause intermittent
+                                        drops. A simple speed test can reveal these issues.</p>
+                                </div>
+
+                                <p id="step3"><span class="kb-step-title">Step 3: Update Network Drivers.</span>Check
+                                    the linked hardware resource in ServiceLink. If the device is a Dell XPS model from
+                                    2025, push the latest Intel Wi-Fi driver update via the management console. A known
+                                    bug in the default factory driver causes intermittent packet loss when dealing with
+                                    encrypted VPN tunnels. Pushing this update usually takes 2-3 minutes and will
+                                    briefly disconnect the user from the internet.</p>
+                            </div>
+
+                            <!-- Section 3 -->
+                            <h2 class="kb-section-title" id="mtu">3. Advanced MTU Adjustments</h2>
+                            <div class="kb-article-text">
+                                <p>If lowering the MTU to 1350 does not fully stabilize the connection, some ISPs may
+                                    require an even lower MTU. You can instruct users to incrementally lower the MTU by
+                                    10 (e.g., 1340, 1330) and test connectivity before finalizing the persistent
+                                    configuration. Additionally, consider adjusting the TCP MSS clamping if your
+                                    firewall supports it. Testing with ping sweeps using the -f and -l flags can help
+                                    determine the exact fragmentation threshold.</p>
+                            </div>
+
+                            <!-- Section 4 -->
+                            <h2 class="kb-section-title" id="escalation">4. Escalation Path</h2>
+                            <div class="kb-article-text">
+                                <p>If the issue persists after these steps, escalate the ticket to the Level 2 Network
+                                    team and attach this KB article indicating the steps you have already taken. Please
+                                    include the user's IP address, the exact time of the disconnects, and any relevant
+                                    logs from the VPN client to expedite the troubleshooting process.</p>
+                            </div>
+
+                            <!-- Related Articles -->
+                            <div class="kb-related">
+                                <h3>Related Articles</h3>
+                                <div class="kb-related-grid">
+                                    <div class="kb-related-card" onclick="showToast('Opening article…')">
+                                        <p class="card-title">Card 1: Optimizing Split-Tunneling Configuration (Guide)
+                                        </p>
+                                    </div>
+                                    <div class="kb-related-card" onclick="showToast('Opening article…')">
+                                        <p class="card-title">Card 2: Common VPN Client Errors &amp; Fixes (Reference)
+                                        </p>
+                                    </div>
+                                    <div class="kb-related-card" onclick="showToast('Opening article…')">
+                                        <p class="card-title">Card 3: Understanding MTU and Packet Fragmentation (Deep
+                                            Dive)</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Side Action Buttons -->
+                        <div class="kb-side-actions">
+                            <button class="kb-side-action-btn" title="Edit article"
+                                onclick="location.href='kb-article-edit.html'">
+                                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z">
+                                    </path>
+                                </svg>
+                            </button>
+                            <button class="kb-side-action-btn" title="Share article"
+                                onclick="showToast('Link copied to clipboard', 'success')">
+                                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z">
+                                    </path>
+                                </svg>
+                            </button>
+                            <button class="kb-side-action-btn" title="Bookmark"
+                                onclick="showToast('Article bookmarked', 'success')">
+                                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"></path>
+                                </svg>
+                            </button>
+                            <button class="kb-side-action-btn" title="Print" onclick="window.print()">
+                                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z">
+                                    </path>
+                                </svg>
+                            </button>
+                            <div style="height: 1px; background: var(--panel-border); margin: 8px 4px;"></div>
+                            <button class="kb-side-action-btn" title="Helpful"
+                                onclick="showToast('Marked as helpful', 'success')">
+                                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.514">
+                                    </path>
+                                </svg>
+                            </button>
+                            <button class="kb-side-action-btn" title="Not Helpful"
+                                onclick="showToast('Marked as not helpful')">
+                                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M10 14H5.236a2 2 0 01-1.789-2.894l3.5-7A2 2 0 018.736 3h4.018a2 2 0 01.485.06l3.76.94m-7 10v5a2 2 0 002 2h.096c.5 0 .905-.405.905-.904 0-.714.211-1.412.608-2.006L17 13V4m-7 10h2m5-10h2a2 2 0 012 2v6a2 2 0 01-2 2h-2.514">
+                                    </path>
+                                </svg>
+                            </button>
+                        </div>
+
+                    </div>
+
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/layout.js"></script>
+    <script src="js/app.js"></script>
+    <script>
+        function scrollToSection(id) {
+            const el = document.getElementById(id);
+            if (el) {
+                el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+            // Update active TOC item
+            document.querySelectorAll('.kb-toc-item').forEach(function (item) {
+                item.classList.remove('active');
+            });
+            // Find the parent toc-item that contains the clicked section
+            const tocItems = document.querySelectorAll('.kb-toc-item');
+            tocItems.forEach(function (item) {
+                if (item.getAttribute('onclick') && item.getAttribute('onclick').includes(id)) {
+                    item.classList.add('active');
+                }
+            });
+        }
+
+        // Highlight TOC items on scroll
+        const contentArea = document.querySelector('.content-area');
+        if (contentArea) {
+            contentArea.addEventListener('scroll', function () {
+                const sections = document.querySelectorAll('.kb-section-title');
+                const tocItems = document.querySelectorAll('.kb-toc-item');
+                let current = '';
+
+                sections.forEach(function (section) {
+                    const rect = section.getBoundingClientRect();
+                    if (rect.top <= 120) {
+                        current = section.id;
+                    }
+                });
+
+                if (current) {
+                    tocItems.forEach(function (item) {
+                        item.classList.remove('active');
+                        if (item.getAttribute('onclick') && item.getAttribute('onclick').includes(current)) {
+                            item.classList.add('active');
+                        }
+                    });
+                }
+            });
+        }
+    </script>
+
+</body>
+
+</html>

@@ -382,6 +382,15 @@
 
     <script src="js/layout.js"></script>
     <script src="js/app.js"></script>
+    <script>
+        document.querySelectorAll('.clickable').forEach(row => {
+            row.addEventListener('click', function(e) {
+                if (e.target.tagName !== 'BUTTON' && e.target.tagName !== 'SELECT' && e.target.tagName !== 'A') {
+                    location.href = 'resource-view.html';
+                }
+            });
+        });
+    </script>
 </body>
 
 </html>

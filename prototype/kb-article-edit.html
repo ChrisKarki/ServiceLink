@@ -25,8 +25,8 @@
                     <div class="flex-between mb-4">
                         <div style="display: flex; align-items: center; gap: 16px;">
                             <button class="icon-btn"
-                                onclick="location.href='knowledge-base.html'"
-                                title="Back to Knowledge Base">
+                                onclick="history.back()"
+                                title="Back">
                                 <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
@@ -40,7 +40,7 @@
                         </div>
                         <div style="display: flex; gap: 12px;">
                             <button class="btn btn-secondary"
-                                onclick="location.href='knowledge-base.html'">Cancel</button>
+                                onclick="history.back()">Cancel</button>
                             <button class="btn btn-primary"
                                 onclick="flash('Article saved and published successfully!', 'success', 'knowledge-base.html')[3])">Save
                                 Changes</button>

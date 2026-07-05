@@ -26,8 +26,8 @@ const NAV_ITEMS = [
         icon: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z'
     },
     {
-        page: 'team', href: 'team.html', label: 'Team',
-        icon: 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z'
+        page: 'team', href: 'team.html', label: 'Admin',
+        icon: 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z'
     }
 ];
 
@@ -38,7 +38,9 @@ const NAV_PARENT = {
     'ticket-edit': 'tickets',
     'ticket-escalate': 'tickets',
     'resource-edit': 'resources',
-    'kb-article-edit': 'knowledge-base'
+    'kb-article-edit': 'knowledge-base',
+    'kb-article-view': 'knowledge-base',
+    'report-view': 'reports'
 };
 
 function svgIcon(path, size) {
@@ -77,38 +79,44 @@ function renderTopbar() {
         svgIcon('M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9', 22) +
         '            <div class="badge-dot"></div>' +
         '        </button>' +
-        '        <div class="dropdown" id="notifDropdown">' +
-        '            <div class="dropdown-header">Notifications <span class="badge" style="background: var(--button-secondary-bg); border: 1px solid var(--panel-border);">2</span></div>' +
-        '            <div class="dropdown-item">' +
-        '                <div class="text-sm" style="color: var(--text-primary); font-weight: 500;">SLA Breach Warning</div>' +
-        '                <div class="text-sm" style="font-size: 12px; margin-top: 4px;">INC-1042 is approaching 4hr resolution target.</div>' +
+        '        <div class="dropdown" id="notifDropdown" style="width: 320px;">' +
+        '            <div class="dropdown-header">Notifications <span class="badge" style="background: rgba(239, 68, 68, 0.15); color: var(--danger-color); border: 1px solid rgba(239, 68, 68, 0.25); padding: 2px 8px; border-radius: 20px; font-size: 11px;">2 new</span></div>' +
+        '            <div class="dropdown-item" style="display: block; cursor: pointer; padding: 14px 18px;">' +
+        '                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">' +
+        '                    <span style="color: var(--text-primary); font-weight: 600; font-size: 13px;">SLA Breach Warning</span>' +
+        '                    <span style="color: var(--text-secondary); font-size: 10px;">10m ago</span>' +
+        '                </div>' +
+        '                <div style="font-size: 12px; color: var(--text-secondary); line-height: 1.4;">INC-1042 is approaching 4hr resolution target.</div>' +
         '            </div>' +
-        '            <div class="dropdown-item">' +
-        '                <div class="text-sm" style="color: var(--text-primary); font-weight: 500;">Ticket Assigned</div>' +
-        '                <div class="text-sm" style="font-size: 12px; margin-top: 4px;">REQ-2055 has been assigned to you.</div>' +
+        '            <div class="dropdown-item" style="display: block; cursor: pointer; padding: 14px 18px;">' +
+        '                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">' +
+        '                    <span style="color: var(--text-primary); font-weight: 600; font-size: 13px;">Ticket Assigned</span>' +
+        '                    <span style="color: var(--text-secondary); font-size: 10px;">2h ago</span>' +
+        '                </div>' +
+        '                <div style="font-size: 12px; color: var(--text-secondary); line-height: 1.4;">REQ-2055 has been assigned to you.</div>' +
         '            </div>' +
-        '            <div class="dropdown-item" style="color: var(--accent-color); text-align: center; padding: 8px;">Mark all as read</div>' +
+        '            <div class="dropdown-item" style="color: var(--accent-color); justify-content: center; font-weight: 600; font-size: 13px; padding: 12px; border-top: 1px solid var(--dropdown-item-border);" onclick="showToast(\'Marked all as read\', \'success\')">Mark all as read</div>' +
         '        </div>' +
         '    </div>' +
         '    <div style="position: relative;">' +
         '        <div class="user-profile" onclick="toggleDropdown(\'profileDropdown\')">' +
         '            <div class="avatar">CK</div>' +
         '        </div>' +
-        '        <div class="dropdown" id="profileDropdown">' +
-        '            <div class="dropdown-item flex-row" style="padding: 16px;">' +
-        '                <div class="avatar" style="width: 40px; height: 40px; font-size: 14px;">CK</div>' +
-        '                <div>' +
-        '                    <div style="color: var(--text-primary); font-weight: 500;">Chris Karki</div>' +
-        '                    <div class="text-sm" style="color: var(--accent-color); font-weight: 500;">Manager</div>' +
-        '                    <div class="text-sm">chris@company.com</div>' +
+        '        <div class="dropdown" id="profileDropdown" style="width: 260px;">' +
+        '            <div style="padding: 16px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--dropdown-divider); background: var(--card-tint);">' +
+        '                <div class="avatar" style="width: 40px; height: 40px; font-size: 14px; font-weight: 600; background: rgba(96, 165, 250, 0.15); color: var(--accent-color); border: none;">CK</div>' +
+        '                <div style="line-height: 1.4;">' +
+        '                    <div style="color: var(--text-primary); font-weight: 600; font-size: 14px;">Chris Karki</div>' +
+        '                    <div style="color: var(--accent-color); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Manager</div>' +
+        '                    <div style="color: var(--text-secondary); font-size: 11px;">chris@company.com</div>' +
         '                </div>' +
         '            </div>' +
-        '            <div class="dropdown-item flex-row">' +
+        '            <div class="dropdown-item" onclick="showToast(\'Opening settings...\')">' +
         svgIcon('M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z', 16) +
-        '                Settings</div>' +
-        '            <div class="dropdown-item flex-row" style="color: var(--danger-color);" onclick="doLogout()">' +
+        '                <span>Settings</span></div>' +
+        '            <div class="dropdown-item" style="color: var(--danger-color);" onclick="doLogout()">' +
         svgIcon('M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1', 16) +
-        '                Sign out</div>' +
+        '                <span>Sign out</span></div>' +
         '        </div>' +
         '    </div>' +
         '</div>';

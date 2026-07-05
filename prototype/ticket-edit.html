@@ -8,6 +8,148 @@
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@100;200;300;400;500;600;700&family=IBM+Plex+Sans:wght@100;200;300;400;500;600;700&family=Montserrat:wght@100;200;300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/main.css">
     <script src="js/theme.js"></script>
+    <style>
+        /* Breadcrumb */
+        .kb-breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+
+        .kb-breadcrumb a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .kb-breadcrumb a:hover {
+            color: var(--text-primary);
+        }
+
+        .kb-breadcrumb .separator {
+            color: var(--text-secondary);
+            opacity: 0.5;
+        }
+
+        .kb-breadcrumb .current {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        /* Ticket Workflow Layout: 1fr main form | 340px control panel */
+        .ticket-workflow-layout {
+            display: grid;
+            grid-template-columns: 1fr 340px;
+            gap: 32px;
+            align-items: start;
+        }
+
+        .section-heading {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .ticket-title-area {
+            margin-bottom: 24px;
+        }
+
+        .ticket-title {
+            font-size: 24px;
+            font-weight: 700;
+            line-height: 1.3;
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .sla-banner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            background: var(--card-tint);
+            border: 1px solid var(--panel-border);
+            border-radius: 12px;
+            margin-bottom: 28px;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .sla-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .sla-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            background: var(--button-secondary-bg);
+            border: 1px solid var(--panel-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent-color);
+            flex-shrink: 0;
+        }
+
+        .card-box {
+            background: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 12px;
+            padding: 22px;
+            margin-bottom: 24px;
+        }
+
+        .card-box-tint {
+            background: var(--card-tint);
+            border: 1px solid var(--panel-border);
+            border-radius: 12px;
+            padding: 22px;
+            margin-bottom: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--text-primary);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px 14px;
+            background: var(--input-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 15px;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+        }
+    </style>
 </head>
 
 <body data-page="ticket-edit">
@@ -22,112 +164,129 @@
         <div class="main-content">
             <div class="content-area">
                 <section class="view-section">
-                    <div class="flex-between mb-4">
-                        <div style="display: flex; align-items: center; gap: 16px;">
-                            <button class="icon-btn"
-                                onclick="location.href='ticket-detail.html'"
-                                title="Back to Incident">
-                                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-                                </svg>
-                            </button>
-                            <div>
-                                <h1 style="margin-bottom: 4px;">Edit Incident / Request</h1>
-                                <div class="text-sm" style="color: var(--text-secondary);">Ticket ID: INC-1042 • Created
-                                    Oct
-                                    24, 2026 by Jane Developer</div>
+                    <!-- Breadcrumb -->
+                    <div class="kb-breadcrumb">
+                        <a href="tickets.html">Tickets</a>
+                        <span class="separator">/</span>
+                        <a href="ticket-detail.html">INC-1042</a>
+                        <span class="separator">/</span>
+                        <span class="current">Edit Incident</span>
+                    </div>
+
+                    <!-- Header Area -->
+                    <div class="ticket-title-area">
+                        <div style="display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; margin-bottom: 12px;">
+                            <div style="display: flex; align-items: center; gap: 14px;">
+                                <button class="icon-btn" onclick="location.href='ticket-detail.html'" title="Back to Incident">
+                                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                                    </svg>
+                                </button>
+                                <span style="color: var(--accent-color); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">DevOps &amp; Infrastructure • Edit Mode</span>
+                            </div>
+                            <div style="display: flex; gap: 12px;">
+                                <button class="btn btn-secondary" onclick="location.href='ticket-detail.html'">Cancel</button>
+                                <button class="btn btn-primary" style="display: flex; align-items: center; gap: 8px;" onclick="flash('Ticket updated successfully!', 'success', 'ticket-detail.html')">
+                                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                    </svg>
+                                    Save Changes
+                                </button>
                             </div>
                         </div>
-                        <div style="display: flex; gap: 12px;">
-                            <button class="btn btn-secondary"
-                                onclick="location.href='ticket-detail.html'">Cancel</button>
-                            <button class="btn btn-primary"
-                                onclick="flash('Ticket updated successfully!', 'success', 'ticket-detail.html')[1])">Save
-                                Changes</button>
+                        <h1 class="ticket-title">Edit: INC-1042 — Production Build Pipeline Failing</h1>
+                    </div>
+
+                    <!-- SLA & Timeline Banner -->
+                    <div class="sla-banner">
+                        <div class="sla-item">
+                            <div class="sla-icon">
+                                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <div class="text-sm" style="color: var(--text-secondary); margin-bottom: 2px;">SLA Target</div>
+                                <div style="color: var(--text-primary); font-weight: 600; font-size: 15px;">4 Hours (Resolution)</div>
+                            </div>
+                        </div>
+
+                        <div class="sla-item">
+                            <div class="sla-icon" style="color: var(--warning-color);">
+                                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <div class="text-sm" style="color: var(--text-secondary); margin-bottom: 2px;">Time Elapsed</div>
+                                <div style="color: var(--warning-color); font-weight: 600; font-size: 15px;">1 Hour 25 Mins</div>
+                            </div>
+                        </div>
+
+                        <div class="sla-item">
+                            <div class="sla-icon" style="color: var(--text-secondary);">
+                                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <div class="text-sm" style="color: var(--text-secondary); margin-bottom: 2px;">Reported Timestamp</div>
+                                <div style="color: var(--text-primary); font-weight: 500; font-size: 15px;">Oct 24, 2026 at 09:15 AM</div>
+                            </div>
                         </div>
                     </div>
 
-                    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px;">
-                        <!-- Left Form Panel -->
-                        <div style="display: flex; flex-direction: column; gap: 24px;">
-                            <div class="panel"
-                                style="margin-bottom: 0; display: flex; flex-direction: column; gap: 20px;">
-                                <h3
-                                    style="font-size: 16px; border-bottom: 1px solid var(--panel-border); padding-bottom: 12px; margin-bottom: 0;">
-                                    Issue Summary & Description</h3>
-
-                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-                                    <div>
-                                        <label class="form-label"
-                                            style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-primary);">Ticket
-                                            ID</label>
-                                        <input type="text" class="form-control" value="INC-1042" disabled
-                                            style="width: 100%; padding: 10px 14px; font-family: monospace; font-weight: bold; opacity: 0.7;">
+                    <!-- Split Workflow Layout: Left Form (1fr) | Right Control Panel (340px) -->
+                    <div class="ticket-workflow-layout">
+                        <!-- LEFT COLUMN: Issue Summary & Detailed Notes Form -->
+                        <div>
+                            <div class="section-heading">Issue Summary &amp; Description</div>
+                            <div class="card-box">
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px;">
+                                    <div class="form-group" style="margin-bottom: 0;">
+                                        <label class="form-label">Ticket ID</label>
+                                        <input type="text" class="form-control" value="INC-1042" disabled style="font-family: monospace; font-weight: 700; opacity: 0.7; cursor: not-allowed;">
                                     </div>
-                                    <div>
-                                        <label class="form-label"
-                                            style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-primary);">Request
-                                            Type</label>
-                                        <select class="form-control"
-                                            style="width: 100%; padding: 10px 14px; background-color: var(--input-bg);">
+                                    <div class="form-group" style="margin-bottom: 0;">
+                                        <label class="form-label">Request Type</label>
+                                        <select class="form-control">
                                             <option selected>Break / Fix Incident</option>
                                             <option>New Service Request</option>
-                                            <option>Access & Permission Change</option>
+                                            <option>Access &amp; Permission Change</option>
                                             <option>Hardware Replacement</option>
                                         </select>
                                     </div>
                                 </div>
 
-                                <div>
-                                    <label class="form-label"
-                                        style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-primary);">Title
-                                        / Summary</label>
-                                    <input type="text" class="form-control" value="Production Build Pipeline Failing"
-                                        style="width: 100%; padding: 10px 14px; font-weight: 500;">
+                                <div class="form-group">
+                                    <label class="form-label">Title / Summary</label>
+                                    <input type="text" class="form-control" value="Production Build Pipeline Failing" style="font-weight: 500;">
                                 </div>
 
-                                <div>
-                                    <label class="form-label"
-                                        style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-primary);">Detailed
-                                        Description</label>
-                                    <textarea class="form-control"
-                                        style="width: 100%; min-height: 150px; padding: 12px 14px; line-height: 1.6; background: var(--input-bg); resize: vertical;">The automated deployment pipeline to staging has been failing for the past hour. The error logs indicate a timeout when connecting to the internal artifact repository. This is blocking the release candidate for the new mobile app update.
+                                <div class="form-group">
+                                    <label class="form-label">Detailed Description</label>
+                                    <textarea class="form-control" style="min-height: 160px; line-height: 1.6; resize: vertical;">The automated deployment pipeline to staging has been failing for the past hour. The error logs indicate a timeout when connecting to the internal artifact repository. This is blocking the release candidate for the new mobile app update.
 
-                    Please check network routing and repository instance health immediately.</textarea>
+Please check network routing and repository instance health immediately.</textarea>
                                 </div>
                             </div>
 
-                            <div class="panel"
-                                style="margin-bottom: 0; display: flex; flex-direction: column; gap: 16px;">
-                                <h3
-                                    style="font-size: 16px; border-bottom: 1px solid var(--panel-border); padding-bottom: 12px; margin-bottom: 0;">
-                                    Resolution Work Log & Notes</h3>
-                                <div>
-                                    <label class="form-label"
-                                        style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-primary);">Internal
-                                        Technician Notes</label>
-                                    <textarea class="form-control"
-                                        style="width: 100%; min-height: 100px; padding: 12px 14px; line-height: 1.6; background: var(--input-bg); resize: vertical;"
-                                        placeholder="Add progress notes, root cause findings, or work done so far...">Investigating connectivity between staging Jenkins workers and Nexus repo. VPC security group rule updated to allow ingress on port 8081.</textarea>
+                            <div class="section-heading" style="margin-top: 32px;">Resolution Work Log &amp; Notes</div>
+                            <div class="card-box-tint">
+                                <div class="form-group">
+                                    <label class="form-label">Internal Technician Notes</label>
+                                    <textarea class="form-control" style="min-height: 120px; line-height: 1.6; resize: vertical;" placeholder="Add progress notes, root cause findings, or work done so far...">Investigating connectivity between staging Jenkins workers and Nexus repo. VPC security group rule updated to allow ingress on port 8081.</textarea>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Right Metadata Panel -->
-                        <div style="display: flex; flex-direction: column; gap: 24px;">
-                            <div class="panel"
-                                style="margin-bottom: 0; display: flex; flex-direction: column; gap: 16px;">
-                                <h3
-                                    style="font-size: 14px; border-bottom: 1px solid var(--panel-border); padding-bottom: 12px; margin-bottom: 4px;">
-                                    Status & Assignment</h3>
-
-                                <div>
-                                    <label class="text-sm"
-                                        style="color: var(--text-secondary); display: block; margin-bottom: 6px;">Workflow
-                                        Status</label>
-                                    <select class="form-control"
-                                        style="width: 100%; padding: 8px 12px; background-color: var(--input-bg); font-weight: 600; border-color: var(--warning-color); color: var(--warning-color);">
+                        <!-- RIGHT COLUMN: Status & Assignment Control Panel (340px) -->
+                        <div>
+                            <div class="section-heading">Status &amp; Assignment</div>
+                            <div class="card-box">
+                                <div class="form-group">
+                                    <label class="form-label" style="color: var(--text-secondary);">Workflow Status</label>
+                                    <select class="form-control" style="font-weight: 600; border-color: var(--warning-color); color: var(--warning-color);">
                                         <option>New / Open</option>
                                         <option selected>In Progress</option>
                                         <option>Pending Vendor</option>
@@ -136,12 +295,9 @@
                                     </select>
                                 </div>
 
-                                <div>
-                                    <label class="text-sm"
-                                        style="color: var(--text-secondary); display: block; margin-bottom: 6px;">Priority
-                                        Level</label>
-                                    <select class="form-control"
-                                        style="width: 100%; padding: 8px 12px; background-color: var(--input-bg); font-weight: 600; border-color: var(--danger-color); color: var(--danger-color);">
+                                <div class="form-group">
+                                    <label class="form-label" style="color: var(--text-secondary);">Priority Level</label>
+                                    <select class="form-control" style="font-weight: 600; border-color: var(--danger-color); color: var(--danger-color);">
                                         <option selected>Critical (P1)</option>
                                         <option>High (P2)</option>
                                         <option>Medium (P3)</option>
@@ -149,68 +305,58 @@
                                     </select>
                                 </div>
 
-                                <div>
-                                    <label class="text-sm"
-                                        style="color: var(--text-secondary); display: block; margin-bottom: 6px;">Assigned
-                                        Technician</label>
-                                    <select class="form-control"
-                                        style="width: 100%; padding: 8px 12px; background-color: var(--input-bg);">
-                                        <option selected>Chris Karki</option>
-                                        <option>Jane Developer</option>
-                                        <option>Arshdeep Mutti</option>
-                                        <option>DevOps Team</option>
-                                        <option>Unassigned</option>
+                                <div class="form-group">
+                                    <label class="form-label" style="color: var(--text-secondary);">Assigned Technician</label>
+                                    <select class="form-control">
+                                        <option selected>Chris Karki (DevOps Lead)</option>
+                                        <option>Jane Developer (Senior Tech)</option>
+                                        <option>Arshdeep Mutti (System Engineer)</option>
+                                        <option>Unassigned (Queue)</option>
                                     </select>
                                 </div>
 
-                                <div>
-                                    <label class="text-sm"
-                                        style="color: var(--text-secondary); display: block; margin-bottom: 6px;">Category</label>
-                                    <select class="form-control"
-                                        style="width: 100%; padding: 8px 12px; background-color: var(--input-bg);">
-                                        <option selected>DevOps / Infrastructure</option>
-                                        <option>Hardware & Devices</option>
-                                        <option>Software Licenses</option>
-                                        <option>Network & Connectivity</option>
-                                    </select>
-                                </div>
-
-                                <div>
-                                    <label class="text-sm"
-                                        style="color: var(--text-secondary); display: block; margin-bottom: 6px;">SLA
-                                        Resolution Target</label>
-                                    <input type="text" class="form-control" value="4 Hours (Expires at 13:15 PM)"
-                                        style="width: 100%; padding: 8px 12px; background-color: var(--input-bg);">
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px;">
+                                    <div class="form-group" style="margin-bottom: 0;">
+                                        <label class="form-label" style="font-size: 12px; color: var(--text-secondary);">Impact</label>
+                                        <select class="form-control" style="padding: 8px 10px; font-size: 13px;">
+                                            <option selected>High</option>
+                                            <option>Medium</option>
+                                            <option>Low</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group" style="margin-bottom: 0;">
+                                        <label class="form-label" style="font-size: 12px; color: var(--text-secondary);">Urgency</label>
+                                        <select class="form-control" style="padding: 8px 10px; font-size: 13px;">
+                                            <option selected>Immediate</option>
+                                            <option>High</option>
+                                            <option>Normal</option>
+                                        </select>
+                                    </div>
                                 </div>
                             </div>
 
-                            <div class="panel" style="margin-bottom: 0;">
-                                <h3
-                                    style="font-size: 14px; border-bottom: 1px solid var(--panel-border); padding-bottom: 12px; margin-bottom: 12px;">
-                                    Linked Resources & Logs</h3>
-                                <div style="display: flex; flex-direction: column; gap: 12px;">
-                                    <div
-                                        style="display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; background: var(--button-secondary-bg); border-radius: 6px; border: 1px solid var(--panel-border);">
+                            <div class="section-heading">Affected Infrastructure</div>
+                            <div class="card-box" style="background: var(--button-secondary-bg);">
+                                <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px;">
+                                    <div style="display: flex; align-items: center; gap: 12px;">
+                                        <div style="width: 36px; height: 36px; border-radius: 8px; background: var(--panel-bg); border: 1px solid var(--panel-border); display: flex; align-items: center; justify-content: center; color: var(--accent-color);">
+                                            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"></path>
+                                            </svg>
+                                        </div>
                                         <div>
-                                            <strong
-                                                style="font-size: 13px; display: block; color: var(--text-primary);">VRT-Build-Server-01</strong>
-                                            <span class="text-sm" style="color: var(--text-secondary);">AWS EC2
-                                                t3.xlarge</span>
+                                            <strong style="color: var(--text-primary); font-size: 14px; font-family: monospace; display: block;">VRT-Build-Server-01</strong>
+                                            <span class="text-sm" style="color: var(--text-secondary);">AWS EC2 t3.xlarge</span>
                                         </div>
-                                        <button class="btn btn-secondary btn-sm"
-                                            onclick="location.href='resources.html'">View
-                                            Resource</button>
-                                    </div>
-                                    <div
-                                        style="display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; background: var(--button-secondary-bg); border-radius: 6px; border: 1px solid var(--panel-border);">
-                                        <div style="display: flex; align-items: center; gap: 8px;">
-                                            <span>📎</span>
-                                            <span
-                                                style="font-size: 13px; font-family: monospace; color: var(--text-primary);">pipeline_err.log</span>
-                                        </div>
-                                        <span class="text-sm" style="color: var(--text-secondary);">14 KB</span>
                                     </div>
                                 </div>
+
+                                <button class="btn btn-secondary" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 13px;" onclick="showToast('Resource selection modal opened', 'info')">
+                                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
+                                    </svg>
+                                    Change / Link Resource
+                                </button>
                             </div>
                         </div>
                     </div>
