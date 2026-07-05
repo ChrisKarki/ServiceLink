@@ -1,16 +1,70 @@
-﻿import os
+"""Database access layer.
+
+Keeps the lazy connection pool from the skeleton (so /health never touches
+the DB) and adds three helpers. Every query goes through these with
+parameterized placeholders only — string-formatted SQL is banned (NFR-S4).
+"""
+
+import os
 from mysql.connector import pooling
 
-_pool = pooling.MySQLConnectionPool(
-    pool_name="servicelink_pool",
-    pool_size=5,
-    host=os.environ["DB_HOST"],
-    port=int(os.environ.get("DB_PORT", 3306)),
-    user=os.environ["DB_USER"],
-    password=os.environ["DB_PASSWORD"],
-    database=os.environ["DB_NAME"],
-)
+_pool = None
 
 
-def get_conn():
-    return _pool.get_connection()
+def _get_pool():
+    global _pool
+    if _pool is None:
+        _pool = pooling.MySQLConnectionPool(
+            pool_name="servicelink_pool",
+            pool_size=5,
+            host=os.environ["DB_HOST"],
+            port=int(os.environ.get("DB_PORT", 3306)),
+            user=os.environ["DB_USER"],
+            password=os.environ["DB_PASSWORD"],
+            database=os.environ["DB_NAME"],
+        )
+    return _pool
+
+
+def query_one(sql, params=()):
+    """Run a SELECT and return the first row as a dict, or None."""
+    conn = _get_pool().get_connection()
+    try:
+        cur = conn.cursor(dictionary=True)
+        cur.execute(sql, params)
+        row = cur.fetchone()
+        cur.close()
+        return row
+    finally:
+        conn.close()
+
+
+def query_all(sql, params=()):
+    """Run a SELECT and return all rows as a list of dicts."""
+    conn = _get_pool().get_connection()
+    try:
+        cur = conn.cursor(dictionary=True)
+        cur.execute(sql, params)
+        rows = cur.fetchall()
+        cur.close()
+        return rows
+    finally:
+        conn.close()
+
+
+def execute(sql, params=()):
+    """Run an INSERT/UPDATE/DELETE inside a transaction.
+
+    Returns the last inserted row id (for INSERTs with AUTO_INCREMENT)
+    or the affected row count otherwise.
+    """
+    conn = _get_pool().get_connection()
+    try:
+        cur = conn.cursor()
+        cur.execute(sql, params)
+        conn.commit()
+        result = cur.lastrowid if cur.lastrowid else cur.rowcount
+        cur.close()
+        return result
+    finally:
+        conn.close()

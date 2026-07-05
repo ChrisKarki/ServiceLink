@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard · ServiceLink</title>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@100;200;300;400;500;600;700&family=IBM+Plex+Sans:wght@100;200;300;400;500;600;700&family=Montserrat:wght@100;200;300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
+</head>
+
+<body class="auth-page">
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Placeholder: swap in the static Phase 3 dashboard markup here.
+         This page exists to prove @login_required and session identity. -->
+    <div class="panel login-card" style="text-align: center;">
+        <h2 style="margin-bottom: 16px;">Dashboard</h2>
+        <p style="margin-bottom: 8px;">Signed in as <strong>{{ session['name'] }}</strong></p>
+        <p class="text-sm" style="color: var(--accent-color); font-weight: 600; margin-bottom: 24px;">{{ session['role'] }}</p>
+        <a href="{{ url_for('auth.logout') }}" class="btn btn-secondary" style="display: inline-block; text-decoration: none;">Sign out</a>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            {% for category, message in messages %}
+            showToast({{ message | tojson }}, {{ category | tojson }});
+            {% endfor %}
+        });
+    </script>
+    {% endif %}
+    {% endwith %}
+</body>
+
+</html>
