@@ -151,4 +151,3 @@ def register():
 def forgot_password():
     flash("Password reset via email token is scheduled for a later build (FR-1.2).", "info")
     return redirect(url_for("auth.login"))
-# Hiten
