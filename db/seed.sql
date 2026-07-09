@@ -51,4 +51,4 @@ INSERT INTO User (email, passwordHash, firstName, lastName, role, status, mfaEna
 
     ('prabh.hans@servicelink.test',
      '$2b$12$MaNBP7IkkQ4EDonoJMboee6QI3jorlALPG/qrQDFVwj0poglX/z96',
-     'Prabh', 'Hans', 'EndUser', 'PendingApproval', FALSE);
+     'Prabh', 'Hans', 'EndUser', 'Active', FALSE);

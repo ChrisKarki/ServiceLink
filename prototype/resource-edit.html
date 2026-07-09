@@ -5,41 +5,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Resource · ServiceLink</title>
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@100;200;300;400;500;600;700&family=IBM+Plex+Sans:wght@100;200;300;400;500;600;700&family=Montserrat:wght@100;200;300;400;500;600;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@100;200;300;400;500;600;700&family=IBM+Plex+Sans:wght@100;200;300;400;500;600;700&family=Montserrat:wght@100;200;300;400;500;600;700&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="css/main.css">
     <script src="js/theme.js"></script>
     <style>
-        /* Breadcrumb */
-        .kb-breadcrumb {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 13px;
-            color: var(--text-secondary);
-            margin-bottom: 24px;
-            flex-wrap: wrap;
-        }
-
-        .kb-breadcrumb a {
-            color: var(--text-secondary);
-            text-decoration: none;
-            transition: color 0.2s;
-        }
-
-        .kb-breadcrumb a:hover {
-            color: var(--text-primary);
-        }
-
-        .kb-breadcrumb .separator {
-            color: var(--text-secondary);
-            opacity: 0.5;
-        }
-
-        .kb-breadcrumb .current {
-            color: var(--text-primary);
-            font-weight: 500;
-        }
-
         /* Infrastructure Dashboard Layout */
         .resource-header-bar {
             display: flex;
@@ -187,26 +158,21 @@
         <div class="main-content">
             <div class="content-area">
                 <section class="view-section">
-                    <!-- Breadcrumb -->
-                    <div class="kb-breadcrumb">
-                        <a href="resources.html">Resources</a>
-                        <span class="separator">/</span>
-                        <a href="resource-view.html">VRT-Build-Server-01</a>
-                        <span class="separator">/</span>
-                        <span class="current">Edit Resource</span>
-                    </div>
-
                     <!-- Header Banner -->
                     <div class="resource-header-bar">
                         <div style="display: flex; align-items: center; gap: 16px;">
-                            <button class="icon-btn" onclick="location.href='resource-view.html'" title="Back to Resource">
+                            <button class="icon-btn" onclick="location.href='resource-view.html'"
+                                title="Back to Resource">
                                 <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
                                 </svg>
                             </button>
                             <div>
                                 <div style="margin-bottom: 6px;">
-                                    <span style="color: var(--accent-color); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Virtual Server / Cloud • Edit Mode</span>
+                                    <span
+                                        style="color: var(--accent-color); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Virtual
+                                        Server / Cloud • Edit Mode</span>
                                 </div>
                                 <h1 class="resource-title">Edit: VRT-BUILD-SERVER-01</h1>
                             </div>
@@ -214,10 +180,13 @@
 
                         <!-- Top Right Action Controls -->
                         <div style="display: flex; gap: 12px; flex-wrap: wrap;">
-                            <button class="btn btn-secondary" onclick="location.href='resource-view.html'">Cancel</button>
-                            <button class="btn btn-primary" style="display: flex; align-items: center; gap: 8px;" onclick="flash('Resource saved successfully!', 'success', 'resource-view.html')">
+                            <button class="btn btn-secondary"
+                                onclick="location.href='resource-view.html'">Cancel</button>
+                            <button class="btn btn-primary" style="display: flex; align-items: center; gap: 8px;"
+                                onclick="flash('Resource saved successfully!', 'success', 'resource-view.html')">
                                 <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M5 13l4 4L19 7"></path>
                                 </svg>
                                 Save Resource
                             </button>
@@ -230,21 +199,26 @@
                         <div class="metric-card">
                             <div class="metric-header">
                                 <span>Operational Status</span>
-                                <div class="metric-icon-box" style="color: var(--danger-color); background: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.2);">
+                                <div class="metric-icon-box"
+                                    style="color: var(--danger-color); background: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.2);">
                                     <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M13 10V3L4 14h7v7l9-11h-7z"></path>
                                     </svg>
                                 </div>
                             </div>
                             <div class="form-group" style="margin-bottom: 0;">
-                                <select class="form-control" style="font-weight: 700; font-size: 16px; border-color: var(--danger-color); color: var(--danger-color); background-color: var(--input-bg);">
+                                <select class="form-control"
+                                    style="font-weight: 700; font-size: 16px; border-color: var(--danger-color); color: var(--danger-color); background-color: var(--input-bg);">
                                     <option>Active / In Use</option>
                                     <option selected>Incident Active (Alert)</option>
                                     <option>Maintenance Mode</option>
                                     <option>Offline / Disconnected</option>
                                     <option>Decommissioned</option>
                                 </select>
-                                <span class="text-sm" style="color: var(--text-secondary); display: block; margin-top: 8px;">Triggered by linked incident INC-1042</span>
+                                <span class="text-sm"
+                                    style="color: var(--text-secondary); display: block; margin-top: 8px;">Triggered by
+                                    linked incident INC-1042</span>
                             </div>
                         </div>
 
@@ -254,7 +228,9 @@
                                 <span>Assigned Team &amp; Owner</span>
                                 <div class="metric-icon-box">
                                     <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z">
+                                        </path>
                                     </svg>
                                 </div>
                             </div>
@@ -265,7 +241,9 @@
                                     <option>QA &amp; Automation Team</option>
                                     <option>IT Operations &amp; Security</option>
                                 </select>
-                                <span class="text-sm" style="color: var(--text-secondary); display: block; margin-top: 8px;">Department: Cloud Infrastructure</span>
+                                <span class="text-sm"
+                                    style="color: var(--text-secondary); display: block; margin-top: 8px;">Department:
+                                    Cloud Infrastructure</span>
                             </div>
                         </div>
 
@@ -275,19 +253,25 @@
                                 <span>Monthly Cost &amp; Region</span>
                                 <div class="metric-icon-box">
                                     <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
+                                        </path>
                                     </svg>
                                 </div>
                             </div>
                             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
                                 <div class="form-group" style="margin-bottom: 0;">
-                                    <input type="text" class="form-control" value="$314.50" style="font-weight: 700; font-size: 16px;">
+                                    <input type="text" class="form-control" value="$314.50"
+                                        style="font-weight: 700; font-size: 16px;">
                                 </div>
                                 <div class="form-group" style="margin-bottom: 0;">
-                                    <input type="text" class="form-control" value="us-east-1a" style="font-family: monospace; font-weight: 600;">
+                                    <input type="text" class="form-control" value="us-east-1a"
+                                        style="font-family: monospace; font-weight: 600;">
                                 </div>
                             </div>
-                            <span class="text-sm" style="color: var(--text-secondary); display: block; margin-top: 2px;">Provider: Amazon Web Services (AWS)</span>
+                            <span class="text-sm"
+                                style="color: var(--text-secondary); display: block; margin-top: 2px;">Provider: Amazon
+                                Web Services (AWS)</span>
                         </div>
                     </div>
 
@@ -300,7 +284,8 @@
                                 <div class="spec-grid-row">
                                     <div class="form-group" style="margin-bottom: 0;">
                                         <label class="form-label">Resource Tag / ID</label>
-                                        <input type="text" class="form-control" value="VRT-Build-Server-01" style="font-family: monospace; font-weight: bold;">
+                                        <input type="text" class="form-control" value="VRT-Build-Server-01"
+                                            style="font-family: monospace; font-weight: bold;">
                                     </div>
                                     <div class="form-group" style="margin-bottom: 0;">
                                         <label class="form-label">Resource Category</label>
@@ -317,11 +302,13 @@
                                 <div class="spec-grid-row" style="margin-top: 20px;">
                                     <div class="form-group" style="margin-bottom: 0;">
                                         <label class="form-label">Make &amp; Model / Instance Type</label>
-                                        <input type="text" class="form-control" value="AWS EC2 t3.xlarge (4 vCPU, 16GB RAM)">
+                                        <input type="text" class="form-control"
+                                            value="AWS EC2 t3.xlarge (4 vCPU, 16GB RAM)">
                                     </div>
                                     <div class="form-group" style="margin-bottom: 0;">
                                         <label class="form-label">Serial Number / IP Address</label>
-                                        <input type="text" class="form-control" value="10.240.12.88 (i-08a9f2429bc0182)" style="font-family: monospace;">
+                                        <input type="text" class="form-control" value="10.240.12.88 (i-08a9f2429bc0182)"
+                                            style="font-family: monospace;">
                                     </div>
                                 </div>
                             </div>
@@ -330,7 +317,8 @@
                             <div class="card-box-tint">
                                 <div class="form-group" style="margin-bottom: 0;">
                                     <label class="form-label">Host Notes &amp; Security Rules</label>
-                                    <textarea class="form-control" style="min-height: 150px; line-height: 1.6; resize: vertical;">Instance hosted in us-east-1a zone. Attached to VPC security group sg-091823ab with restricted SSH ingress. Automated EBS snapshots configured daily at 04:00 UTC via AWS Backup vault. Primary host for Jenkins CI build pipelines.</textarea>
+                                    <textarea class="form-control"
+                                        style="min-height: 150px; line-height: 1.6; resize: vertical;">Instance hosted in us-east-1a zone. Attached to VPC security group sg-091823ab with restricted SSH ingress. Automated EBS snapshots configured daily at 04:00 UTC via AWS Backup vault. Primary host for Jenkins CI build pipelines.</textarea>
                                 </div>
                             </div>
                         </div>
@@ -338,25 +326,38 @@
                         <!-- RIGHT COLUMN: Linked Incidents & Lifecycle Management -->
                         <div>
                             <div class="section-heading">Linked Tickets &amp; Incidents</div>
-                            <div class="card-box" style="padding: 16px; display: flex; flex-direction: column; gap: 14px;">
-                                <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 10px;">
+                            <div class="card-box"
+                                style="padding: 16px; display: flex; flex-direction: column; gap: 14px;">
+                                <div
+                                    style="display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 10px;">
                                     <div style="display: flex; align-items: center; gap: 12px;">
-                                        <div style="width: 34px; height: 34px; border-radius: 8px; background: rgba(239, 68, 68, 0.15); display: flex; align-items: center; justify-content: center; color: var(--danger-color);">
-                                            <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                                        <div
+                                            style="width: 34px; height: 34px; border-radius: 8px; background: rgba(239, 68, 68, 0.15); display: flex; align-items: center; justify-content: center; color: var(--danger-color);">
+                                            <svg width="18" height="18" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">
+                                                </path>
                                             </svg>
                                         </div>
                                         <div>
-                                            <strong style="color: var(--text-primary); display: block; font-size: 14px;">INC-1042: Production Build Pipeline Failing</strong>
-                                            <span class="text-sm" style="color: var(--text-secondary);">Critical • Assigned to Chris Karki</span>
+                                            <strong
+                                                style="color: var(--text-primary); display: block; font-size: 14px;">INC-1042:
+                                                Production Build Pipeline Failing</strong>
+                                            <span class="text-sm" style="color: var(--text-secondary);">Critical •
+                                                Assigned to Chris Karki</span>
                                         </div>
                                     </div>
-                                    <button class="btn btn-secondary btn-sm" onclick="location.href='ticket-detail.html'">View</button>
+                                    <button class="btn btn-secondary btn-sm"
+                                        onclick="location.href='ticket-detail.html'">View</button>
                                 </div>
 
-                                <button class="btn btn-secondary" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 13px;" onclick="showToast('Incident link modal opened', 'info')">
+                                <button class="btn btn-secondary"
+                                    style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 13px;"
+                                    onclick="showToast('Incident link modal opened', 'info')">
                                     <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                                     </svg>
                                     Link Another Ticket / Incident
                                 </button>
@@ -364,7 +365,8 @@
 
                             <div class="section-heading">Lifecycle &amp; Provisioning</div>
                             <div class="card-box">
-                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px;">
+                                <div
+                                    style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px;">
                                     <div class="form-group" style="margin-bottom: 0;">
                                         <label class="form-label">Provisioned Date</label>
                                         <input type="date" class="form-control" value="2025-10-12">
@@ -380,11 +382,19 @@
                                 </div>
 
                                 <div style="padding-top: 8px;">
-                                    <label class="form-label" style="color: var(--danger-color);">Decommission Asset</label>
-                                    <p class="text-sm" style="color: var(--text-secondary); margin-bottom: 12px;">Permanently retire this infrastructure component and release associated cloud IPs and storage.</p>
-                                    <button class="btn btn-secondary" style="color: var(--danger-color); border-color: rgba(239, 68, 68, 0.4); width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px;" onclick="showToast('Resource marked for decommissioning', 'warning')">
-                                        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                    <label class="form-label" style="color: var(--danger-color);">Decommission
+                                        Asset</label>
+                                    <p class="text-sm" style="color: var(--text-secondary); margin-bottom: 12px;">
+                                        Permanently retire this infrastructure component and release associated cloud
+                                        IPs and storage.</p>
+                                    <button class="btn btn-secondary"
+                                        style="color: var(--danger-color); border-color: rgba(239, 68, 68, 0.4); width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px;"
+                                        onclick="showToast('Resource marked for decommissioning', 'warning')">
+                                        <svg width="16" height="16" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+                                            </path>
                                         </svg>
                                         Initiate Decommission Protocol
                                     </button>

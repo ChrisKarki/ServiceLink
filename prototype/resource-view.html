@@ -5,41 +5,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Resource Detail · ServiceLink</title>
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@100;200;300;400;500;600;700&family=IBM+Plex+Sans:wght@100;200;300;400;500;600;700&family=Montserrat:wght@100;200;300;400;500;600;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@100;200;300;400;500;600;700&family=IBM+Plex+Sans:wght@100;200;300;400;500;600;700&family=Montserrat:wght@100;200;300;400;500;600;700&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="css/main.css">
     <script src="js/theme.js"></script>
     <style>
-        /* Breadcrumb */
-        .kb-breadcrumb {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 13px;
-            color: var(--text-secondary);
-            margin-bottom: 24px;
-            flex-wrap: wrap;
-        }
-
-        .kb-breadcrumb a {
-            color: var(--text-secondary);
-            text-decoration: none;
-            transition: color 0.2s;
-        }
-
-        .kb-breadcrumb a:hover {
-            color: var(--text-primary);
-        }
-
-        .kb-breadcrumb .separator {
-            color: var(--text-secondary);
-            opacity: 0.5;
-        }
-
-        .kb-breadcrumb .current {
-            color: var(--text-primary);
-            font-weight: 500;
-        }
-
         /* Infrastructure Dashboard Layout */
         .resource-header-bar {
             display: flex;
@@ -156,26 +127,20 @@
         <div class="main-content">
             <div class="content-area">
                 <section class="view-section">
-                    <!-- Breadcrumb -->
-                    <div class="kb-breadcrumb">
-                        <a href="resources.html">Resources</a>
-                        <span class="separator">/</span>
-                        <a href="resources.html">Virtual</a>
-                        <span class="separator">/</span>
-                        <span class="current">VRT-Build-Server-01</span>
-                    </div>
-
                     <!-- Header Banner -->
                     <div class="resource-header-bar">
                         <div style="display: flex; align-items: center; gap: 16px;">
                             <button class="icon-btn" onclick="location.href='resources.html'" title="Back to Resources">
                                 <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
                                 </svg>
                             </button>
                             <div>
                                 <div style="margin-bottom: 6px;">
-                                    <span style="color: var(--accent-color); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Virtual Server / Cloud • AWS EC2</span>
+                                    <span
+                                        style="color: var(--accent-color); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Virtual
+                                        Server / Cloud • AWS EC2</span>
                                 </div>
                                 <h1 class="resource-title">VRT-BUILD-SERVER-01</h1>
                             </div>
@@ -184,20 +149,29 @@
                         <!-- Top Right Action Controls -->
                         <div style="display: flex; gap: 10px; flex-wrap: wrap;">
                             <button class="btn btn-secondary" onclick="showToast('Audit report downloaded', 'success')">
-                                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-right: 6px;">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                    style="margin-right: 6px;">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
                                 </svg>
                                 Export Audit
                             </button>
-                            <button class="btn btn-secondary" onclick="showToast('Diagnostic reboot initiated...', 'info')">
-                                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-right: 6px;">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                            <button class="btn btn-secondary"
+                                onclick="showToast('Diagnostic reboot initiated...', 'info')">
+                                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                    style="margin-right: 6px;">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
+                                    </path>
                                 </svg>
                                 Reboot
                             </button>
                             <button class="btn btn-primary" onclick="location.href='resource-edit.html'">
-                                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-right: 6px;">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
+                                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                    style="margin-right: 6px;">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z">
+                                    </path>
                                 </svg>
                                 Edit Resource
                             </button>
@@ -210,18 +184,26 @@
                         <div class="metric-card">
                             <div class="metric-header">
                                 <span>Operational Health</span>
-                                <div class="metric-icon-box" style="color: var(--danger-color); background: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.2);">
+                                <div class="metric-icon-box"
+                                    style="color: var(--danger-color); background: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.2);">
                                     <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M13 10V3L4 14h7v7l9-11h-7z"></path>
                                     </svg>
                                 </div>
                             </div>
                             <div>
-                                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
-                                    <span style="font-size: 22px; font-weight: 700; color: var(--text-primary);">Incident Active</span>
-                                    <span class="badge badge-status-open" style="border-color: var(--danger-color); color: var(--danger-color);">Critical Alert</span>
+                                <div
+                                    style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+                                    <span
+                                        style="font-size: 22px; font-weight: 700; color: var(--text-primary);">Incident
+                                        Active</span>
+                                    <span class="badge badge-status-open"
+                                        style="border-color: var(--danger-color); color: var(--danger-color);">Critical
+                                        Alert</span>
                                 </div>
-                                <span class="text-sm" style="color: var(--text-secondary);">Affected by linked incident INC-1042</span>
+                                <span class="text-sm" style="color: var(--text-secondary);">Affected by linked incident
+                                    INC-1042</span>
                             </div>
                         </div>
 
@@ -231,16 +213,22 @@
                                 <span>Assigned Team &amp; Owner</span>
                                 <div class="metric-icon-box">
                                     <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z">
+                                        </path>
                                     </svg>
                                 </div>
                             </div>
                             <div>
                                 <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 6px;">
-                                    <div style="width: 32px; height: 32px; border-radius: 50%; background: rgba(96, 165, 250, 0.2); color: var(--accent-color); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700;">DT</div>
+                                    <div
+                                        style="width: 32px; height: 32px; border-radius: 50%; background: rgba(96, 165, 250, 0.2); color: var(--accent-color); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700;">
+                                        DT</div>
                                     <div>
-                                        <div style="font-size: 16px; font-weight: 700; color: var(--text-primary);">DevOps Team</div>
-                                        <span class="text-sm" style="color: var(--text-secondary);">Infrastructure &amp; Cloud</span>
+                                        <div style="font-size: 16px; font-weight: 700; color: var(--text-primary);">
+                                            DevOps Team</div>
+                                        <span class="text-sm" style="color: var(--text-secondary);">Infrastructure &amp;
+                                            Cloud</span>
                                     </div>
                                 </div>
                             </div>
@@ -252,16 +240,22 @@
                                 <span>Monthly Cost &amp; Region</span>
                                 <div class="metric-icon-box">
                                     <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
+                                        </path>
                                     </svg>
                                 </div>
                             </div>
                             <div>
-                                <div style="display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 6px;">
-                                    <span style="font-size: 24px; font-weight: 700; color: var(--text-primary);">$314.50</span>
-                                    <span class="badge" style="border: 1px solid var(--panel-border); background: var(--button-secondary-bg); font-family: monospace;">us-east-1a</span>
+                                <div
+                                    style="display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 6px;">
+                                    <span
+                                        style="font-size: 24px; font-weight: 700; color: var(--text-primary);">$314.50</span>
+                                    <span class="badge"
+                                        style="border: 1px solid var(--panel-border); background: var(--button-secondary-bg); font-family: monospace;">us-east-1a</span>
                                 </div>
-                                <span class="text-sm" style="color: var(--text-secondary);">Provisioned Oct 12, 2025</span>
+                                <span class="text-sm" style="color: var(--text-secondary);">Provisioned Oct 12,
+                                    2025</span>
                             </div>
                         </div>
                     </div>
@@ -274,23 +268,33 @@
                             <div class="card-box">
                                 <div class="spec-grid-row">
                                     <div class="spec-item">
-                                        <span class="text-sm" style="color: var(--text-secondary);">Resource Tag / ID</span>
-                                        <span style="color: var(--text-primary); font-weight: 600; font-size: 15px; font-family: monospace;">VRT-Build-Server-01</span>
+                                        <span class="text-sm" style="color: var(--text-secondary);">Resource Tag /
+                                            ID</span>
+                                        <span
+                                            style="color: var(--text-primary); font-weight: 600; font-size: 15px; font-family: monospace;">VRT-Build-Server-01</span>
                                     </div>
                                     <div class="spec-item">
-                                        <span class="text-sm" style="color: var(--text-secondary);">Resource Category</span>
-                                        <span style="color: var(--text-primary); font-weight: 500; font-size: 15px;">Virtual Server / Cloud</span>
+                                        <span class="text-sm" style="color: var(--text-secondary);">Resource
+                                            Category</span>
+                                        <span
+                                            style="color: var(--text-primary); font-weight: 500; font-size: 15px;">Virtual
+                                            Server / Cloud</span>
                                     </div>
                                 </div>
 
                                 <div class="spec-grid-row" style="margin-bottom: 0;">
                                     <div class="spec-item">
-                                        <span class="text-sm" style="color: var(--text-secondary);">Make &amp; Model / Instance Type</span>
-                                        <span style="color: var(--text-primary); font-weight: 500; font-size: 15px;">AWS EC2 t3.xlarge</span>
+                                        <span class="text-sm" style="color: var(--text-secondary);">Make &amp; Model /
+                                            Instance Type</span>
+                                        <span style="color: var(--text-primary); font-weight: 500; font-size: 15px;">AWS
+                                            EC2 t3.xlarge</span>
                                     </div>
                                     <div class="spec-item">
-                                        <span class="text-sm" style="color: var(--text-secondary);">IP Address / Instance ID</span>
-                                        <span style="color: var(--text-primary); font-weight: 500; font-size: 15px; font-family: monospace;">10.240.12.88 (i-08a9f2)</span>
+                                        <span class="text-sm" style="color: var(--text-secondary);">IP Address /
+                                            Instance ID</span>
+                                        <span
+                                            style="color: var(--text-primary); font-weight: 500; font-size: 15px; font-family: monospace;">10.240.12.88
+                                            (i-08a9f2)</span>
                                     </div>
                                 </div>
                             </div>
@@ -298,21 +302,33 @@
                             <div class="section-heading">Configuration &amp; Maintenance Notes</div>
                             <div class="card-box-tint">
                                 <p style="color: var(--text-primary); line-height: 1.7; font-size: 15px; margin: 0;">
-                                    Instance hosted in us-east-1a zone. Attached to VPC security group sg-091823ab with restricted SSH ingress. Automated EBS snapshots configured daily at 04:00 UTC via AWS Backup vault. Primary host for Jenkins CI build pipelines.
+                                    Instance hosted in us-east-1a zone. Attached to VPC security group sg-091823ab with
+                                    restricted SSH ingress. Automated EBS snapshots configured daily at 04:00 UTC via
+                                    AWS Backup vault. Primary host for Jenkins CI build pipelines.
                                 </p>
                             </div>
 
                             <!-- Decommission Zone -->
                             <div class="section-heading">Lifecycle Management</div>
-                            <div class="card-box" style="border-color: rgba(239, 68, 68, 0.3); background: rgba(239, 68, 68, 0.04);">
-                                <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;">
+                            <div class="card-box"
+                                style="border-color: rgba(239, 68, 68, 0.3); background: rgba(239, 68, 68, 0.04);">
+                                <div
+                                    style="display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;">
                                     <div>
-                                        <strong style="color: var(--danger-color); font-size: 15px; display: block; margin-bottom: 4px;">Decommission Infrastructure</strong>
-                                        <span class="text-sm" style="color: var(--text-secondary);">Permanently revoke access and archive asset records.</span>
+                                        <strong
+                                            style="color: var(--danger-color); font-size: 15px; display: block; margin-bottom: 4px;">Decommission
+                                            Infrastructure</strong>
+                                        <span class="text-sm" style="color: var(--text-secondary);">Permanently revoke
+                                            access and archive asset records.</span>
                                     </div>
-                                    <button class="btn btn-secondary" style="color: var(--danger-color); border-color: rgba(239, 68, 68, 0.4);" onclick="showToast('Resource marked for decommissioning', 'warning')">
-                                        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-right: 6px;">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                    <button class="btn btn-secondary"
+                                        style="color: var(--danger-color); border-color: rgba(239, 68, 68, 0.4);"
+                                        onclick="showToast('Resource marked for decommissioning', 'warning')">
+                                        <svg width="16" height="16" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24" style="margin-right: 6px;">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+                                            </path>
                                         </svg>
                                         Decommission
                                     </button>
@@ -323,35 +339,54 @@
                         <!-- RIGHT COLUMN: Linked Incidents & Audit Feed -->
                         <div>
                             <div class="section-heading">Linked Tickets &amp; Incidents</div>
-                            <div class="card-box" style="padding: 16px; display: flex; flex-direction: column; gap: 12px;">
-                                <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px; background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 10px; cursor: pointer; transition: background 0.2s;" onclick="location.href='ticket-detail.html'">
+                            <div class="card-box"
+                                style="padding: 16px; display: flex; flex-direction: column; gap: 12px;">
+                                <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px; background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 10px; cursor: pointer; transition: background 0.2s;"
+                                    onclick="location.href='ticket-detail.html'">
                                     <div style="display: flex; align-items: center; gap: 14px;">
-                                        <div style="width: 36px; height: 36px; border-radius: 8px; background: rgba(239, 68, 68, 0.15); display: flex; align-items: center; justify-content: center; color: var(--danger-color);">
-                                            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                                        <div
+                                            style="width: 36px; height: 36px; border-radius: 8px; background: rgba(239, 68, 68, 0.15); display: flex; align-items: center; justify-content: center; color: var(--danger-color);">
+                                            <svg width="20" height="20" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">
+                                                </path>
                                             </svg>
                                         </div>
                                         <div>
-                                            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
-                                                <span class="badge badge-priority-high" style="font-size: 11px;">Critical</span>
-                                                <strong style="color: var(--text-primary); font-size: 15px;">INC-1042</strong>
+                                            <div
+                                                style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                                                <span class="badge badge-priority-high"
+                                                    style="font-size: 11px;">Critical</span>
+                                                <strong
+                                                    style="color: var(--text-primary); font-size: 15px;">INC-1042</strong>
                                             </div>
-                                            <span style="color: var(--text-secondary); font-size: 14px; display: block;">Production Build Pipeline Failing</span>
+                                            <span
+                                                style="color: var(--text-secondary); font-size: 14px; display: block;">Production
+                                                Build Pipeline Failing</span>
                                         </div>
                                     </div>
-                                    <button class="btn btn-secondary btn-sm" onclick="event.stopPropagation(); location.href='ticket-detail.html'">View</button>
+                                    <button class="btn btn-secondary btn-sm"
+                                        onclick="event.stopPropagation(); location.href='ticket-detail.html'">View</button>
                                 </div>
 
-                                <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; background: var(--card-tint); border: 1px solid var(--panel-border); border-radius: 10px;">
+                                <div
+                                    style="display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; background: var(--card-tint); border: 1px solid var(--panel-border); border-radius: 10px;">
                                     <div style="display: flex; align-items: center; gap: 14px;">
-                                        <div style="width: 36px; height: 36px; border-radius: 8px; background: var(--panel-bg); border: 1px solid var(--panel-border); display: flex; align-items: center; justify-content: center; color: var(--text-secondary);">
-                                            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                        <div
+                                            style="width: 36px; height: 36px; border-radius: 8px; background: var(--panel-bg); border: 1px solid var(--panel-border); display: flex; align-items: center; justify-content: center; color: var(--text-secondary);">
+                                            <svg width="20" height="20" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                             </svg>
                                         </div>
                                         <div>
-                                            <strong style="color: var(--text-primary); font-size: 14px; display: block; margin-bottom: 2px;">REQ-2050: Increase EBS Volume to 500GB</strong>
-                                            <span class="text-sm" style="color: var(--text-secondary);">Submitted Oct 20 • Resolved by DevOps Team</span>
+                                            <strong
+                                                style="color: var(--text-primary); font-size: 14px; display: block; margin-bottom: 2px;">REQ-2050:
+                                                Increase EBS Volume to 500GB</strong>
+                                            <span class="text-sm" style="color: var(--text-secondary);">Submitted Oct 20
+                                                • Resolved by DevOps Team</span>
                                         </div>
                                     </div>
                                     <span class="badge badge-status-resolved">Resolved</span>
@@ -360,39 +395,60 @@
 
                             <div class="section-heading">Activity &amp; Audit Log</div>
                             <div style="display: flex; flex-direction: column; gap: 14px;">
-                                <div class="card-box" style="margin-bottom: 0; background: var(--button-secondary-bg); padding: 16px 18px;">
-                                    <div style="margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
+                                <div class="card-box"
+                                    style="margin-bottom: 0; background: var(--button-secondary-bg); padding: 16px 18px;">
+                                    <div
+                                        style="margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
                                         <div style="display: flex; align-items: center; gap: 10px;">
-                                            <div style="width: 26px; height: 26px; border-radius: 50%; background: rgba(96, 165, 250, 0.2); color: var(--accent-color); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700;">CK</div>
-                                            <strong style="color: var(--text-primary); font-size: 14px;">Chris Karki</strong>
+                                            <div
+                                                style="width: 26px; height: 26px; border-radius: 50%; background: rgba(96, 165, 250, 0.2); color: var(--accent-color); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700;">
+                                                CK</div>
+                                            <strong style="color: var(--text-primary); font-size: 14px;">Chris
+                                                Karki</strong>
                                         </div>
-                                        <span style="color: var(--text-secondary); font-size: 12px;">Today at 10:42 AM</span>
+                                        <span style="color: var(--text-secondary); font-size: 12px;">Today at 10:42
+                                            AM</span>
                                     </div>
-                                    <p style="color: var(--text-primary); margin: 0; font-size: 14px; line-height: 1.6;">
-                                        Linked incident INC-1042 to this resource. Firewall rule blocking port 8081 identified as root cause.</p>
+                                    <p
+                                        style="color: var(--text-primary); margin: 0; font-size: 14px; line-height: 1.6;">
+                                        Linked incident INC-1042 to this resource. Firewall rule blocking port 8081
+                                        identified as root cause.</p>
                                 </div>
 
                                 <div class="card-box-tint" style="margin-bottom: 0; padding: 14px 18px;">
-                                    <div style="margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center;">
+                                    <div
+                                        style="margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center;">
                                         <div style="display: flex; align-items: center; gap: 10px;">
-                                            <div style="width: 24px; height: 24px; border-radius: 50%; background: var(--panel-bg); border: 1px solid var(--panel-border); color: var(--text-secondary); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700;">SYS</div>
-                                            <strong style="color: var(--text-primary); font-size: 13px;">System Automated</strong>
+                                            <div
+                                                style="width: 24px; height: 24px; border-radius: 50%; background: var(--panel-bg); border: 1px solid var(--panel-border); color: var(--text-secondary); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700;">
+                                                SYS</div>
+                                            <strong style="color: var(--text-primary); font-size: 13px;">System
+                                                Automated</strong>
                                         </div>
-                                        <span style="color: var(--text-secondary); font-size: 12px;">Today at 09:15 AM</span>
+                                        <span style="color: var(--text-secondary); font-size: 12px;">Today at 09:15
+                                            AM</span>
                                     </div>
-                                    <p style="color: var(--text-secondary); margin: 0; font-size: 13px; font-style: italic;">
-                                        Status changed from <strong>Active</strong> to <strong>Incident Active</strong> due to linked incident INC-1042.</p>
+                                    <p
+                                        style="color: var(--text-secondary); margin: 0; font-size: 13px; font-style: italic;">
+                                        Status changed from <strong>Active</strong> to <strong>Incident Active</strong>
+                                        due to linked incident INC-1042.</p>
                                 </div>
 
                                 <div class="card-box-tint" style="margin-bottom: 0; padding: 14px 18px;">
-                                    <div style="margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center;">
+                                    <div
+                                        style="margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center;">
                                         <div style="display: flex; align-items: center; gap: 10px;">
-                                            <div style="width: 24px; height: 24px; border-radius: 50%; background: var(--panel-bg); border: 1px solid var(--panel-border); color: var(--text-secondary); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700;">SYS</div>
-                                            <strong style="color: var(--text-primary); font-size: 13px;">System Automated</strong>
+                                            <div
+                                                style="width: 24px; height: 24px; border-radius: 50%; background: var(--panel-bg); border: 1px solid var(--panel-border); color: var(--text-secondary); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700;">
+                                                SYS</div>
+                                            <strong style="color: var(--text-primary); font-size: 13px;">System
+                                                Automated</strong>
                                         </div>
-                                        <span style="color: var(--text-secondary); font-size: 12px;">Oct 21 at 04:00 AM</span>
+                                        <span style="color: var(--text-secondary); font-size: 12px;">Oct 21 at 04:00
+                                            AM</span>
                                     </div>
-                                    <p style="color: var(--text-secondary); margin: 0; font-size: 13px; font-style: italic;">
+                                    <p
+                                        style="color: var(--text-secondary); margin: 0; font-size: 13px; font-style: italic;">
                                         Automated EBS snapshot completed successfully. ID: snap-0a8b91f2c4d87e123.</p>
                                 </div>
                             </div>

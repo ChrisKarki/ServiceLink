@@ -1,8 +1,11 @@
-﻿.venv/
+.venv/
 venv/
 __pycache__/
 *.pyc
 .env
+env
+.DS_Store
 cloudbox.pem
 database_ssh.bat
 *.pem
+
