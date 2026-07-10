@@ -11,11 +11,11 @@
     <link rel="stylesheet" href="css/main.css">
     <script src="js/theme.js"></script>
     <style>
-        /* Ticket Workflow Layout: 1fr main conversation | 340px control panel */
+        /* Ticket Workflow Layout: 1fr main conversation | 390px control panel */
         .ticket-workflow-layout {
             display: grid;
-            grid-template-columns: 1fr 340px;
-            gap: 32px;
+            grid-template-columns: 1fr 390px;
+            gap: 16px;
             align-items: start;
         }
 
@@ -76,31 +76,31 @@
             background: var(--panel-bg);
             border: 1px solid var(--panel-border);
             border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 24px;
+            padding: 14px 16px;
+            margin-bottom: 10px;
         }
 
         .card-box-tint {
             background: var(--card-tint);
             border: 1px solid var(--panel-border);
             border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 24px;
+            padding: 14px 16px;
+            margin-bottom: 10px;
         }
 
         .action-button-stack {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 6px;
         }
 
         .action-btn {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            gap: 8px;
             width: 100%;
-            padding: 12px 16px;
+            padding: 9px 14px;
             font-size: 14px;
             font-weight: 600;
             border-radius: 8px;
@@ -130,19 +130,23 @@
                 <section class="view-section">
                     <!-- Header Area -->
                     <div class="ticket-title-area">
-                        <div style="display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; margin-bottom: 20px;">
+                        <div
+                            style="display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; margin-bottom: 20px;">
                             <h1 class="ticket-title" style="margin: 0;">INC-1042: Production Build Pipeline Failing</h1>
                             <div style="display: flex; align-items: center; gap: 10px;">
-                                <span style="color: var(--accent-color); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Incident</span>
-                                <span class="badge badge-status-open" style="padding: 6px 14px; font-size: 13px;">In Progress</span>
-                                <span class="badge badge-priority-high" style="padding: 6px 14px; font-size: 13px;">Critical Priority</span>
+                                <span
+                                    style="color: var(--accent-color); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Incident</span>
+                                <span class="badge badge-status-open" style="padding: 6px 14px; font-size: 13px;">In
+                                    Progress</span>
+                                <span class="badge badge-priority-high"
+                                    style="padding: 6px 14px; font-size: 13px;">Critical Priority</span>
                             </div>
                         </div>
                     </div>
 
 
 
-                    <!-- Split Workflow Layout: Left Conversation (1fr) | Right Control Panel (340px) -->
+                    <!-- Split Workflow Layout: Left Conversation (1fr) | Right Control Panel (390px) -->
                     <div class="ticket-workflow-layout">
                         <!-- LEFT COLUMN: Description & Conversation Feed -->
                         <div>
@@ -150,7 +154,7 @@
 
                             <div class="card-box-tint">
                                 <div
-                                    style="display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 16px; flex-wrap: wrap;">
+                                    style="display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 10px; flex-wrap: wrap;">
                                     <div style="display: flex; align-items: center; gap: 12px;">
                                         <div
                                             style="width: 38px; height: 38px; border-radius: 50%; background: rgba(96, 165, 250, 0.15); display: flex; align-items: center; justify-content: center; color: var(--accent-color); font-size: 14px; font-weight: 700;">
@@ -168,10 +172,9 @@
                                         Service Portal</span>
                                 </div>
 
-                                <div
-                                    style="padding: 16px; background: var(--panel-bg); border: 1px solid var(--panel-border); border-radius: 8px;">
+                                <div>
                                     <p
-                                        style="color: var(--text-primary); line-height: 1.7; font-size: 15px; margin: 0;">
+                                        style="color: var(--text-primary); line-height: 1.5; font-size: 15px; margin: 0;">
                                         The automated deployment pipeline to staging has been failing for the past hour.
                                         The error logs indicate a timeout when connecting to the internal artifact
                                         repository. This is blocking the release candidate for the new mobile app
@@ -185,33 +188,121 @@
                             <!-- Comment & Activity Feed -->
 
 
-                            <!-- Comment Input -->
-                            <div class="card-box"
-                                style="padding: 16px; background: var(--input-bg); transition: border-color 0.2s;"
+                            <!-- Comment Input Bar -->
+                            <div class="card-box comment-bar-container"
+                                style="padding: 10px 14px; background: var(--input-bg); transition: border-color 0.2s, background 0.2s; display: flex; flex-direction: row; align-items: center; justify-content: space-between; gap: 6px; border: 1px solid var(--panel-border); border-radius: 10px; margin-bottom: 6px;"
                                 tabindex="0" onfocusin="this.style.borderColor='var(--accent-color)'"
                                 onfocusout="this.style.borderColor='var(--panel-border)'">
-                                <textarea class="comment-input"
-                                    style="border: none; padding: 0; min-height: 70px; margin-bottom: 14px; background: transparent; box-shadow: none; font-size: 15px; width: 100%; color: var(--text-primary); resize: vertical;"
-                                    placeholder="Add a comment or internal note..."></textarea>
-                                <div
-                                    style="display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
-                                    <label
-                                        style="display: inline-flex; align-items: center; gap: 8px; cursor: pointer; color: var(--warning-color); font-weight: 600; font-size: 13px; padding: 6px 14px; background: rgba(234, 179, 8, 0.1); border-radius: 50px;">
-                                        <input type="checkbox"
-                                            style="width: 15px; height: 15px; cursor: pointer; accent-color: var(--warning-color);">
-                                        Internal Note (Visible to Techs Only)
+                                <textarea class="comment-input" rows="1"
+                                    style="border: none; padding: 2px 0; height: 24px; min-height: 24px; background: transparent; box-shadow: none; font-size: 15px; flex: 1; min-width: 0; color: var(--text-primary); resize: none; overflow-y: hidden; line-height: 1.5; margin: 0;"
+                                    placeholder="Add a comment or internal note..."
+                                    oninput="autoResizeComment(this)"></textarea>
+                                <div class="comment-actions"
+                                    style="display: flex; align-items: center; gap: 8px; flex-shrink: 0;">
+                                    <label title="Internal Note (Visible to Techs Only)"
+                                        style="display: inline-flex; align-items: center; justify-content: center; cursor: pointer; width: 36px; height: 36px; border-radius: 8px; background: rgba(234, 179, 8, 0.15); color: var(--warning-color); border: 1px solid rgba(234, 179, 8, 0.3); transition: all 0.2s; margin: 0;">
+                                        <input type="checkbox" id="internalNoteToggle" style="display: none;" onchange="
+                                            if(this.checked) {
+                                                this.parentElement.style.background = 'var(--warning-color)';
+                                                this.parentElement.style.color = '#000';
+                                                this.parentElement.style.boxShadow = '0 0 10px rgba(234, 179, 8, 0.4)';
+                                            } else {
+                                                this.parentElement.style.background = 'rgba(234, 179, 8, 0.15)';
+                                                this.parentElement.style.color = 'var(--warning-color)';
+                                                this.parentElement.style.boxShadow = 'none';
+                                            }
+                                        ">
+                                        <svg width="18" height="18" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z">
+                                            </path>
+                                        </svg>
                                     </label>
-                                    <button class="btn btn-primary" style="padding: 8px 22px; font-size: 14px;"
-                                        onclick="showToast('Comment posted successfully', 'success')">Post
-                                        Comment</button>
+                                    <button class="btn btn-primary" title="Post Comment"
+                                        style="padding: 0; width: 36px; height: 36px; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; border: none; cursor: pointer;"
+                                        onclick="showToast('Comment posted successfully', 'success'); const ta = this.closest('.comment-bar-container').querySelector('textarea'); ta.value=''; autoResizeComment(ta);">
+                                        <svg width="18" height="18" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                                        </svg>
+                                    </button>
                                 </div>
                             </div>
+                            <script>
+                                function autoResizeComment(textarea) {
+                                    const container = textarea.closest('.comment-bar-container');
+                                    const actions = container.querySelector('.comment-actions');
+                                    const isColumn = container.style.flexDirection === 'column';
+                                    const isCleared = textarea.value === '' || textarea.value.trim() === '';
+
+                                    if (isColumn) {
+                                        if (isCleared) {
+                                            container.style.flexDirection = 'row';
+                                            container.style.alignItems = 'center';
+                                            actions.style.marginTop = '0px';
+                                            actions.style.width = 'auto';
+                                            actions.style.justifyContent = 'flex-end';
+                                            textarea.style.flex = '1';
+                                            textarea.style.width = 'auto';
+                                            textarea.style.height = '24px';
+                                            textarea.style.overflowY = 'hidden';
+                                            return;
+                                        }
+
+                                        textarea.style.height = 'auto';
+                                        const scrollH = textarea.scrollHeight;
+
+                                        if (scrollH <= 36 && !textarea.value.includes('\n')) {
+                                            textarea.style.height = '24px';
+                                            textarea.style.overflowY = 'hidden';
+                                        } else if (scrollH > 168) {
+                                            textarea.style.height = '168px';
+                                            textarea.style.overflowY = 'auto';
+                                        } else {
+                                            textarea.style.height = scrollH + 'px';
+                                            textarea.style.overflowY = 'hidden';
+                                        }
+                                    } else {
+                                        textarea.style.height = 'auto';
+                                        const scrollH = textarea.scrollHeight;
+                                        const needsColumn = scrollH > 30 || textarea.value.includes('\n');
+
+                                        if (needsColumn) {
+                                            container.style.flexDirection = 'column';
+                                            container.style.alignItems = 'stretch';
+                                            actions.style.marginTop = '4px';
+                                            actions.style.width = '100%';
+                                            actions.style.justifyContent = 'flex-end';
+                                            textarea.style.flex = 'none';
+                                            textarea.style.width = '100%';
+
+                                            textarea.style.height = 'auto';
+                                            const fullScrollH = textarea.scrollHeight;
+                                            if (fullScrollH <= 36 && !textarea.value.includes('\n')) {
+                                                textarea.style.height = '24px';
+                                                textarea.style.overflowY = 'hidden';
+                                            } else if (fullScrollH > 168) {
+                                                textarea.style.height = '168px';
+                                                textarea.style.overflowY = 'auto';
+                                            } else {
+                                                textarea.style.height = fullScrollH + 'px';
+                                                textarea.style.overflowY = 'hidden';
+                                            }
+                                        } else {
+                                            textarea.style.height = '24px';
+                                            textarea.style.overflowY = 'hidden';
+                                        }
+                                    }
+                                }
+                            </script>
 
                             <!-- Comment Thread -->
-                            <div style="display: flex; flex-direction: column; gap: 16px;">
-                                <div class="card-box" style="margin-bottom: 0; background: var(--button-secondary-bg);">
+                            <div style="display: flex; flex-direction: column; gap: 8px;">
+                                <div class="card-box" style="margin-bottom: 0; padding: 12px 14px; background: var(--button-secondary-bg);">
                                     <div
-                                        style="margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+                                        style="margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
                                         <div style="display: flex; align-items: center; gap: 10px;">
                                             <div
                                                 style="width: 30px; height: 30px; border-radius: 50%; background: rgba(234, 179, 8, 0.2); color: var(--warning-color); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700;">
@@ -229,14 +320,14 @@
                                             AM</span>
                                     </div>
                                     <p
-                                        style="color: var(--text-primary); margin: 0; font-size: 15px; line-height: 1.6;">
+                                        style="color: var(--text-primary); margin: 0; font-size: 15px; line-height: 1.45;">
                                         Checked the firewall logs, there seems to be a new rule blocking port 8081.
                                         Reverting the recent network config update now.</p>
                                 </div>
 
-                                <div class="card-box-tint" style="margin-bottom: 0; padding: 14px 18px;">
+                                <div class="card-box-tint" style="margin-bottom: 0; padding: 8px 14px;">
                                     <div
-                                        style="margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+                                        style="margin-bottom: 4px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
                                         <div style="display: flex; align-items: center; gap: 10px;">
                                             <div
                                                 style="width: 28px; height: 28px; border-radius: 50%; background: var(--panel-bg); border: 1px solid var(--panel-border); color: var(--text-secondary); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700;">
@@ -254,9 +345,9 @@
                                         Auto-assigned to Chris Karki based on category routing.</p>
                                 </div>
 
-                                <div class="card-box" style="margin-bottom: 0;">
+                                <div class="card-box" style="margin-bottom: 0; padding: 12px 14px;">
                                     <div
-                                        style="margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+                                        style="margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
                                         <div style="display: flex; align-items: center; gap: 10px;">
                                             <div
                                                 style="width: 30px; height: 30px; border-radius: 50%; background: rgba(96, 165, 250, 0.15); color: var(--accent-color); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700;">
@@ -271,7 +362,7 @@
                                             AM</span>
                                     </div>
                                     <p
-                                        style="color: var(--text-secondary); margin: 0; font-size: 15px; line-height: 1.6;">
+                                        style="color: var(--text-secondary); margin: 0; font-size: 15px; line-height: 1.45;">
                                         This is causing a complete blocker for the Q3 feature release. I've attempted to
                                         re-run the pipeline three times and it fails at the exact same step every time.
                                         Logs are attached.</p>
@@ -279,52 +370,62 @@
                             </div>
                         </div>
 
-                        <!-- RIGHT COLUMN: Control Panel & Metadata (340px) -->
+                        <!-- RIGHT COLUMN: Control Panel & Metadata (390px) -->
                         <div>
                             <!-- SLA & Timeline Banner -->
-                            <div class="card-box" style="display: flex; flex-direction: column; gap: 16px; margin-bottom: 24px;">
+                            <div class="card-box"
+                                style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 10px;">
                                 <div class="sla-item">
                                     <div class="sla-icon">
-                                        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <svg width="20" height="20" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                         </svg>
                                     </div>
                                     <div>
-                                        <div class="text-sm" style="color: var(--text-secondary); margin-bottom: 2px;">SLA
+                                        <div class="text-sm" style="color: var(--text-secondary); margin-bottom: 2px;">
+                                            SLA
                                             Target</div>
-                                        <div style="color: var(--text-primary); font-weight: 600; font-size: 15px;">4 Hours
+                                        <div style="color: var(--text-primary); font-weight: 600; font-size: 15px;">4
+                                            Hours
                                             (Resolution)</div>
                                     </div>
                                 </div>
 
                                 <div class="sla-item">
                                     <div class="sla-icon" style="color: var(--warning-color);">
-                                        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <svg width="20" height="20" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M13 10V3L4 14h7v7l9-11h-7z"></path>
                                         </svg>
                                     </div>
                                     <div>
-                                        <div class="text-sm" style="color: var(--text-secondary); margin-bottom: 2px;">Time
+                                        <div class="text-sm" style="color: var(--text-secondary); margin-bottom: 2px;">
+                                            Time
                                             Elapsed</div>
-                                        <div style="color: var(--warning-color); font-weight: 600; font-size: 15px;">1 Hour 25
+                                        <div style="color: var(--warning-color); font-weight: 600; font-size: 15px;">1
+                                            Hour 25
                                             Mins</div>
                                     </div>
                                 </div>
 
                                 <div class="sla-item">
                                     <div class="sla-icon" style="color: var(--text-secondary);">
-                                        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <svg width="20" height="20" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
                                             </path>
                                         </svg>
                                     </div>
                                     <div>
-                                        <div class="text-sm" style="color: var(--text-secondary); margin-bottom: 2px;">Reported
+                                        <div class="text-sm" style="color: var(--text-secondary); margin-bottom: 2px;">
+                                            Reported
                                             Timestamp</div>
-                                        <div style="color: var(--text-primary); font-weight: 500; font-size: 15px;">Oct 24, 2026
+                                        <div style="color: var(--text-primary); font-weight: 500; font-size: 15px;">Oct
+                                            24, 2026
                                             at 09:15 AM</div>
                                     </div>
                                 </div>
@@ -332,7 +433,7 @@
 
                             <!-- Quick Actions Panel -->
 
-                            <div class="card-box">
+                            <div class="card-box" style="margin-bottom: 10px;">
                                 <div class="action-button-stack">
                                     <button class="btn btn-primary action-btn"
                                         onclick="showToast('Ticket marked as resolved', 'success')">
@@ -378,7 +479,7 @@
 
                             <!-- Assignment & Classification Card -->
 
-                            <div class="card-box" style="display: flex; flex-direction: column; gap: 16px;">
+                            <div class="card-box" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 10px;">
                                 <div class="meta-grid-row">
                                     <span class="text-sm" style="color: var(--text-secondary);">Assignee</span>
                                     <div
@@ -407,7 +508,7 @@
                             <!-- Linked Assets Card -->
 
                             <div class="card-box"
-                                style="cursor: pointer; transition: border-color 0.2s, background 0.2s; background: var(--button-secondary-bg);"
+                                style="cursor: pointer; transition: border-color 0.2s, background 0.2s; background: var(--button-secondary-bg); margin-bottom: 0;"
                                 onclick="location.href='resource-view.html'">
                                 <div
                                     style="display: flex; align-items: center; justify-content: space-between; gap: 12px;">
