@@ -29,7 +29,7 @@
         }
 
         .ticket-title-area {
-            margin-bottom: 24px;
+            margin-bottom: 16px;
         }
 
         .ticket-title {
@@ -76,20 +76,20 @@
             background: var(--panel-bg);
             border: 1px solid var(--panel-border);
             border-radius: 12px;
-            padding: 22px;
-            margin-bottom: 24px;
+            padding: 14px 16px;
+            margin-bottom: 10px;
         }
 
         .card-box-tint {
             background: var(--card-tint);
             border: 1px solid var(--panel-border);
             border-radius: 12px;
-            padding: 22px;
-            margin-bottom: 24px;
+            padding: 14px 16px;
+            margin-bottom: 10px;
         }
 
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 14px;
         }
 
         .form-group:last-child {
@@ -138,24 +138,13 @@
                     <!-- Header Area -->
                     <div class="ticket-title-area">
                         <div
-                            style="display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; margin-bottom: 12px;">
-                            <div style="display: flex; align-items: center; gap: 14px;">
-                                <button class="icon-btn" onclick="location.href='ticket-detail.html'"
-                                    title="Back to Incident">
-                                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-                                    </svg>
-                                </button>
-                                <span
-                                    style="color: var(--accent-color); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">DevOps
-                                    &amp; Infrastructure • Edit Mode</span>
-                            </div>
-                            <div style="display: flex; gap: 12px;">
+                            style="display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap;">
+                            <h1 class="ticket-title" style="margin: 0;">Edit: INC-1042: Production Build Pipeline Failing</h1>
+                            <div style="display: flex; align-items: center; gap: 12px;">
                                 <button class="btn btn-secondary"
-                                    onclick="location.href='ticket-detail.html'">Cancel</button>
+                                    onclick="location.href='ticket-view.html'">Cancel</button>
                                 <button class="btn btn-primary" style="display: flex; align-items: center; gap: 8px;"
-                                    onclick="flash('Ticket updated successfully!', 'success', 'ticket-detail.html')">
+                                    onclick="flash('Ticket updated successfully!', 'success', 'ticket-view.html')">
                                     <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M5 13l4 4L19 7"></path>
@@ -164,63 +153,12 @@
                                 </button>
                             </div>
                         </div>
-                        <h1 class="ticket-title">Edit: INC-1042 — Production Build Pipeline Failing</h1>
                     </div>
 
-                    <!-- SLA & Timeline Banner -->
-                    <div class="sla-banner">
-                        <div class="sla-item">
-                            <div class="sla-icon">
-                                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                </svg>
-                            </div>
-                            <div>
-                                <div class="text-sm" style="color: var(--text-secondary); margin-bottom: 2px;">SLA
-                                    Target</div>
-                                <div style="color: var(--text-primary); font-weight: 600; font-size: 15px;">4 Hours
-                                    (Resolution)</div>
-                            </div>
-                        </div>
-
-                        <div class="sla-item">
-                            <div class="sla-icon" style="color: var(--warning-color);">
-                                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                                </svg>
-                            </div>
-                            <div>
-                                <div class="text-sm" style="color: var(--text-secondary); margin-bottom: 2px;">Time
-                                    Elapsed</div>
-                                <div style="color: var(--warning-color); font-weight: 600; font-size: 15px;">1 Hour 25
-                                    Mins</div>
-                            </div>
-                        </div>
-
-                        <div class="sla-item">
-                            <div class="sla-icon" style="color: var(--text-secondary);">
-                                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
-                                    </path>
-                                </svg>
-                            </div>
-                            <div>
-                                <div class="text-sm" style="color: var(--text-secondary); margin-bottom: 2px;">Reported
-                                    Timestamp</div>
-                                <div style="color: var(--text-primary); font-weight: 500; font-size: 15px;">Oct 24, 2026
-                                    at 09:15 AM</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Split Workflow Layout: Left Form (1fr) | Right Control Panel (340px) -->
+                    <!-- Split Workflow Layout: Left Form (1fr) | Right Control Panel (390px) -->
                     <div class="ticket-workflow-layout">
                         <!-- LEFT COLUMN: Issue Summary & Detailed Notes Form -->
                         <div>
-                            <div class="section-heading">Issue Summary &amp; Description</div>
                             <div class="card-box">
                                 <div
                                     style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px;">
@@ -255,9 +193,8 @@ Please check network routing and repository instance health immediately.</textar
                                 </div>
                             </div>
 
-                            <div class="section-heading" style="margin-top: 32px;">Resolution Work Log &amp; Notes</div>
                             <div class="card-box-tint">
-                                <div class="form-group">
+                                <div class="form-group" style="margin-bottom: 0;">
                                     <label class="form-label">Internal Technician Notes</label>
                                     <textarea class="form-control"
                                         style="min-height: 120px; line-height: 1.6; resize: vertical;"
@@ -266,9 +203,61 @@ Please check network routing and repository instance health immediately.</textar
                             </div>
                         </div>
 
-                        <!-- RIGHT COLUMN: Status & Assignment Control Panel (340px) -->
+                        <!-- RIGHT COLUMN: Status & Assignment Control Panel (390px) -->
                         <div>
-                            <div class="section-heading">Status &amp; Assignment</div>
+                            <!-- SLA & Timeline Banner -->
+                            <div class="card-box"
+                                style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 10px;">
+                                <div class="sla-item">
+                                    <div class="sla-icon">
+                                        <svg width="20" height="20" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <div class="text-sm" style="color: var(--text-secondary); margin-bottom: 2px;">
+                                            SLA Target</div>
+                                        <div style="color: var(--text-primary); font-weight: 600; font-size: 15px;">4
+                                            Hours (Resolution)</div>
+                                    </div>
+                                </div>
+
+                                <div class="sla-item">
+                                    <div class="sla-icon" style="color: var(--warning-color);">
+                                        <svg width="20" height="20" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <div class="text-sm" style="color: var(--text-secondary); margin-bottom: 2px;">
+                                            Time Elapsed</div>
+                                        <div style="color: var(--warning-color); font-weight: 600; font-size: 15px;">1
+                                            Hour 25 Mins</div>
+                                    </div>
+                                </div>
+
+                                <div class="sla-item">
+                                    <div class="sla-icon" style="color: var(--text-secondary);">
+                                        <svg width="20" height="20" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
+                                            </path>
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <div class="text-sm" style="color: var(--text-secondary); margin-bottom: 2px;">
+                                            Reported Timestamp</div>
+                                        <div style="color: var(--text-primary); font-weight: 500; font-size: 15px;">Oct
+                                            24, 2026 at 09:15 AM</div>
+                                    </div>
+                                </div>
+                            </div>
+
                             <div class="card-box">
                                 <div class="form-group">
                                     <label class="form-label" style="color: var(--text-secondary);">Workflow
@@ -329,7 +318,6 @@ Please check network routing and repository instance health immediately.</textar
                                 </div>
                             </div>
 
-                            <div class="section-heading">Affected Infrastructure</div>
                             <div class="card-box" style="background: var(--button-secondary-bg);">
                                 <div
                                     style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px;">

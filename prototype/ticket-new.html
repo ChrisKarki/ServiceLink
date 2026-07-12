@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Submit Request · ServiceLink</title>
+    <title>New Ticket · ServiceLink</title>
     <link
         href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@100;200;300;400;500;600;700&family=IBM+Plex+Sans:wght@100;200;300;400;500;600;700&family=Montserrat:wght@100;200;300;400;500;600;700&display=swap"
         rel="stylesheet">
@@ -45,7 +45,7 @@
                         <div style="display: flex; gap: 12px;">
                             <button class="btn btn-secondary" onclick="location.href='dashboard.html'">Cancel</button>
                             <button class="btn btn-primary"
-                                onclick="flash('Ticket submitted successfully! Ticket ID: REQ-2056', 'success', 'ticket-detail.html')[2])">Submit
+                                onclick="flash('Ticket submitted successfully! Ticket ID: REQ-2056', 'success', 'ticket-view.html')">Submit
                                 Ticket</button>
                         </div>
                     </div>
@@ -88,7 +88,7 @@
                                     placeholder="Please provide as much detail as possible. If this is an incident, include steps to reproduce, error messages, and what you were doing when it occurred."></textarea>
                             </div>
 
-                            <div class="form-group">
+                            <div class="form-group" style="margin-bottom: 0px !important;">
                                 <label class="form-label">Steps to Reproduce (For Incidents)</label>
                                 <textarea class="form-control" style="height: 225px; resize: vertical;"
                                     placeholder="1. Go to...\n2. Click on...\n3. Error appears..."></textarea>
@@ -138,7 +138,7 @@
                                 </select>
                             </div>
 
-                            <div class="form-group">
+                            <div class="form-group" style="margin-bottom: 0px !important;">
                                 <label class="form-label">Attachments (Logs, Screenshots, Documents)</label>
                                 <div style="border: 2px dashed var(--panel-border); border-radius: 6px; padding: 32px; text-align: center; color: var(--text-secondary); cursor: pointer; transition: all 0.2s;"
                                     onmouseover="this.style.borderColor='var(--accent-color)'"

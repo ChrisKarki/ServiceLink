@@ -16,44 +16,43 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 24px;
-            margin-bottom: 28px;
+            gap: 16px;
+            margin-bottom: 16px;
             flex-wrap: wrap;
         }
 
         .resource-title {
-            font-size: 26px;
+            font-size: 24px;
             font-weight: 700;
-            line-height: 1.2;
+            line-height: 1.3;
             color: var(--text-primary);
             margin: 0;
-            font-family: monospace;
         }
 
         .metrics-grid-3 {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 24px;
-            margin-bottom: 32px;
+            gap: 16px;
+            margin-bottom: 16px;
         }
 
         .metric-card {
             background: var(--panel-bg);
             border: 1px solid var(--panel-border);
-            border-radius: 14px;
-            padding: 22px;
+            border-radius: 12px;
+            padding: 14px 16px;
             display: flex;
             flex-direction: column;
-            gap: 14px;
+            gap: 10px;
         }
 
         .metric-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            color: var(--text-secondary);
-            font-size: 14px;
-            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 17px;
+            font-weight: 700;
         }
 
         .metric-icon-box {
@@ -71,7 +70,7 @@
         .dashboard-grid-2 {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 32px;
+            gap: 16px;
             align-items: start;
         }
 
@@ -88,23 +87,23 @@
             background: var(--panel-bg);
             border: 1px solid var(--panel-border);
             border-radius: 12px;
-            padding: 22px;
-            margin-bottom: 24px;
+            padding: 14px 16px;
+            margin-bottom: 10px;
         }
 
         .card-box-tint {
             background: var(--card-tint);
             border: 1px solid var(--panel-border);
             border-radius: 12px;
-            padding: 22px;
-            margin-bottom: 24px;
+            padding: 14px 16px;
+            margin-bottom: 10px;
         }
 
         .spec-grid-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin-bottom: 20px;
+            gap: 16px;
+            margin-bottom: 14px;
         }
 
         .spec-item {
@@ -129,25 +128,10 @@
                 <section class="view-section">
                     <!-- Header Banner -->
                     <div class="resource-header-bar">
-                        <div style="display: flex; align-items: center; gap: 16px;">
-                            <button class="icon-btn" onclick="location.href='resources.html'" title="Back to Resources">
-                                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-                                </svg>
-                            </button>
-                            <div>
-                                <div style="margin-bottom: 6px;">
-                                    <span
-                                        style="color: var(--accent-color); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Virtual
-                                        Server / Cloud • AWS EC2</span>
-                                </div>
-                                <h1 class="resource-title">VRT-BUILD-SERVER-01</h1>
-                            </div>
-                        </div>
+                        <h1 class="resource-title" style="margin: 0;">VRT-BUILD-SERVER-01</h1>
 
                         <!-- Top Right Action Controls -->
-                        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                        <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
                             <button class="btn btn-secondary" onclick="showToast('Audit report downloaded', 'success')">
                                 <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                                     style="margin-right: 6px;">
@@ -194,9 +178,9 @@
                             </div>
                             <div>
                                 <div
-                                    style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+                                    style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; min-height: 32px;">
                                     <span
-                                        style="font-size: 22px; font-weight: 700; color: var(--text-primary);">Incident
+                                        style="font-size: 24px; font-weight: 700; color: var(--text-primary); line-height: 1.2;">Incident
                                         Active</span>
                                     <span class="badge badge-status-open"
                                         style="border-color: var(--danger-color); color: var(--danger-color);">Critical
@@ -220,17 +204,19 @@
                                 </div>
                             </div>
                             <div>
-                                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 6px;">
-                                    <div
-                                        style="width: 32px; height: 32px; border-radius: 50%; background: rgba(96, 165, 250, 0.2); color: var(--accent-color); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700;">
-                                        DT</div>
-                                    <div>
-                                        <div style="font-size: 16px; font-weight: 700; color: var(--text-primary);">
-                                            DevOps Team</div>
-                                        <span class="text-sm" style="color: var(--text-secondary);">Infrastructure &amp;
-                                            Cloud</span>
-                                    </div>
+                                <div
+                                    style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 6px; min-height: 32px;">
+                                    <span
+                                        style="font-size: 24px; font-weight: 700; color: var(--text-primary); line-height: 1.2;">DevOps Team</span>
+                                    <span class="badge"
+                                        style="border: 1px solid var(--panel-border); background: var(--button-secondary-bg); color: var(--text-primary); display: flex; align-items: center; gap: 6px; font-weight: 600; flex-shrink: 0;">
+                                        <div
+                                            style="width: 18px; height: 18px; border-radius: 50%; background: rgba(96, 165, 250, 0.2); color: var(--accent-color); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700;">
+                                            CK</div>
+                                        Chris Karki
+                                    </span>
                                 </div>
+                                <span class="text-sm" style="color: var(--text-secondary);">Department: Cloud Infrastructure • Tier 2 Support</span>
                             </div>
                         </div>
 
@@ -248,9 +234,9 @@
                             </div>
                             <div>
                                 <div
-                                    style="display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 6px;">
+                                    style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; min-height: 32px;">
                                     <span
-                                        style="font-size: 24px; font-weight: 700; color: var(--text-primary);">$314.50</span>
+                                        style="font-size: 24px; font-weight: 700; color: var(--text-primary); line-height: 1.2;">$314.50</span>
                                     <span class="badge"
                                         style="border: 1px solid var(--panel-border); background: var(--button-secondary-bg); font-family: monospace;">us-east-1a</span>
                                 </div>
@@ -264,7 +250,6 @@
                     <div class="dashboard-grid-2">
                         <!-- LEFT COLUMN: Specs & Configuration -->
                         <div>
-                            <div class="section-heading">System Specifications</div>
                             <div class="card-box">
                                 <div class="spec-grid-row">
                                     <div class="spec-item">
@@ -299,7 +284,6 @@
                                 </div>
                             </div>
 
-                            <div class="section-heading">Configuration &amp; Maintenance Notes</div>
                             <div class="card-box-tint">
                                 <p style="color: var(--text-primary); line-height: 1.7; font-size: 15px; margin: 0;">
                                     Instance hosted in us-east-1a zone. Attached to VPC security group sg-091823ab with
@@ -309,7 +293,6 @@
                             </div>
 
                             <!-- Decommission Zone -->
-                            <div class="section-heading">Lifecycle Management</div>
                             <div class="card-box"
                                 style="border-color: rgba(239, 68, 68, 0.3); background: rgba(239, 68, 68, 0.04);">
                                 <div
@@ -338,11 +321,10 @@
 
                         <!-- RIGHT COLUMN: Linked Incidents & Audit Feed -->
                         <div>
-                            <div class="section-heading">Linked Tickets &amp; Incidents</div>
                             <div class="card-box"
-                                style="padding: 16px; display: flex; flex-direction: column; gap: 12px;">
+                                style="display: flex; flex-direction: column; gap: 8px;">
                                 <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px; background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 10px; cursor: pointer; transition: background 0.2s;"
-                                    onclick="location.href='ticket-detail.html'">
+                                    onclick="location.href='ticket-view.html'">
                                     <div style="display: flex; align-items: center; gap: 14px;">
                                         <div
                                             style="width: 36px; height: 36px; border-radius: 8px; background: rgba(239, 68, 68, 0.15); display: flex; align-items: center; justify-content: center; color: var(--danger-color);">
@@ -367,7 +349,7 @@
                                         </div>
                                     </div>
                                     <button class="btn btn-secondary btn-sm"
-                                        onclick="event.stopPropagation(); location.href='ticket-detail.html'">View</button>
+                                        onclick="event.stopPropagation(); location.href='ticket-view.html'">View</button>
                                 </div>
 
                                 <div
@@ -393,10 +375,9 @@
                                 </div>
                             </div>
 
-                            <div class="section-heading">Activity &amp; Audit Log</div>
-                            <div style="display: flex; flex-direction: column; gap: 14px;">
+                            <div style="display: flex; flex-direction: column; gap: 8px;">
                                 <div class="card-box"
-                                    style="margin-bottom: 0; background: var(--button-secondary-bg); padding: 16px 18px;">
+                                    style="margin-bottom: 0; background: var(--button-secondary-bg); padding: 12px 14px;">
                                     <div
                                         style="margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
                                         <div style="display: flex; align-items: center; gap: 10px;">
@@ -415,7 +396,7 @@
                                         identified as root cause.</p>
                                 </div>
 
-                                <div class="card-box-tint" style="margin-bottom: 0; padding: 14px 18px;">
+                                <div class="card-box-tint" style="margin-bottom: 0; padding: 12px 14px;">
                                     <div
                                         style="margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center;">
                                         <div style="display: flex; align-items: center; gap: 10px;">
@@ -434,7 +415,7 @@
                                         due to linked incident INC-1042.</p>
                                 </div>
 
-                                <div class="card-box-tint" style="margin-bottom: 0; padding: 14px 18px;">
+                                <div class="card-box-tint" style="margin-bottom: 0; padding: 12px 14px;">
                                     <div
                                         style="margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center;">
                                         <div style="display: flex; align-items: center; gap: 10px;">

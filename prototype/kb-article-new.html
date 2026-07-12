@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit KB Article · ServiceLink</title>
+    <title>New KB Article · ServiceLink</title>
     <link
         href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@100;200;300;400;500;600;700&family=IBM+Plex+Sans:wght@100;200;300;400;500;600;700&family=Montserrat:wght@100;200;300;400;500;600;700&display=swap"
         rel="stylesheet">
@@ -22,7 +22,7 @@
     </style>
 </head>
 
-<body data-page="kb-article-edit">
+<body data-page="kb-article-new">
 
     <div class="toast-container" id="toastContainer"></div>
 
@@ -35,12 +35,20 @@
             <div class="content-area">
                 <section class="view-section">
                     <div class="flex-between mb-4">
-                        <h1 class="kb-title" style="margin: 0;">Edit Article</h1>
+                        <h1 class="kb-title" style="margin: 0;">New Article</h1>
                         <div style="display: flex; gap: 12px;">
-                            <button class="btn btn-secondary" onclick="history.back()">Cancel</button>
-                            <button class="btn btn-primary"
-                                onclick="flash('Article saved and published successfully!', 'success', 'kb-article-view.html')">Save
-                                Changes</button>
+                            <button class="btn btn-secondary"
+                                onclick="location.href='knowledge-base.html'">Cancel</button>
+                            <button class="btn btn-secondary" onclick="flash('Draft saved successfully!', 'info')">Save
+                                Draft</button>
+                            <button class="btn btn-primary" style="display: flex; align-items: center; gap: 8px;"
+                                onclick="flash('Article created and published successfully!', 'success', 'kb-article-view.html')">
+                                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                </svg>
+                                Publish Article
+                            </button>
                         </div>
                     </div>
 
@@ -49,7 +57,7 @@
                         <div class="panel" style="margin-bottom: 0; display: flex; flex-direction: column; gap: 20px;">
                             <div>
                                 <input type="text" class="form-control"
-                                    value="Troubleshooting Remote VPN Connectivity Drops"
+                                    placeholder="Enter a descriptive article title (e.g. Troubleshooting Remote VPN Connectivity)..."
                                     style="font-size: 16px; font-weight: 500; padding: 12px 16px; width: 100%;">
                             </div>
 
@@ -99,26 +107,8 @@
                                     </button>
                                 </div>
                                 <textarea class="form-control"
-                                    style="width: 100%; min-height: 420px; font-family: monospace; font-size: 14px; line-height: 1.6; padding: 16px; border-radius: 0 0 8px 8px; resize: vertical; background: var(--input-bg);">## 1. Overview & Scope
-                    This guide addresses the common issue where end users experience frequent disconnects from the corporate VPN, specifically when utilizing split-tunneling on Windows 11 machines connecting via home ISPs.
-
-                    ## 2. Resolution Steps
-
-                    **Step 1: Verify the client version.**
-                    Ensure the user is running the latest version of the VPN client (v4.2.1 or higher). Older versions have known compatibility issues with recent Windows OS updates.
-
-                    **Step 2: Check MTU Settings.**
-                    Often, home ISP routers fragment packets if the MTU is too high. Instruct the user or use remote management to lower the VPN adapter MTU to 1350.
-
-                    ```cmd
-                    netsh interface ipv4 set subinterface "VPN Connection" mtu=1350 store=persistent
-                    ```
-
-                    **Step 3: Update Network Drivers.**
-                    Check the linked hardware resource in ServiceLink. If the device is a Dell XPS model from 2025, push the latest Intel Wi-Fi driver update via the management console.
-
-                    ## 3. Escalation
-                    If the issue persists after these steps, escalate the ticket to the Level 2 Network team and attach this KB article indicating steps already taken.</textarea>
+                                    style="width: 100%; min-height: 420px; font-family: monospace; font-size: 14px; line-height: 1.6; padding: 16px; border-radius: 0 0 8px 8px; resize: vertical; background: var(--input-bg);"
+                                    placeholder="## 1. Overview &amp; Scope&#10;Provide a brief summary of the topic or issue addressed by this article...&#10;&#10;## 2. Resolution Steps&#10;**Step 1:** First diagnosis or verification step...&#10;**Step 2:** Configuration change or remediation step...&#10;**Step 3:** Final verification check...&#10;&#10;## 3. Escalation &amp; Related Resources&#10;If the issue persists, escalate to Level 2 and attach relevant system logs."></textarea>
                             </div>
                         </div>
 
@@ -141,7 +131,7 @@
                                             Prabhnoorjit Hans</div>
                                         <div class="text-sm"
                                             style="color: var(--text-secondary); line-height: 1.4; margin-top: 2px;">
-                                            Last saved 2 minutes ago</div>
+                                            Draft Author</div>
                                     </div>
                                 </div>
                             </div>
@@ -150,14 +140,16 @@
                                 style="margin-bottom: 0; display: flex; flex-direction: column; gap: 16px;">
                                 <div>
                                     <label class="text-sm"
-                                        style="color: var(--text-secondary); display: block; margin-bottom: 6px;">Category</label>
+                                        style="color: var(--text-secondary); display: block; margin-bottom: 6px;">Category
+                                        *</label>
                                     <select class="form-control"
                                         style="width: 100%; padding: 8px 12px; background-color: var(--input-bg);">
-                                        <option selected>Networking & VPN</option>
-                                        <option>Hardware & Policies</option>
-                                        <option>Software & Licenses</option>
-                                        <option>Security & Identity</option>
-                                        <option>HR & Onboarding</option>
+                                        <option selected disabled>Select Category...</option>
+                                        <option>Networking &amp; VPN</option>
+                                        <option>Hardware &amp; Policies</option>
+                                        <option>Software &amp; Licenses</option>
+                                        <option>Security &amp; Identity</option>
+                                        <option>HR &amp; Onboarding</option>
                                     </select>
                                 </div>
 
@@ -181,28 +173,23 @@
                                         Tags
                                         (comma separated)</label>
                                     <input type="text" class="form-control"
-                                        value="VPN, Networking, Windows11, Troubleshooting"
+                                        placeholder="e.g. VPN, Windows11, Network..."
                                         style="width: 100%; padding: 8px 12px; font-size: 13px;">
                                 </div>
-                                <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+                                <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px;">
+                                    <span class="text-sm"
+                                        style="color: var(--text-secondary); width: 100%; font-size: 12px;">Suggested
+                                        Tags:</span>
                                     <span class="badge"
-                                        style="background: var(--button-secondary-bg); border: 1px solid var(--panel-border); display: inline-flex; align-items: center; gap: 6px;">#VPN
-                                        <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="cursor: pointer;">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                                        </svg>
-                                    </span>
+                                        style="background: var(--button-secondary-bg); border: 1px solid var(--panel-border); cursor: pointer;"
+                                        onclick="showToast('Added tag #Troubleshooting', 'info')">+
+                                        #Troubleshooting</span>
                                     <span class="badge"
-                                        style="background: var(--button-secondary-bg); border: 1px solid var(--panel-border); display: inline-flex; align-items: center; gap: 6px;">#Networking
-                                        <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="cursor: pointer;">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                                        </svg>
-                                    </span>
+                                        style="background: var(--button-secondary-bg); border: 1px solid var(--panel-border); cursor: pointer;"
+                                        onclick="showToast('Added tag #Windows11', 'info')">+ #Windows11</span>
                                     <span class="badge"
-                                        style="background: var(--button-secondary-bg); border: 1px solid var(--panel-border); display: inline-flex; align-items: center; gap: 6px;">#Windows11
-                                        <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="cursor: pointer;">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                                        </svg>
-                                    </span>
+                                        style="background: var(--button-secondary-bg); border: 1px solid var(--panel-border); cursor: pointer;"
+                                        onclick="showToast('Added tag #Security', 'info')">+ #Security</span>
                                 </div>
                             </div>
                         </div>

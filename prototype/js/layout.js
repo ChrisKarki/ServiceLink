@@ -33,14 +33,20 @@ const NAV_ITEMS = [
 
 /* Which page each secondary screen belongs to, for sidebar highlighting */
 const NAV_PARENT = {
+    'dashboard-edit': 'dashboard',
     'submit-request': 'tickets',
     'ticket-detail': 'tickets',
+    'ticket-view': 'tickets',
     'ticket-edit': 'tickets',
     'ticket-escalate': 'tickets',
     'resource-edit': 'resources',
+    'resource-new': 'resources',
     'kb-article-edit': 'knowledge-base',
+    'kb-article-new': 'knowledge-base',
     'kb-article-view': 'knowledge-base',
-    'report-view': 'reports'
+    'report-view': 'reports',
+    'report-new': 'reports',
+    'report-edit': 'reports'
 };
 
 function svgIcon(path, size) {
