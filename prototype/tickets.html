@@ -2,335 +2,433 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tickets · ServiceLink</title>
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@100;200;300;400;500;600;700&family=IBM+Plex+Sans:wght@100;200;300;400;500;600;700&family=Montserrat:wght@100;200;300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/main.css">
-    <script src="js/theme.js"></script>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Tickets · ServiceLink</title>
+        <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@100;200;300;400;500;600;700&family=IBM+Plex+Sans:wght@100;200;300;400;500;600;700&family=Montserrat:wght@100;200;300;400;500;600;700&display=swap"
+                rel="stylesheet">
+        <link rel="stylesheet" href="css/main.css">
+        <script src="js/theme.js"></script>
 </head>
 
 <body data-page="tickets">
 
-    <div class="toast-container" id="toastContainer"></div>
+        <div class="toast-container" id="toastContainer"></div>
 
-    <header data-shell="topbar"></header>
+        <header data-shell="topbar"></header>
 
-    <div class="app-layout">
-        <nav data-shell="sidebar"></nav>
+        <div class="app-layout">
+                <nav data-shell="sidebar"></nav>
 
-        <div class="main-content">
-            <div class="content-area">
-                <section class="view-section">
-                    <div class="flex-between mb-4">
-                        <h1>Tickets</h1>
-                        <button class="btn btn-primary" onclick="location.href='submit-request.html'">+ New Ticket</button>
-                    </div>
+                <div class="main-content">
+                        <div class="content-area">
+                                <section class="view-section">
+                                        <div class="flex-between mb-4">
+                                                <h1>Tickets</h1>
+                                                <button class="btn btn-primary"
+                                                        onclick="location.href='ticket-new.html'">+ New Ticket</button>
+                                        </div>
 
-                    <div class="filter-bar" style="margin-bottom: 24px;">
-                        <div class="filter-pill active">All Tickets</div>
-                        <div class="filter-pill">My Tickets</div>
-                        <div class="filter-pill">Unassigned</div>
-                        <div class="filter-pill">Resolved</div>
-                    </div>
+                                        <div class="filter-bar" style="margin-bottom: 24px;">
+                                                <div class="filter-pill active" onclick="selectFilter(this)">All Tickets
+                                                </div>
+                                                <div class="filter-pill" onclick="selectFilter(this)">My Tickets</div>
+                                                <div class="filter-pill" onclick="selectFilter(this)">Unassigned</div>
+                                                <div class="filter-pill" onclick="selectFilter(this)">Resolved</div>
+                                        </div>
 
-                    <div class="panel" style="padding: 0;">
-                        <div class="table-wrapper">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>Title</th>
-                                        <th>Status</th>
-                                        <th>Priority</th>
-                                        <th>Assignee</th>
-                                        <th>Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr class="clickable">
-                                        <td style="font-weight: 500; color: var(--text-primary);">INC-1042</td>
-                                        <td>Production Build Pipeline Failing</td>
-                                        <td><span class="badge badge-status-open">In Progress</span></td>
-                                        <td><span class="badge badge-priority-high">Critical</span></td>
-                                        <td>Chris Karki</td>
-                                        <td><button class="btn btn-secondary btn-sm"
-                                                onclick="showToast('Ticket re-assigned')">Reassign</button></td>
-                                    </tr>
-                                    <tr class="clickable">
-                                        <td style="font-weight: 500; color: var(--text-primary);">REQ-2055</td>
-                                        <td>Request Adobe Creative Cloud License</td>
-                                        <td><span class="badge"
-                                                style="border: 1px solid var(--panel-border); color: var(--text-secondary);">New</span>
-                                        </td>
-                                        <td><span class="badge"
-                                                style="border: 1px solid var(--panel-border); color: var(--text-secondary);">Low</span>
-                                        </td>
-                                        <td><span
-                                                style="color: var(--text-secondary); font-style: italic;">Unassigned</span>
-                                        </td>
-                                        <td><button class="btn btn-ghost btn-sm"
-                                                onclick="showToast('Ticket claimed by you', 'success')">Claim</button>
-                                        </td>
-                                    </tr>
-                                    <tr class="clickable">
-                                        <td style="font-weight: 500; color: var(--text-primary);">INC-1041</td>
-                                        <td>VPN Connection Dropping</td>
-                                        <td><span class="badge badge-status-resolved">Resolved</span></td>
-                                        <td><span class="badge"
-                                                style="border: 1px solid var(--warning-color); color: var(--warning-color);">Medium</span>
-                                        </td>
-                                        <td>Jane Developer</td>
-                                        <td><button class="btn btn-secondary btn-sm"
-                                                onclick="location.href='ticket-edit.html'">Edit</button>
-                                        </td>
-                                    </tr>
-                                    <tr class="clickable">
-                                        <td style="font-weight: 500; color: var(--text-primary);">REQ-2054</td>
-                                        <td>New Monitor Setup for Engineering</td>
-                                        <td><span class="badge"
-                                                style="border: 1px solid var(--panel-border); color: var(--text-secondary);">New</span>
-                                        </td>
-                                        <td><span class="badge"
-                                                style="border: 1px solid var(--panel-border); color: var(--text-secondary);">Low</span>
-                                        </td>
-                                        <td><span
-                                                style="color: var(--text-secondary); font-style: italic;">Unassigned</span>
-                                        </td>
-                                        <td><button class="btn btn-ghost btn-sm"
-                                                onclick="showToast('Ticket claimed by you', 'success')">Claim</button>
-                                        </td>
-                                    </tr>
-                                    <tr class="clickable">
-                                        <td style="font-weight: 500; color: var(--text-primary);">INC-1040</td>
-                                        <td>Email Sync Issue on Mobile</td>
-                                        <td><span class="badge badge-status-open">In Progress</span></td>
-                                        <td><span class="badge"
-                                                style="border: 1px solid var(--warning-color); color: var(--warning-color);">Medium</span>
-                                        </td>
-                                        <td>Arshdeep Mutti</td>
-                                        <td><button class="btn btn-secondary btn-sm"
-                                                onclick="location.href='ticket-edit.html'">Edit</button>
-                                        </td>
-                                    </tr>
-                                    <tr class="clickable">
-                                        <td style="font-weight: 500; color: var(--text-primary);">INC-1039</td>
-                                        <td>Printer Network Configuration</td>
-                                        <td><span class="badge badge-status-resolved">Resolved</span></td>
-                                        <td><span class="badge"
-                                                style="border: 1px solid var(--panel-border); color: var(--text-secondary);">Low</span>
-                                        </td>
-                                        <td>Hiten Lamba</td>
-                                        <td><button class="btn btn-secondary btn-sm"
-                                                onclick="location.href='ticket-edit.html'">Edit</button>
-                                        </td>
-                                    </tr>
-                                    <tr class="clickable">
-                                        <td style="font-weight: 500; color: var(--text-primary);">REQ-2053</td>
-                                        <td>Access to GitHub Organization</td>
-                                        <td><span class="badge badge-status-open">In Progress</span></td>
-                                        <td><span class="badge"
-                                                style="border: 1px solid var(--panel-border); color: var(--text-secondary);">Low</span>
-                                        </td>
-                                        <td>Katie Weng</td>
-                                        <td><button class="btn btn-secondary btn-sm"
-                                                onclick="location.href='ticket-edit.html'">Edit</button>
-                                        </td>
-                                    </tr>
-                                    <tr class="clickable">
-                                        <td style="font-weight: 500; color: var(--text-primary);">INC-1038</td>
-                                        <td>Database Read Replica Lag</td>
-                                        <td><span class="badge badge-status-resolved">Resolved</span></td>
-                                        <td><span class="badge badge-priority-high">Critical</span></td>
-                                        <td>Jane Developer</td>
-                                        <td><button class="btn btn-secondary btn-sm"
-                                                onclick="location.href='ticket-edit.html'">Edit</button>
-                                        </td>
-                                    </tr>
-                                    <tr class="clickable">
-                                        <td style="font-weight: 500; color: var(--text-primary);">REQ-2052</td>
-                                        <td>Increase S3 Bucket Storage Limit</td>
-                                        <td><span class="badge"
-                                                style="border: 1px solid var(--panel-border); color: var(--text-secondary);">New</span>
-                                        </td>
-                                        <td><span class="badge"
-                                                style="border: 1px solid var(--warning-color); color: var(--warning-color);">Medium</span>
-                                        </td>
-                                        <td><span
-                                                style="color: var(--text-secondary); font-style: italic;">Unassigned</span>
-                                        </td>
-                                        <td><button class="btn btn-ghost btn-sm"
-                                                onclick="showToast('Ticket claimed by you', 'success')">Claim</button>
-                                        </td>
-                                    </tr>
-                                    <tr class="clickable">
-                                        <td style="font-weight: 500; color: var(--text-primary);">INC-1037</td>
-                                        <td>SSO Integration Failing for Jira</td>
-                                        <td><span class="badge badge-status-open">In Progress</span></td>
-                                        <td><span class="badge badge-priority-high">High</span></td>
-                                        <td>Chris Karki</td>
-                                        <td><button class="btn btn-secondary btn-sm"
-                                                onclick="location.href='ticket-edit.html'">Edit</button>
-                                        </td>
-                                    </tr>
-                                    <tr class="clickable">
-                                        <td style="font-weight: 500; color: var(--text-primary);">REQ-2051</td>
-                                        <td>Provision AWS EC2 Instance for QA</td>
-                                        <td><span class="badge badge-status-open">In Progress</span></td>
-                                        <td><span class="badge"
-                                                style="border: 1px solid var(--panel-border); color: var(--text-secondary);">Low</span>
-                                        </td>
-                                        <td>Arshdeep Mutti</td>
-                                        <td><button class="btn btn-secondary btn-sm"
-                                                onclick="location.href='ticket-edit.html'">Edit</button>
-                                        </td>
-                                    </tr>
-                                    <tr class="clickable">
-                                        <td style="font-weight: 500; color: var(--text-primary);">INC-1036</td>
-                                        <td>Slack Notifications Delayed</td>
-                                        <td><span class="badge badge-status-resolved">Resolved</span></td>
-                                        <td><span class="badge"
-                                                style="border: 1px solid var(--panel-border); color: var(--text-secondary);">Low</span>
-                                        </td>
-                                        <td>Hiten Lamba</td>
-                                        <td><button class="btn btn-secondary btn-sm"
-                                                onclick="location.href='ticket-edit.html'">Edit</button>
-                                        </td>
-                                    </tr>
-                                    <tr class="clickable">
-                                        <td style="font-weight: 500; color: var(--text-primary);">REQ-2050</td>
-                                        <td>Figma Enterprise Seat Upgrade</td>
-                                        <td><span class="badge"
-                                                style="border: 1px solid var(--panel-border); color: var(--text-secondary);">New</span>
-                                        </td>
-                                        <td><span class="badge"
-                                                style="border: 1px solid var(--panel-border); color: var(--text-secondary);">Low</span>
-                                        </td>
-                                        <td><span
-                                                style="color: var(--text-secondary); font-style: italic;">Unassigned</span>
-                                        </td>
-                                        <td><button class="btn btn-ghost btn-sm"
-                                                onclick="showToast('Ticket claimed by you', 'success')">Claim</button>
-                                        </td>
-                                    </tr>
-                                    <tr class="clickable">
-                                        <td style="font-weight: 500; color: var(--text-primary);">INC-1035</td>
-                                        <td>Staging Cluster Memory Leak</td>
-                                        <td><span class="badge badge-status-open">In Progress</span></td>
-                                        <td><span class="badge badge-priority-high">Critical</span></td>
-                                        <td>Jane Developer</td>
-                                        <td><button class="btn btn-secondary btn-sm"
-                                                onclick="location.href='ticket-edit.html'">Edit</button>
-                                        </td>
-                                    </tr>
-                                    <tr class="clickable">
-                                        <td style="font-weight: 500; color: var(--text-primary);">REQ-2049</td>
-                                        <td>New Employee Laptop Onboarding</td>
-                                        <td><span class="badge badge-status-open">In Progress</span></td>
-                                        <td><span class="badge"
-                                                style="border: 1px solid var(--warning-color); color: var(--warning-color);">Medium</span>
-                                        </td>
-                                        <td>Chris Karki</td>
-                                        <td><button class="btn btn-secondary btn-sm"
-                                                onclick="location.href='ticket-edit.html'">Edit</button>
-                                        </td>
-                                    </tr>
-                                    <tr class="clickable">
-                                        <td style="font-weight: 500; color: var(--text-primary);">INC-1034</td>
-                                        <td>Datadog Alert Ingestion Failures</td>
-                                        <td><span class="badge badge-status-resolved">Resolved</span></td>
-                                        <td><span class="badge badge-priority-high">High</span></td>
-                                        <td>Arshdeep Mutti</td>
-                                        <td><button class="btn btn-secondary btn-sm"
-                                                onclick="location.href='ticket-edit.html'">Edit</button>
-                                        </td>
-                                    </tr>
-                                    <tr class="clickable">
-                                        <td style="font-weight: 500; color: var(--text-primary);">REQ-2048</td>
-                                        <td>Update DNS Records for Marketing Domain</td>
-                                        <td><span class="badge"
-                                                style="border: 1px solid var(--panel-border); color: var(--text-secondary);">New</span>
-                                        </td>
-                                        <td><span class="badge"
-                                                style="border: 1px solid var(--panel-border); color: var(--text-secondary);">Low</span>
-                                        </td>
-                                        <td><span
-                                                style="color: var(--text-secondary); font-style: italic;">Unassigned</span>
-                                        </td>
-                                        <td><button class="btn btn-ghost btn-sm"
-                                                onclick="showToast('Ticket claimed by you', 'success')">Claim</button>
-                                        </td>
-                                    </tr>
-                                    <tr class="clickable">
-                                        <td style="font-weight: 500; color: var(--text-primary);">INC-1033</td>
-                                        <td>Internal Wiki Search 500 Errors</td>
-                                        <td><span class="badge badge-status-open">In Progress</span></td>
-                                        <td><span class="badge"
-                                                style="border: 1px solid var(--warning-color); color: var(--warning-color);">Medium</span>
-                                        </td>
-                                        <td>Katie Weng</td>
-                                        <td><button class="btn btn-secondary btn-sm"
-                                                onclick="location.href='ticket-edit.html'">Edit</button>
-                                        </td>
-                                    </tr>
-                                    <tr class="clickable">
-                                        <td style="font-weight: 500; color: var(--text-primary);">REQ-2047</td>
-                                        <td>Grant Snowflake Read Access to BI Team</td>
-                                        <td><span class="badge badge-status-resolved">Resolved</span></td>
-                                        <td><span class="badge"
-                                                style="border: 1px solid var(--panel-border); color: var(--text-secondary);">Low</span>
-                                        </td>
-                                        <td>Hiten Lamba</td>
-                                        <td><button class="btn btn-secondary btn-sm"
-                                                onclick="location.href='ticket-edit.html'">Edit</button>
-                                        </td>
-                                    </tr>
-                                    <tr class="clickable">
-                                        <td style="font-weight: 500; color: var(--text-primary);">INC-1032</td>
-                                        <td>Twilio Webhook Verification Failed</td>
-                                        <td><span class="badge badge-status-open">In Progress</span></td>
-                                        <td><span class="badge badge-priority-high">High</span></td>
-                                        <td>Jane Developer</td>
-                                        <td><button class="btn btn-secondary btn-sm"
-                                                onclick="location.href='ticket-edit.html'">Edit</button>
-                                        </td>
-                                    </tr>
-                                    <tr class="clickable">
-                                        <td style="font-weight: 500; color: var(--text-primary);">REQ-2046</td>
-                                        <td>Zoom Room Hardware Calibration</td>
-                                        <td><span class="badge"
-                                                style="border: 1px solid var(--panel-border); color: var(--text-secondary);">New</span>
-                                        </td>
-                                        <td><span class="badge"
-                                                style="border: 1px solid var(--panel-border); color: var(--text-secondary);">Low</span>
-                                        </td>
-                                        <td><span
-                                                style="color: var(--text-secondary); font-style: italic;">Unassigned</span>
-                                        </td>
-                                        <td><button class="btn btn-ghost btn-sm"
-                                                onclick="showToast('Ticket claimed by you', 'success')">Claim</button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                                        <div class="panel" style="padding: 0;">
+                                                <div class="table-wrapper">
+                                                        <table>
+                                                                <thead>
+                                                                        <tr>
+                                                                                <th>ID</th>
+                                                                                <th>Title</th>
+                                                                                <th>Status</th>
+                                                                                <th>Priority</th>
+                                                                                <th>Assignee</th>
+                                                                                <th>Action</th>
+                                                                        </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                        <tr class="clickable">
+                                                                                <td
+                                                                                        style="font-weight: 500; color: var(--text-primary);">
+                                                                                        INC-1042</td>
+                                                                                <td>Production Build Pipeline Failing
+                                                                                </td>
+                                                                                <td><span
+                                                                                                class="badge badge-status-open">In
+                                                                                                Progress</span></td>
+                                                                                <td><span
+                                                                                                class="badge badge-priority-high">Critical</span>
+                                                                                </td>
+                                                                                <td>Chris Karki</td>
+                                                                                <td><button class="btn btn-secondary btn-sm"
+                                                                                                onclick="showToast('Ticket re-assigned')">Reassign</button>
+                                                                                </td>
+                                                                        </tr>
+                                                                        <tr class="clickable">
+                                                                                <td
+                                                                                        style="font-weight: 500; color: var(--text-primary);">
+                                                                                        REQ-2055</td>
+                                                                                <td>Request Adobe Creative Cloud License
+                                                                                </td>
+                                                                                <td><span class="badge"
+                                                                                                style="border: 1px solid var(--panel-border); color: var(--text-secondary);">New</span>
+                                                                                </td>
+                                                                                <td><span class="badge"
+                                                                                                style="border: 1px solid var(--panel-border); color: var(--text-secondary);">Low</span>
+                                                                                </td>
+                                                                                <td><span
+                                                                                                style="color: var(--text-secondary); font-style: italic;">Unassigned</span>
+                                                                                </td>
+                                                                                <td><button class="btn btn-ghost btn-sm"
+                                                                                                onclick="showToast('Ticket claimed by you', 'success')">Claim</button>
+                                                                                </td>
+                                                                        </tr>
+                                                                        <tr class="clickable">
+                                                                                <td
+                                                                                        style="font-weight: 500; color: var(--text-primary);">
+                                                                                        INC-1041</td>
+                                                                                <td>VPN Connection Dropping</td>
+                                                                                <td><span
+                                                                                                class="badge badge-status-resolved">Resolved</span>
+                                                                                </td>
+                                                                                <td><span class="badge"
+                                                                                                style="border: 1px solid var(--warning-color); color: var(--warning-color);">Medium</span>
+                                                                                </td>
+                                                                                <td>Jane Developer</td>
+                                                                                <td><button class="btn btn-secondary btn-sm"
+                                                                                                onclick="location.href='ticket-edit.html'">Edit</button>
+                                                                                </td>
+                                                                        </tr>
+                                                                        <tr class="clickable">
+                                                                                <td
+                                                                                        style="font-weight: 500; color: var(--text-primary);">
+                                                                                        REQ-2054</td>
+                                                                                <td>New Monitor Setup for Engineering
+                                                                                </td>
+                                                                                <td><span class="badge"
+                                                                                                style="border: 1px solid var(--panel-border); color: var(--text-secondary);">New</span>
+                                                                                </td>
+                                                                                <td><span class="badge"
+                                                                                                style="border: 1px solid var(--panel-border); color: var(--text-secondary);">Low</span>
+                                                                                </td>
+                                                                                <td><span
+                                                                                                style="color: var(--text-secondary); font-style: italic;">Unassigned</span>
+                                                                                </td>
+                                                                                <td><button class="btn btn-ghost btn-sm"
+                                                                                                onclick="showToast('Ticket claimed by you', 'success')">Claim</button>
+                                                                                </td>
+                                                                        </tr>
+                                                                        <tr class="clickable">
+                                                                                <td
+                                                                                        style="font-weight: 500; color: var(--text-primary);">
+                                                                                        INC-1040</td>
+                                                                                <td>Email Sync Issue on Mobile</td>
+                                                                                <td><span
+                                                                                                class="badge badge-status-open">In
+                                                                                                Progress</span></td>
+                                                                                <td><span class="badge"
+                                                                                                style="border: 1px solid var(--warning-color); color: var(--warning-color);">Medium</span>
+                                                                                </td>
+                                                                                <td>Arshdeep Mutti</td>
+                                                                                <td><button class="btn btn-secondary btn-sm"
+                                                                                                onclick="location.href='ticket-edit.html'">Edit</button>
+                                                                                </td>
+                                                                        </tr>
+                                                                        <tr class="clickable">
+                                                                                <td
+                                                                                        style="font-weight: 500; color: var(--text-primary);">
+                                                                                        INC-1039</td>
+                                                                                <td>Printer Network Configuration</td>
+                                                                                <td><span
+                                                                                                class="badge badge-status-resolved">Resolved</span>
+                                                                                </td>
+                                                                                <td><span class="badge"
+                                                                                                style="border: 1px solid var(--panel-border); color: var(--text-secondary);">Low</span>
+                                                                                </td>
+                                                                                <td>Hiten Lamba</td>
+                                                                                <td><button class="btn btn-secondary btn-sm"
+                                                                                                onclick="location.href='ticket-edit.html'">Edit</button>
+                                                                                </td>
+                                                                        </tr>
+                                                                        <tr class="clickable">
+                                                                                <td
+                                                                                        style="font-weight: 500; color: var(--text-primary);">
+                                                                                        REQ-2053</td>
+                                                                                <td>Access to GitHub Organization</td>
+                                                                                <td><span
+                                                                                                class="badge badge-status-open">In
+                                                                                                Progress</span></td>
+                                                                                <td><span class="badge"
+                                                                                                style="border: 1px solid var(--panel-border); color: var(--text-secondary);">Low</span>
+                                                                                </td>
+                                                                                <td>Katie Weng</td>
+                                                                                <td><button class="btn btn-secondary btn-sm"
+                                                                                                onclick="location.href='ticket-edit.html'">Edit</button>
+                                                                                </td>
+                                                                        </tr>
+                                                                        <tr class="clickable">
+                                                                                <td
+                                                                                        style="font-weight: 500; color: var(--text-primary);">
+                                                                                        INC-1038</td>
+                                                                                <td>Database Read Replica Lag</td>
+                                                                                <td><span
+                                                                                                class="badge badge-status-resolved">Resolved</span>
+                                                                                </td>
+                                                                                <td><span
+                                                                                                class="badge badge-priority-high">Critical</span>
+                                                                                </td>
+                                                                                <td>Jane Developer</td>
+                                                                                <td><button class="btn btn-secondary btn-sm"
+                                                                                                onclick="location.href='ticket-edit.html'">Edit</button>
+                                                                                </td>
+                                                                        </tr>
+                                                                        <tr class="clickable">
+                                                                                <td
+                                                                                        style="font-weight: 500; color: var(--text-primary);">
+                                                                                        REQ-2052</td>
+                                                                                <td>Increase S3 Bucket Storage Limit
+                                                                                </td>
+                                                                                <td><span class="badge"
+                                                                                                style="border: 1px solid var(--panel-border); color: var(--text-secondary);">New</span>
+                                                                                </td>
+                                                                                <td><span class="badge"
+                                                                                                style="border: 1px solid var(--warning-color); color: var(--warning-color);">Medium</span>
+                                                                                </td>
+                                                                                <td><span
+                                                                                                style="color: var(--text-secondary); font-style: italic;">Unassigned</span>
+                                                                                </td>
+                                                                                <td><button class="btn btn-ghost btn-sm"
+                                                                                                onclick="showToast('Ticket claimed by you', 'success')">Claim</button>
+                                                                                </td>
+                                                                        </tr>
+                                                                        <tr class="clickable">
+                                                                                <td
+                                                                                        style="font-weight: 500; color: var(--text-primary);">
+                                                                                        INC-1037</td>
+                                                                                <td>SSO Integration Failing for Jira
+                                                                                </td>
+                                                                                <td><span
+                                                                                                class="badge badge-status-open">In
+                                                                                                Progress</span></td>
+                                                                                <td><span
+                                                                                                class="badge badge-priority-high">High</span>
+                                                                                </td>
+                                                                                <td>Chris Karki</td>
+                                                                                <td><button class="btn btn-secondary btn-sm"
+                                                                                                onclick="location.href='ticket-edit.html'">Edit</button>
+                                                                                </td>
+                                                                        </tr>
+                                                                        <tr class="clickable">
+                                                                                <td
+                                                                                        style="font-weight: 500; color: var(--text-primary);">
+                                                                                        REQ-2051</td>
+                                                                                <td>Provision AWS EC2 Instance for QA
+                                                                                </td>
+                                                                                <td><span
+                                                                                                class="badge badge-status-open">In
+                                                                                                Progress</span></td>
+                                                                                <td><span class="badge"
+                                                                                                style="border: 1px solid var(--panel-border); color: var(--text-secondary);">Low</span>
+                                                                                </td>
+                                                                                <td>Arshdeep Mutti</td>
+                                                                                <td><button class="btn btn-secondary btn-sm"
+                                                                                                onclick="location.href='ticket-edit.html'">Edit</button>
+                                                                                </td>
+                                                                        </tr>
+                                                                        <tr class="clickable">
+                                                                                <td
+                                                                                        style="font-weight: 500; color: var(--text-primary);">
+                                                                                        INC-1036</td>
+                                                                                <td>Slack Notifications Delayed</td>
+                                                                                <td><span
+                                                                                                class="badge badge-status-resolved">Resolved</span>
+                                                                                </td>
+                                                                                <td><span class="badge"
+                                                                                                style="border: 1px solid var(--panel-border); color: var(--text-secondary);">Low</span>
+                                                                                </td>
+                                                                                <td>Hiten Lamba</td>
+                                                                                <td><button class="btn btn-secondary btn-sm"
+                                                                                                onclick="location.href='ticket-edit.html'">Edit</button>
+                                                                                </td>
+                                                                        </tr>
+                                                                        <tr class="clickable">
+                                                                                <td
+                                                                                        style="font-weight: 500; color: var(--text-primary);">
+                                                                                        REQ-2050</td>
+                                                                                <td>Figma Enterprise Seat Upgrade</td>
+                                                                                <td><span class="badge"
+                                                                                                style="border: 1px solid var(--panel-border); color: var(--text-secondary);">New</span>
+                                                                                </td>
+                                                                                <td><span class="badge"
+                                                                                                style="border: 1px solid var(--panel-border); color: var(--text-secondary);">Low</span>
+                                                                                </td>
+                                                                                <td><span
+                                                                                                style="color: var(--text-secondary); font-style: italic;">Unassigned</span>
+                                                                                </td>
+                                                                                <td><button class="btn btn-ghost btn-sm"
+                                                                                                onclick="showToast('Ticket claimed by you', 'success')">Claim</button>
+                                                                                </td>
+                                                                        </tr>
+                                                                        <tr class="clickable">
+                                                                                <td
+                                                                                        style="font-weight: 500; color: var(--text-primary);">
+                                                                                        INC-1035</td>
+                                                                                <td>Staging Cluster Memory Leak</td>
+                                                                                <td><span
+                                                                                                class="badge badge-status-open">In
+                                                                                                Progress</span></td>
+                                                                                <td><span
+                                                                                                class="badge badge-priority-high">Critical</span>
+                                                                                </td>
+                                                                                <td>Jane Developer</td>
+                                                                                <td><button class="btn btn-secondary btn-sm"
+                                                                                                onclick="location.href='ticket-edit.html'">Edit</button>
+                                                                                </td>
+                                                                        </tr>
+                                                                        <tr class="clickable">
+                                                                                <td
+                                                                                        style="font-weight: 500; color: var(--text-primary);">
+                                                                                        REQ-2049</td>
+                                                                                <td>New Employee Laptop Onboarding</td>
+                                                                                <td><span
+                                                                                                class="badge badge-status-open">In
+                                                                                                Progress</span></td>
+                                                                                <td><span class="badge"
+                                                                                                style="border: 1px solid var(--warning-color); color: var(--warning-color);">Medium</span>
+                                                                                </td>
+                                                                                <td>Chris Karki</td>
+                                                                                <td><button class="btn btn-secondary btn-sm"
+                                                                                                onclick="location.href='ticket-edit.html'">Edit</button>
+                                                                                </td>
+                                                                        </tr>
+                                                                        <tr class="clickable">
+                                                                                <td
+                                                                                        style="font-weight: 500; color: var(--text-primary);">
+                                                                                        INC-1034</td>
+                                                                                <td>Datadog Alert Ingestion Failures
+                                                                                </td>
+                                                                                <td><span
+                                                                                                class="badge badge-status-resolved">Resolved</span>
+                                                                                </td>
+                                                                                <td><span
+                                                                                                class="badge badge-priority-high">High</span>
+                                                                                </td>
+                                                                                <td>Arshdeep Mutti</td>
+                                                                                <td><button class="btn btn-secondary btn-sm"
+                                                                                                onclick="location.href='ticket-edit.html'">Edit</button>
+                                                                                </td>
+                                                                        </tr>
+                                                                        <tr class="clickable">
+                                                                                <td
+                                                                                        style="font-weight: 500; color: var(--text-primary);">
+                                                                                        REQ-2048</td>
+                                                                                <td>Update DNS Records for Marketing
+                                                                                        Domain</td>
+                                                                                <td><span class="badge"
+                                                                                                style="border: 1px solid var(--panel-border); color: var(--text-secondary);">New</span>
+                                                                                </td>
+                                                                                <td><span class="badge"
+                                                                                                style="border: 1px solid var(--panel-border); color: var(--text-secondary);">Low</span>
+                                                                                </td>
+                                                                                <td><span
+                                                                                                style="color: var(--text-secondary); font-style: italic;">Unassigned</span>
+                                                                                </td>
+                                                                                <td><button class="btn btn-ghost btn-sm"
+                                                                                                onclick="showToast('Ticket claimed by you', 'success')">Claim</button>
+                                                                                </td>
+                                                                        </tr>
+                                                                        <tr class="clickable">
+                                                                                <td
+                                                                                        style="font-weight: 500; color: var(--text-primary);">
+                                                                                        INC-1033</td>
+                                                                                <td>Internal Wiki Search 500 Errors</td>
+                                                                                <td><span
+                                                                                                class="badge badge-status-open">In
+                                                                                                Progress</span></td>
+                                                                                <td><span class="badge"
+                                                                                                style="border: 1px solid var(--warning-color); color: var(--warning-color);">Medium</span>
+                                                                                </td>
+                                                                                <td>Katie Weng</td>
+                                                                                <td><button class="btn btn-secondary btn-sm"
+                                                                                                onclick="location.href='ticket-edit.html'">Edit</button>
+                                                                                </td>
+                                                                        </tr>
+                                                                        <tr class="clickable">
+                                                                                <td
+                                                                                        style="font-weight: 500; color: var(--text-primary);">
+                                                                                        REQ-2047</td>
+                                                                                <td>Grant Snowflake Read Access to BI
+                                                                                        Team</td>
+                                                                                <td><span
+                                                                                                class="badge badge-status-resolved">Resolved</span>
+                                                                                </td>
+                                                                                <td><span class="badge"
+                                                                                                style="border: 1px solid var(--panel-border); color: var(--text-secondary);">Low</span>
+                                                                                </td>
+                                                                                <td>Hiten Lamba</td>
+                                                                                <td><button class="btn btn-secondary btn-sm"
+                                                                                                onclick="location.href='ticket-edit.html'">Edit</button>
+                                                                                </td>
+                                                                        </tr>
+                                                                        <tr class="clickable">
+                                                                                <td
+                                                                                        style="font-weight: 500; color: var(--text-primary);">
+                                                                                        INC-1032</td>
+                                                                                <td>Twilio Webhook Verification Failed
+                                                                                </td>
+                                                                                <td><span
+                                                                                                class="badge badge-status-open">In
+                                                                                                Progress</span></td>
+                                                                                <td><span
+                                                                                                class="badge badge-priority-high">High</span>
+                                                                                </td>
+                                                                                <td>Jane Developer</td>
+                                                                                <td><button class="btn btn-secondary btn-sm"
+                                                                                                onclick="location.href='ticket-edit.html'">Edit</button>
+                                                                                </td>
+                                                                        </tr>
+                                                                        <tr class="clickable">
+                                                                                <td
+                                                                                        style="font-weight: 500; color: var(--text-primary);">
+                                                                                        REQ-2046</td>
+                                                                                <td>Zoom Room Hardware Calibration</td>
+                                                                                <td><span class="badge"
+                                                                                                style="border: 1px solid var(--panel-border); color: var(--text-secondary);">New</span>
+                                                                                </td>
+                                                                                <td><span class="badge"
+                                                                                                style="border: 1px solid var(--panel-border); color: var(--text-secondary);">Low</span>
+                                                                                </td>
+                                                                                <td><span
+                                                                                                style="color: var(--text-secondary); font-style: italic;">Unassigned</span>
+                                                                                </td>
+                                                                                <td><button class="btn btn-ghost btn-sm"
+                                                                                                onclick="showToast('Ticket claimed by you', 'success')">Claim</button>
+                                                                                </td>
+                                                                        </tr>
+                                                                </tbody>
+                                                        </table>
+                                                </div>
+                                        </div>
+                                </section>
                         </div>
-                    </div>
-                </section>
-            </div>
+                </div>
         </div>
-    </div>
 
-    <script src="js/layout.js"></script>
-    <script src="js/app.js"></script>
-    <script>
-        document.querySelectorAll('.clickable').forEach(row => {
-            row.addEventListener('click', function(e) {
-                if (e.target.tagName !== 'BUTTON' && e.target.tagName !== 'SELECT' && e.target.tagName !== 'A') {
-                    location.href = 'ticket-detail.html';
-                }
-            });
-        });
-    </script>
+        <script src="js/layout.js"></script>
+        <script src="js/app.js"></script>
+        <script>
+                document.querySelectorAll('.clickable').forEach(row => {
+                        row.addEventListener('click', function (e) {
+                                if (e.target.tagName !== 'BUTTON' && e.target.tagName !== 'SELECT' && e.target.tagName !== 'A') {
+                                        location.href = 'ticket-view.html';
+                                }
+                        });
+                });
+        </script>
 </body>
 
 </html>

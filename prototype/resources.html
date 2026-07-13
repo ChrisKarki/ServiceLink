@@ -5,7 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Resources · ServiceLink</title>
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@100;200;300;400;500;600;700&family=IBM+Plex+Sans:wght@100;200;300;400;500;600;700&family=Montserrat:wght@100;200;300;400;500;600;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@100;200;300;400;500;600;700&family=IBM+Plex+Sans:wght@100;200;300;400;500;600;700&family=Montserrat:wght@100;200;300;400;500;600;700&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="css/main.css">
     <script src="js/theme.js"></script>
 </head>
@@ -24,8 +26,7 @@
                 <section class="view-section">
                     <div class="flex-between mb-4">
                         <h1>Resources</h1>
-                        <button class="btn btn-primary"
-                            onclick="location.href='resource-edit.html'">+ Add
+                        <button class="btn btn-primary" onclick="location.href='resource-new.html'">+ New
                             Resource</button>
                     </div>
 
@@ -384,7 +385,7 @@
     <script src="js/app.js"></script>
     <script>
         document.querySelectorAll('.clickable').forEach(row => {
-            row.addEventListener('click', function(e) {
+            row.addEventListener('click', function (e) {
                 if (e.target.tagName !== 'BUTTON' && e.target.tagName !== 'SELECT' && e.target.tagName !== 'A') {
                     location.href = 'resource-view.html';
                 }

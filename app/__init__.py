@@ -39,4 +39,12 @@ def create_app():
     app.register_blueprint(tickets_bp)
     app.register_blueprint(admin_bp)
 
+    # Automatically ensure prabh.hans@servicelink.test is Active upon app boot/restart
+    try:
+        from .db import execute
+        execute("UPDATE User SET status = 'Active' WHERE email = 'prabh.hans@servicelink.test'")
+        print("[Startup] Auto-activated prabh.hans@servicelink.test")
+    except Exception as e:
+        print(f"[Startup] Note: Could not auto-activate prabh.hans: {e}")
+
     return app

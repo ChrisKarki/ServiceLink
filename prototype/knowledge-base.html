@@ -5,7 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Knowledge Base · ServiceLink</title>
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@100;200;300;400;500;600;700&family=IBM+Plex+Sans:wght@100;200;300;400;500;600;700&family=Montserrat:wght@100;200;300;400;500;600;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@100;200;300;400;500;600;700&family=IBM+Plex+Sans:wght@100;200;300;400;500;600;700&family=Montserrat:wght@100;200;300;400;500;600;700&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="css/main.css">
     <script src="js/theme.js"></script>
     <style>
@@ -19,26 +21,31 @@
             align-items: center;
             white-space: nowrap;
         }
+
         .kb-cat-badge.networking {
             color: #60a5fa;
             border: 1px solid rgba(96, 165, 250, 0.35);
             background: rgba(96, 165, 250, 0.08);
         }
+
         .kb-cat-badge.hardware {
             color: #f59e0b;
             border: 1px solid rgba(245, 158, 11, 0.35);
             background: rgba(245, 158, 11, 0.08);
         }
+
         .kb-cat-badge.software {
             color: #a78bfa;
             border: 1px solid rgba(167, 139, 250, 0.35);
             background: rgba(167, 139, 250, 0.08);
         }
+
         .kb-cat-badge.security {
             color: #f87171;
             border: 1px solid rgba(248, 113, 113, 0.35);
             background: rgba(248, 113, 113, 0.08);
         }
+
         .kb-cat-badge.hr {
             color: #34d399;
             border: 1px solid rgba(52, 211, 153, 0.35);
@@ -50,30 +57,38 @@
             cursor: pointer;
             transition: background 0.15s ease;
         }
+
         .kb-table tbody tr:hover td {
             background: var(--button-secondary-bg);
         }
+
         .kb-table td.kb-id {
             font-weight: 500;
             color: var(--text-primary);
             white-space: nowrap;
         }
+
         .kb-table td.kb-title {
             color: var(--text-primary);
         }
+
         .kb-table td.kb-author {
             white-space: nowrap;
         }
+
         .kb-table td.kb-views {
             text-align: right;
             font-variant-numeric: tabular-nums;
         }
+
         .kb-table th.kb-views-header {
             text-align: right;
         }
+
         .kb-table td.kb-action {
             text-align: right;
         }
+
         .kb-table th.kb-action-header {
             text-align: right;
         }
@@ -86,6 +101,7 @@
             cursor: pointer;
             transition: color 0.2s;
         }
+
         .kb-edit-link:hover {
             text-decoration: underline;
         }
@@ -106,8 +122,8 @@
                 <section class="view-section">
                     <div class="flex-between mb-4">
                         <h1>Knowledge Base</h1>
-                        <button class="btn btn-primary"
-                            onclick="location.href='kb-article-edit.html'">+ New Article</button>
+                        <button class="btn btn-primary" onclick="location.href='kb-article-new.html'">+ New
+                            Article</button>
                     </div>
 
                     <!-- Category Filter Tabs -->
@@ -169,7 +185,7 @@
         function renderKBTable(filter) {
             const tbody = document.getElementById('kbTableBody');
             const articles = filter === 'all' ? KB_ARTICLES : KB_ARTICLES.filter(a => a.category === filter);
-            tbody.innerHTML = articles.map(function(a) {
+            tbody.innerHTML = articles.map(function (a) {
                 return '<tr onclick="location.href=\'kb-article-view.html?id=' + a.id + '\'">' +
                     '<td class="kb-id">' + a.id + '</td>' +
                     '<td class="kb-title">' + a.title + '</td>' +

@@ -69,11 +69,36 @@ def execute(sql, params=()):
     finally:
         conn.close()
 
-def get_connection():
-    """Raw pooled connection for multi-statement transactions.
 
-    Used by services that must commit several statements atomically
-    (e.g. audit.log_action writing AuditLog + AuditLogChange together).
-    Caller is responsible for commit/rollback and close().
-    """
-    return _get_pool().get_connection()
+def log_audit(actor_id, entity_type, entity_id, action, ip_address, changes=None):
+    """Insert a record into AuditLog and optional field diffs into AuditLogChange."""
+    log_id = execute(
+        """
+        INSERT INTO AuditLog (actorID, entityType, entityID, action, ipAddress, timestamp)
+        VALUES (%s, %s, %s, %s, %s, NOW())
+        """,
+        (actor_id, entity_type, entity_id, action, ip_address or "127.0.0.1"),
+    )
+    if changes:
+        conn = _get_pool().get_connection()
+        try:
+            cur = conn.cursor()
+            for field_name, old_val, new_val in changes:
+                cur.execute(
+                    """
+                    INSERT INTO AuditLogChange (logID, fieldName, oldValue, newValue)
+                    VALUES (%s, %s, %s, %s)
+                    """,
+                    (
+                        log_id,
+                        field_name,
+                        str(old_val) if old_val is not None else None,
+                        str(new_val) if new_val is not None else None,
+                    ),
+                )
+            conn.commit()
+            cur.close()
+        finally:
+            conn.close()
+    return log_id
+
