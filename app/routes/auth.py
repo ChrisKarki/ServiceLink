@@ -19,8 +19,8 @@ import time
 from functools import wraps
 
 import bcrypt
-from flask import (Blueprint, flash, redirect, render_template, request,
-                   session, url_for)
+from flask import (Blueprint, abort, flash, redirect, render_template,
+                   request, session, url_for)
 
 from ..db import execute, query_one
 
@@ -59,14 +59,20 @@ def login_required(view):
 
 
 def roles_required(*roles):
-    """Restrict a route to specific roles, e.g. @roles_required('Manager', 'Administrator')."""
+    """Restrict a route to specific roles, e.g. @roles_required('Manager', 'Administrator').
+
+    An authenticated user whose role is not permitted gets a hard 403.
+    We deliberately do NOT redirect: a redirect reports "wrong place, here's
+    somewhere else", while the requirement (FR-1.2, and the H1.1 acceptance
+    criterion) is that the request is *denied*. A 403 is also what Katie's
+    automation asserts against, and what a security review expects to see.
+    """
     def decorator(view):
         @wraps(view)
         @login_required
         def wrapped(*args, **kwargs):
             if session.get("role") not in roles:
-                flash("You do not have permission to access that page.", "error")
-                return redirect(url_for("main.dashboard"))
+                abort(403)
             return view(*args, **kwargs)
         return wrapped
     return decorator
