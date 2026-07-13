@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Access Denied{% endblock %}
+{% block content %}
+                    <div class="panel" style="max-width: 520px; margin: 60px auto; text-align: center; padding: 40px;">
+                        <h1 style="margin-bottom: 12px;">403 — Access Denied</h1>
+                        <p style="color: var(--text-secondary); margin-bottom: 24px;">
+                            Your role ({{ session['role'] }}) does not have permission to view this page.
+                        </p>
+                        <a class="btn btn-primary" href="{{ url_for('main.dashboard') }}"
+                            style="text-decoration: none;">Back to Dashboard</a>
+                    </div>
+{% endblock %}
