@@ -1,40 +1,185 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+                    <div class="flex-between mb-4">
+                        <h1>Dashboard</h1>
+                        <button class="btn btn-primary" style="display: flex; align-items: center; gap: 8px;"
+                            onclick="showToast('Dashboard customization mode enabled', 'success')">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4">
+                                </path>
+                            </svg>
+                            Customize Layout
+                        </button>
+                    </div>
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard · ServiceLink</title>
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@100;200;300;400;500;600;700&family=IBM+Plex+Sans:wght@100;200;300;400;500;600;700&family=Montserrat:wght@100;200;300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
-    <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
-</head>
+                    {% if filters %}
+                    {# FR-5.2 filter row — Manager/Administrator only. Design Doc §5.2:
+                       "dropdown filters for date range, technician, and priority". #}
+                    <form method="get" action="{{ url_for('main.dashboard') }}" class="mb-4"
+                        style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+                        <select name="days" class="form-control" style="width: auto; padding: 8px 12px;">
+                            <option value="7" {% if filters.days == 7 %}selected{% endif %}>Last 7 days</option>
+                            <option value="30" {% if filters.days == 30 %}selected{% endif %}>Last 30 days</option>
+                            <option value="90" {% if filters.days == 90 %}selected{% endif %}>Last 90 days</option>
+                        </select>
+                        <select name="tech" class="form-control" style="width: auto; padding: 8px 12px;">
+                            <option value="all">All Technicians</option>
+                            {% for t in technicians %}
+                            <option value="{{ t.userID }}" {% if filters.tech == t.userID %}selected{% endif %}>{{ t.name }}</option>
+                            {% endfor %}
+                        </select>
+                        <select name="priority" class="form-control" style="width: auto; padding: 8px 12px;">
+                            <option value="all">All Priorities</option>
+                            {% for p in ['Critical', 'High', 'Medium', 'Low'] %}
+                            <option value="{{ p }}" {% if filters.priority == p %}selected{% endif %}>{{ p }}</option>
+                            {% endfor %}
+                        </select>
+                        <select name="status" class="form-control" style="width: auto; padding: 8px 12px;">
+                            <option value="all">All Statuses</option>
+                            {% for s, label in [('New', 'New'), ('Assigned', 'Assigned'), ('InProgress', 'In Progress'), ('WaitingOnUser', 'Waiting on User'), ('Resolved', 'Resolved'), ('Closed', 'Closed')] %}
+                            <option value="{{ s }}" {% if filters.status == s %}selected{% endif %}>{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                        <button type="submit" class="btn btn-secondary">Apply</button>
+                    </form>
+                    {% endif %}
 
-<body class="auth-page">
+                    <div
+                        style="display: grid; grid-template-columns: minmax(0, 1fr){% if feed %} 360px{% endif %}; gap: 16px; margin-bottom: 16px;">
+                        <div style="display: flex; flex-direction: column; height: 100%;">
+                            <div class="sla-tracker"
+                                style="margin-top: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px;">
+                                {% for card in cards %}
+                                <div class="sla-card">
+                                    <div class="text-sm">{{ card.label }}</div>
+                                    <div class="sla-value">{{ card.value }}</div>
+                                    <div class="text-sm"{% if card.tone %} style="color: var(--{{ card.tone }}-color);"{% endif %}>{{ card.sub }}</div>
+                                </div>
+                                {% endfor %}
+                            </div>
 
-    <div class="toast-container" id="toastContainer"></div>
+                            <!-- Ticket volume: last 7 days -->
+                            <div class="panel"
+                                style="margin-top: 16px; flex: 1; display: flex; flex-direction: column; justify-content: flex-end; padding: 16px 24px; border: 1px solid var(--panel-border); background: var(--panel-bg); margin-bottom: 0; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                                <div
+                                    style="font-weight: 600; margin-bottom: auto; font-size: 15px; display: flex; justify-content: space-between; align-items: center;">
+                                    Ticket Volume
+                                </div>
+                                <div
+                                    style="display: flex; align-items: flex-end; justify-content: space-between; flex: 1; min-height: 140px; padding-top: 20px; position: relative;">
+                                    <div
+                                        style="position: absolute; top: 20%; left: 0; right: 0; border-top: 1px dashed var(--panel-border); opacity: 0.5; z-index: 0;">
+                                    </div>
+                                    <div
+                                        style="position: absolute; top: 50%; left: 0; right: 0; border-top: 1px dashed var(--panel-border); opacity: 0.5; z-index: 0;">
+                                    </div>
+                                    <div
+                                        style="position: absolute; bottom: 24px; left: 0; right: 0; border-top: 1px dashed var(--panel-border); opacity: 0.5; z-index: 0;">
+                                    </div>
 
-    <!-- Placeholder: swap in the static Phase 3 dashboard markup here.
-         This page exists to prove @login_required and session identity. -->
-    <div class="panel login-card" style="text-align: center;">
-        <h2 style="margin-bottom: 16px;">Dashboard</h2>
-        <p style="margin-bottom: 8px;">Signed in as <strong>{{ session['name'] }}</strong></p>
-        <p class="text-sm" style="color: var(--accent-color); font-weight: 600; margin-bottom: 24px;">{{ session['role'] }}</p>
-        <a href="{{ url_for('auth.logout') }}" class="btn btn-secondary" style="display: inline-block; text-decoration: none;">Sign out</a>
-    </div>
+                                    {% for bar in volume %}
+                                    <div
+                                        style="display: flex; flex-direction: column; align-items: center; gap: 8px; flex: 1; z-index: 1; height: 100%; justify-content: flex-end;">
+                                        <div style="font-size: 10px; font-weight: 600; color: var(--text-{{ 'primary' if bar.is_peak else 'secondary' }});">
+                                            {{ bar.count }}</div>
+                                        <div style="width: 36px; height: {{ bar.pct }}%; background: linear-gradient(180deg, var(--accent-color) 0%, rgba(37,99,235,0.2) 100%); border-radius: 6px 6px 0 0; cursor: pointer; transition: filter 0.2s, height 0.5s ease-out;"
+                                            onmouseover="this.style.filter='brightness(1.2)'"
+                                            onmouseout="this.style.filter='none'"></div>
+                                        <div class="text-sm"
+                                            style="font-size: 11px; font-weight: 500; color: var(--text-secondary);">
+                                            {{ bar.label }}</div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
 
-    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
-    {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            {% for category, message in messages %}
-            showToast({{ message | tojson }}, {{ category | tojson }});
-            {% endfor %}
-        });
-    </script>
-    {% endif %}
-    {% endwith %}
-</body>
+                        {% if feed %}
+                        <!-- Live activity feed (staff only) — sourced from the audit trail -->
+                        <div class="panel"
+                            style="margin-bottom: 0; display: flex; flex-direction: column; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                            <div class="flex-between" style="margin-bottom: 20px;">
+                                <div style="font-weight: 600; font-size: 15px;">Live Activity Feed</div>
+                                <span class="badge"
+                                    style="border: 1px solid var(--accent-color); color: var(--accent-color); font-size: 10px;">Live</span>
+                            </div>
+                            <div style="display: flex; flex-direction: column; gap: 20px; overflow-y: auto;">
+                                {% for item in feed %}
+                                <div style="display: flex; gap: 16px; align-items: flex-start;">
+                                    <div class="avatar"
+                                        style="width: 36px; height: 36px; font-size: 12px; flex-shrink: 0; background: var(--button-secondary-bg); color: var(--text-primary); border: 1px solid var(--panel-border);">
+                                        {{ item.initials }}</div>
+                                    <div>
+                                        <div class="text-sm" style="line-height: 1.5; color: var(--text-primary);">
+                                            <strong>{{ item.name }}</strong> {{ item.verb }}
+                                            <span style="color: var(--{{ 'accent' if item.accent else 'text' }}-{{ 'color' if item.accent else 'primary' }}); font-weight: 500;">{{ item.target }}</span>
+                                        </div>
+                                        <div
+                                            style="font-size: 12px; color: var(--text-secondary); margin-top: 6px; display: flex; align-items: center; gap: 6px;">
+                                            <svg width="12" height="12" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                            </svg>
+                                            {{ item.when }}
+                                        </div>
+                                    </div>
+                                </div>
+                                {% else %}
+                                <div class="text-sm">No recent activity.</div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
 
-</html>
+                    <div class="flex-between mb-4">
+                        <h2>Recent Tickets</h2>
+                        <div class="filter-bar" style="margin-bottom: 0;">
+                            {% for key, label in chips %}
+                            <a class="filter-pill {% if view == key %}active{% endif %}"
+                               href="{{ url_for('main.dashboard', view=key, days=filters.days if filters else none, tech=filters.tech if filters else none, priority=filters.priority if filters else none) }}"
+                               style="text-decoration: none;">{{ label }}</a>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="panel" style="padding: 0;">
+                        <div class="table-wrapper">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Title</th>
+                                        <th>Status</th>
+                                        <th>Priority</th>
+                                        <th>Assignee</th>
+                                        <th>Age</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for t in tickets %}
+                                    <tr class="clickable"
+                                        onclick="showToast('Ticket detail lands with the ticket module (Sprint 1)', 'info')">
+                                        <td style="font-weight: 500; color: var(--text-primary);">TKT-{{ t.id }}</td>
+                                        <td>{{ t.title }}</td>
+                                        <td><span class="{{ t.status_badge.cls }}"{% if t.status_badge.style %} style="{{ t.status_badge.style }}"{% endif %}>{{ t.status_label }}</span></td>
+                                        <td><span class="{{ t.priority_badge.cls }}"{% if t.priority_badge.style %} style="{{ t.priority_badge.style }}"{% endif %}>{{ t.priority }}</span></td>
+                                        <td>{% if t.unassigned %}<span
+                                                style="color: var(--text-secondary); font-style: italic;">Unassigned</span>{% else %}{{ t.assignee }}{% endif %}
+                                        </td>
+                                        <td style="color: var(--text-secondary);">{{ t.age }}</td>
+                                    </tr>
+                                    {% else %}
+                                    <tr>
+                                        <td colspan="6" style="text-align: center; color: var(--text-secondary); padding: 32px;">
+                                            No tickets match this view.</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+{% endblock %}
