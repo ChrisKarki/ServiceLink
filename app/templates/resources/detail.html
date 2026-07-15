@@ -304,7 +304,9 @@
                             <div class="section-heading">Linked Tickets &amp; Incidents</div>
                             <div class="card-box" style="padding: 16px; display: flex; flex-direction: column; gap: 12px;">
                                 {% for t in tickets %}
-                                <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px; background: var(--card-tint); border: 1px solid var(--panel-border); border-radius: 10px;">
+                                <div class="clickable"
+                                    onclick="location.href='{{ url_for('tickets.view_ticket', ticket_id=t.ticketID) }}'"
+                                    style="display: flex; align-items: center; justify-content: space-between; padding: 16px; background: var(--card-tint); border: 1px solid var(--panel-border); border-radius: 10px; cursor: pointer;">
                                     <div style="display: flex; align-items: center; gap: 14px;">
                                         <div style="width: 36px; height: 36px; border-radius: 8px; background: var(--button-secondary-bg); display: flex; align-items: center; justify-content: center; color: var(--text-secondary);">
                                             <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -325,7 +327,8 @@
                                 </div>
                                 {% else %}
                                 <div class="text-sm" style="padding: 16px; color: var(--text-secondary);">
-                                    No tickets have been linked to this resource. Linking arrives with H2.1.</div>
+                                    No tickets have been linked to this resource. Resources are linked from the
+                                    ticket detail page.</div>
                                 {% endfor %}
                             </div>
 

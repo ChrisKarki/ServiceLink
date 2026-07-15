@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Not Found{% endblock %}
+{% block content %}
+                    <div class="panel" style="max-width: 520px; margin: 60px auto; text-align: center; padding: 40px;">
+                        <h1 style="margin-bottom: 12px;">404 — Not Found</h1>
+                        <p style="color: var(--text-secondary); margin-bottom: 24px;">
+                            That ticket or resource doesn't exist, or the link is out of date.
+                        </p>
+                        <a class="btn btn-primary" href="{{ url_for('main.dashboard') }}"
+                            style="text-decoration: none;">Back to Dashboard</a>
+                    </div>
+{% endblock %}
+{# Note: base.html reads session['initials'] etc. A 404 for an anonymous
+   visitor renders with empty session values — acceptable for the prototype;
+   every meaningful route already sits behind login_required. #}

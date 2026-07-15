@@ -1,210 +1,142 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "base.html" %}
+{% block title %}Submit Request{% endblock %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Submit Request · ServiceLink</title>
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@100;200;300;400;500;600;700&family=IBM+Plex+Sans:wght@100;200;300;400;500;600;700&family=Montserrat:wght@100;200;300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
-    <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
-    <style>
-        .form-error-msg {
-            color: #ef4444;
-            font-size: 13px;
-            font-weight: 600;
-            margin-top: 6px;
-        }
-        .form-control.input-error {
-            border-color: #ef4444 !important;
-            background-color: rgba(239, 68, 68, 0.05);
-        }
-    </style>
-</head>
+{% block page_css %}
+<style>
+    .form-error-msg {
+        color: var(--danger-color);
+        font-size: 13px;
+        font-weight: 600;
+        margin-top: 6px;
+    }
 
-<body data-page="submit-request">
+    .form-control.input-error {
+        border-color: var(--danger-color) !important;
+        background-color: rgba(239, 68, 68, 0.05);
+    }
+</style>
+{% endblock %}
 
-    <div class="toast-container" id="toastContainer"></div>
-
-    <header data-shell="topbar"></header>
-
-    <div class="app-layout">
-        <nav data-shell="sidebar"></nav>
-
-        <div class="main-content">
-            <div class="content-area">
-                <section class="view-section">
+{% block content %}
+{# Context: categories (active only), priorities, form (posted values on
+   validation failure — EX-1), errors (field → message).
+   Only fields persisted by P1.1 appear here. Impact / sub-category /
+   contact-method from the Phase 3 mock are dropped until they have
+   columns — a field that silently discards input is worse than no field. #}
                     <div class="flex-between mb-4">
                         <h1>Submit a New Request or Incident</h1>
-                        <a href="{{ url_for('main.dashboard') }}" class="btn btn-secondary" style="text-decoration: none;">Cancel</a>
+                        <a href="{{ url_for('main.dashboard') }}" class="btn btn-secondary"
+                            style="text-decoration: none;">Cancel</a>
                     </div>
 
                     {% if errors %}
-                    <div class="panel" style="border-left: 4px solid #ef4444; background: rgba(239, 68, 68, 0.1); margin-bottom: 20px; padding: 16px;">
-                        <div style="color: #ef4444; font-weight: 700; font-size: 14px; margin-bottom: 6px;">Please correct the validation errors below:</div>
+                    <div class="panel"
+                        style="border-left: 4px solid var(--danger-color); background: rgba(239, 68, 68, 0.1); margin-bottom: 20px; padding: 16px;">
+                        <div style="color: var(--danger-color); font-weight: 700; font-size: 14px; margin-bottom: 6px;">
+                            Please correct the validation errors below:</div>
                         <ul style="margin: 0; padding-left: 20px; font-size: 13px; color: var(--text-primary);">
                             {% for field, msg in errors.items() %}
-                            <li><strong>{{ field | capitalize }}:</strong> {{ msg }}</li>
+                            <li><strong>{{ field | replace('_id', '') | capitalize }}:</strong> {{ msg }}</li>
                             {% endfor %}
                         </ul>
                     </div>
                     {% endif %}
 
-                    <form method="POST" action="{{ url_for('tickets.create_ticket') }}">
+                    <form method="post" action="{{ url_for('tickets.create_ticket') }}">
                         <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px;">
-                            <!-- Left Column: Details -->
+                            <!-- Left: request details -->
                             <div class="panel">
-                                <h2 style="font-size: 16px; border-bottom: 1px solid var(--panel-border); padding-bottom: 12px; margin-bottom: 20px;">
-                                    Request Details
-                                </h2>
+                                <h2
+                                    style="font-size: 16px; border-bottom: 1px solid var(--panel-border); padding-bottom: 12px; margin-bottom: 20px;">
+                                    Request Details</h2>
 
                                 <div class="form-group">
-                                    <label class="form-label">Summary / Title *</label>
-                                    <input type="text" name="title" class="form-control {% if errors and errors.get('title') %}input-error{% endif %}"
+                                    <label class="form-label" for="title">Summary / Title *</label>
+                                    <input type="text" id="title" name="title" maxlength="150"
+                                        class="form-control {% if errors.get('title') %}input-error{% endif %}"
                                         placeholder="Brief description of the issue or request"
-                                        value="{{ form.get('title', '') if form else '' }}">
-                                    {% if errors and errors.get('title') %}
+                                        value="{{ form.get('title', '') }}">
+                                    {% if errors.get('title') %}
                                     <div class="form-error-msg">{{ errors.get('title') }}</div>
                                     {% endif %}
                                 </div>
 
-                                <div class="flex-row form-group">
-                                    <div style="flex: 1;">
-                                        <label class="form-label">Category *</label>
-                                        <select name="category_id" class="form-control {% if errors and errors.get('category_id') %}input-error{% endif %}">
-                                            <option value="" disabled {% if not form or not form.get('category_id') %}selected{% endif %}>Select Category...</option>
-                                            {% for cat in categories %}
-                                            <option value="{{ cat.categoryID }}" {% if form and str(form.get('category_id')) == str(cat.categoryID) %}selected{% endif %}>
-                                                {{ cat.name }}
-                                            </option>
-                                            {% endfor %}
-                                        </select>
-                                        {% if errors and errors.get('category_id') %}
-                                        <div class="form-error-msg">{{ errors.get('category_id') }}</div>
-                                        {% endif %}
-                                    </div>
-                                    <div style="flex: 1;">
-                                        <label class="form-label">Sub-Category</label>
-                                        <select name="subcategory" class="form-control">
-                                            <option value="New Request">New Request</option>
-                                            <option value="Break / Fix Incident">Break / Fix Incident</option>
-                                            <option value="Modification / Change">Modification / Change</option>
-                                        </select>
-                                    </div>
-                                </div>
-
                                 <div class="form-group">
-                                    <label class="form-label">Detailed Description *</label>
-                                    <textarea name="description" class="form-control {% if errors and errors.get('description') %}input-error{% endif %}" rows="6"
-                                        placeholder="Please provide as much detail as possible. If this is an incident, include steps to reproduce, error messages, and what you were doing when it occurred.">{{ form.get('description', '') if form else '' }}</textarea>
-                                    {% if errors and errors.get('description') %}
+                                    <label class="form-label" for="description">Detailed Description *</label>
+                                    <textarea id="description" name="description" rows="8"
+                                        class="form-control {% if errors.get('description') %}input-error{% endif %}"
+                                        placeholder="Please provide as much detail as possible. For incidents, include steps to reproduce, error messages, and what you were doing when it occurred.">{{ form.get('description', '') }}</textarea>
+                                    {% if errors.get('description') %}
                                     <div class="form-error-msg">{{ errors.get('description') }}</div>
                                     {% endif %}
                                 </div>
 
-                                <div class="form-group">
-                                    <label class="form-label">Steps to Reproduce (For Incidents)</label>
-                                    <textarea name="steps_to_reproduce" class="form-control" rows="3"
-                                        placeholder="1. Go to...&#10;2. Click on...&#10;3. Error appears...">{{ form.get('steps_to_reproduce', '') if form else '' }}</textarea>
-                                </div>
-
-                                <div class="form-group">
-                                    <label class="form-label">Attachments (Logs, Screenshots, Documents)</label>
-                                    <div style="border: 2px dashed var(--panel-border); border-radius: 6px; padding: 32px; text-align: center; color: var(--text-secondary); cursor: pointer; transition: all 0.2s;"
-                                        onmouseover="this.style.borderColor='var(--accent-color)'"
-                                        onmouseout="this.style.borderColor='var(--panel-border)'">
-                                        <svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                                            style="margin-bottom: 8px;">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12">
-                                            </path>
-                                        </svg>
-                                        <p>Drag and drop files here or click to browse</p>
-                                        <p style="font-size: 12px; margin-top: 4px;">Max file size: 25MB. Supported: .log, .png, .pdf, .docx</p>
-                                        <input type="file" style="display: none;">
+                                <!-- Attachments (FR-2.4) arrive with the Attachment
+                                     module in a later sprint — visible stub, not a
+                                     fake upload control. -->
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label class="form-label">Attachments</label>
+                                    <div
+                                        style="border: 2px dashed var(--panel-border); border-radius: 6px; padding: 20px; text-align: center; color: var(--text-secondary);">
+                                        <p class="text-sm">File attachments land with the Attachment module in a later
+                                            sprint (FR-2.4).</p>
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- Right Column: Classification & Action -->
+                            <!-- Right: classification -->
                             <div class="panel" style="height: fit-content;">
-                                <h2 style="font-size: 16px; border-bottom: 1px solid var(--panel-border); padding-bottom: 12px; margin-bottom: 20px;">
-                                    Classification & Impact
-                                </h2>
+                                <h2
+                                    style="font-size: 16px; border-bottom: 1px solid var(--panel-border); padding-bottom: 12px; margin-bottom: 20px;">
+                                    Classification &amp; Impact</h2>
 
                                 <div class="form-group">
-                                    <label class="form-label">Priority (Required) *</label>
-                                    <select name="priority" class="form-control {% if errors and errors.get('priority') %}input-error{% endif %}">
-                                        <option value="" disabled {% if not form or not form.get('priority') %}selected{% endif %}>Select Priority...</option>
-                                        {% for p in priorities %}
-                                        <option value="{{ p }}" {% if form and form.get('priority') == p %}selected{% elif not form and p == 'Medium' %}selected{% endif %}>
-                                            {{ p }} {% if p == 'Low' %}- Workaround available{% elif p == 'Medium' %}- Affects daily work{% elif p == 'High' %}- Severe productivity impact{% elif p == 'Critical' %}- Business halting / VIP{% endif %}
-                                        </option>
+                                    <label class="form-label" for="category_id">Category *</label>
+                                    <select id="category_id" name="category_id"
+                                        class="form-control {% if errors.get('category_id') %}input-error{% endif %}">
+                                        <option value="" disabled {% if not form.get('category_id') %}selected{% endif %}>
+                                            Select Category...</option>
+                                        {% for cat in categories %}
+                                        <option value="{{ cat.categoryID }}"
+                                            {% if form.get('category_id')|string == cat.categoryID|string %}selected{% endif %}>
+                                            {{ cat.name }}</option>
                                         {% endfor %}
                                     </select>
-                                    {% if errors and errors.get('priority') %}
-                                    <div class="form-error-msg">{{ errors.get('priority') }}</div>
+                                    {% if errors.get('category_id') %}
+                                    <div class="form-error-msg">{{ errors.get('category_id') }}</div>
                                     {% endif %}
                                 </div>
 
                                 <div class="form-group">
-                                    <label class="form-label">Impact (How many users/services affected?)</label>
-                                    <select name="impact" class="form-control">
-                                        <option>Single User</option>
-                                        <option>Department / Team</option>
-                                        <option>Site-wide / Regional</option>
-                                        <option>Global / Enterprise-wide</option>
+                                    <label class="form-label" for="priority">Priority *</label>
+                                    <select id="priority" name="priority"
+                                        class="form-control {% if errors.get('priority') %}input-error{% endif %}">
+                                        <option value="" disabled
+                                            {% if not form.get('priority') %}selected{% endif %}>Select Priority...</option>
+                                        {% for p in priorities %}
+                                        <option value="{{ p }}" {% if form.get('priority') == p %}selected{% endif %}>
+                                            {{ p }}
+                                            {%- if p == 'Low' %} — Workaround available
+                                            {%- elif p == 'Medium' %} — Affects daily work
+                                            {%- elif p == 'High' %} — Severe productivity impact
+                                            {%- elif p == 'Critical' %} — Business halting / VIP{% endif %}</option>
+                                        {% endfor %}
                                     </select>
+                                    {% if errors.get('priority') %}
+                                    <div class="form-error-msg">{{ errors.get('priority') }}</div>
+                                    {% endif %}
                                 </div>
 
-                                <div class="form-group">
-                                    <label class="form-label">Affected Configuration Item (CI) / Resource</label>
-                                    <div style="position: relative;">
-                                        <input type="text" name="resource_ci" class="form-control"
-                                            placeholder="Search resources (e.g. VRT-WEB-01)..."
-                                            value="{{ form.get('resource_ci', '') if form else '' }}">
-                                        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                                            style="position: absolute; right: 12px; top: 10px; color: var(--text-secondary);">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                                        </svg>
-                                    </div>
-                                </div>
-
-                                <div class="form-group">
-                                    <label class="form-label">Preferred Contact Method</label>
-                                    <select name="contact_method" class="form-control">
-                                        <option>Email</option>
-                                        <option>Slack / Teams</option>
-                                        <option>Phone</option>
-                                    </select>
+                                <div class="card-box-tint"
+                                    style="background: var(--card-tint); border: 1px solid var(--panel-border); border-radius: 8px; padding: 14px 16px; margin-bottom: 20px;">
+                                    <span class="text-sm" style="color: var(--text-secondary);">
+                                        Your ticket is routed automatically to the next available technician for the
+                                        selected category. You'll be notified when it is assigned.</span>
                                 </div>
 
                                 <button type="submit" class="btn btn-primary"
-                                    style="width: 100%; margin-top: 24px; padding: 12px; font-size: 16px;">
-                                    Submit Ticket
-                                </button>
+                                    style="width: 100%; padding: 12px; font-size: 16px;">Submit Ticket</button>
                             </div>
                         </div>
                     </form>
-                </section>
-            </div>
-        </div>
-    </div>
-
-    <script src="{{ url_for('static', filename='js/layout.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
-    {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            {% for category, message in messages %}
-            showToast({{ message | tojson }}, {{ category | tojson }});
-            {% endfor %}
-        });
-    </script>
-    {% endif %}
-    {% endwith %}
-</body>
-
-</html>
+{% endblock %}
