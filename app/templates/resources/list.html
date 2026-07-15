@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+{% block title %}Resources{% endblock %}
+{% block content %}
+                    <div class="flex-between mb-4">
+                        <h1>Resources</h1>
+                        <button class="btn btn-primary"
+                            onclick="location.href='{{ url_for('resources.new_resource') }}'">+ Add
+                            Resource</button>
+                    </div>
+
+                    <!-- Summary cards (Design Doc 5.5) -->
+                    <div class="sla-tracker"
+                        style="margin-top: 0; margin-bottom: 20px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px;">
+                        <div class="sla-card">
+                            <div class="text-sm">Total Resources</div>
+                            <div class="sla-value">{{ counts.total }}</div>
+                            <div class="text-sm">Across all types</div>
+                        </div>
+                        <div class="sla-card">
+                            <div class="text-sm">Hardware</div>
+                            <div class="sla-value">{{ counts.Hardware }}</div>
+                            <div class="text-sm">Physical devices</div>
+                        </div>
+                        <div class="sla-card">
+                            <div class="text-sm">Software</div>
+                            <div class="sla-value">{{ counts.Software }}</div>
+                            <div class="text-sm">Licences</div>
+                        </div>
+                        <div class="sla-card">
+                            <div class="text-sm">Virtual</div>
+                            <div class="sla-value">{{ counts.Virtual }}</div>
+                            <div class="text-sm">Cloud and VMs</div>
+                        </div>
+                    </div>
+
+                    <!-- Type chips: keep the URL's other filters when switching type -->
+                    <div class="filter-bar">
+                        <a class="filter-pill {% if not filters.type %}active{% endif %}"
+                            href="{{ url_for('resources.list_resources', status=filters.status, warranty=filters.warranty, q=filters.q) }}"
+                            style="text-decoration: none;">All Resources</a>
+                        {% for t in ['Hardware', 'Software', 'Virtual'] %}
+                        <a class="filter-pill {% if filters.type == t %}active{% endif %}"
+                            href="{{ url_for('resources.list_resources', type=t, status=filters.status, warranty=filters.warranty, q=filters.q) }}"
+                            style="text-decoration: none;">{{ t }}</a>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Search + status/warranty filters (FR-3.1) -->
+                    <form method="get" action="{{ url_for('resources.list_resources') }}" class="mb-4"
+                        style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+                        {% if filters.type %}<input type="hidden" name="type" value="{{ filters.type }}">{% endif %}
+                        <input type="text" name="q" class="form-control" value="{{ filters.q }}"
+                            placeholder="Search tag, make, model, serial, or location..."
+                            style="flex: 1; min-width: 260px;">
+                        <select name="status" class="form-control" style="width: auto; padding: 8px 12px;">
+                            <option value="">All Statuses</option>
+                            {% for s in statuses %}
+                            <option value="{{ s }}" {% if filters.status == s %}selected{% endif %}>{{ status_labels[s] }}</option>
+                            {% endfor %}
+                        </select>
+                        <select name="warranty" class="form-control" style="width: auto; padding: 8px 12px;">
+                            <option value="">All Warranties</option>
+                            <option value="active" {% if filters.warranty == 'active' %}selected{% endif %}>Under warranty</option>
+                            <option value="expired" {% if filters.warranty == 'expired' %}selected{% endif %}>Warranty expired</option>
+                        </select>
+                        <button type="submit" class="btn btn-secondary">Filter</button>
+                        {% if filters.q or filters.status or filters.warranty %}
+                        <a class="btn btn-ghost" href="{{ url_for('resources.list_resources', type=filters.type) }}"
+                            style="text-decoration: none;">Reset</a>
+                        {% endif %}
+                    </form>
+
+                    <div class="panel" style="padding: 0;">
+                        <div class="table-wrapper">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Resource Tag</th>
+                                        <th>Type</th>
+                                        <th>Make &amp; Model</th>
+                                        <th>Serial No.</th>
+                                        <th>Assigned User</th>
+                                        <th>Location</th>
+                                        <th>Status</th>
+                                        <th>Warranty</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for r in resources %}
+                                    <tr class="clickable"
+                                        onclick="if (event.target.tagName !== 'BUTTON') location.href='{{ url_for('resources.view_resource', resource_id=r.resourceID) }}'">
+                                        <td style="font-weight: 500; color: var(--text-primary); font-family: monospace;">
+                                            {{ r.resourceTag }}</td>
+                                        <td>{{ r.type }}</td>
+                                        <td>{{ r.make }} {{ r.model }}</td>
+                                        <td style="font-family: monospace; color: var(--text-secondary);">
+                                            {{ r.serialNumber or '—' }}</td>
+                                        <td>{% if r.assignedName %}{{ r.assignedName }}{% else %}<span
+                                                style="color: var(--text-secondary); font-style: italic;">Unassigned</span>{% endif %}
+                                        </td>
+                                        <td style="color: var(--text-secondary);">{{ r.location }}</td>
+                                        <td><span class="{{ r.status_badge.cls }}"{% if r.status_badge.style %} style="{{ r.status_badge.style }}"{% endif %}>{{ r.status_label }}</span></td>
+                                        <td style="color: var(--{{ 'text-secondary' if r.under_warranty else 'warning-color' }});">
+                                            {{ r.warranty_label }}</td>
+                                        <td><button class="btn btn-secondary btn-sm"
+                                                onclick="location.href='{{ url_for('resources.edit_resource', resource_id=r.resourceID) }}'">Edit</button>
+                                        </td>
+                                    </tr>
+                                    {% else %}
+                                    <tr>
+                                        <td colspan="9"
+                                            style="text-align: center; color: var(--text-secondary); padding: 32px;">
+                                            No resources match these filters.</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+{% endblock %}

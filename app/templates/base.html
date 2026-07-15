@@ -7,6 +7,7 @@
     <title>{% block title %}ServiceLink{% endblock %} · ServiceLink</title>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@100;200;300;400;500;600;700&family=IBM+Plex+Sans:wght@100;200;300;400;500;600;700&family=Montserrat:wght@100;200;300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    {% block page_css %}{% endblock %}
     <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
 </head>
 
@@ -42,7 +43,7 @@
                     <div class="dropdown-header">Notifications</div>
                     <div class="dropdown-item">
                         <div class="text-sm" style="color: var(--text-primary); font-weight: 500;">Notification centre</div>
-                        <div class="text-sm" style="font-size: 12px; margin-top: 4px;">In-app notifications arrive with the ticket module (Sprint 1). Email-shaped output currently logs to logs/notifications.log.</div>
+                        <div class="text-sm" style="font-size: 12px; margin-top: 4px;">In-app notifications arrive in a later sprint. Assignment and queue alerts are currently delivered as email-shaped output in logs/notifications.log.</div>
                     </div>
                 </div>
             </div>
@@ -70,8 +71,9 @@
     <div class="app-layout">
         <nav class="sidebar minimized" id="sidebar">
             <ul class="nav-menu">
-                {# Live route. Everything below it lands with its module's sprint;
-                   dead links are visible stubs, not broken url_for() calls. #}
+                {# Dashboard, tickets, and resources are live routes. Everything
+                   else lands with its module's sprint; dead links are visible
+                   stubs, not broken url_for() calls. #}
                 <li class="nav-item {% if request.endpoint == 'main.dashboard' %}active{% endif %}"
                     onclick="location.href='{{ url_for('main.dashboard') }}'"
                     title="{% if session['role'] == 'EndUser' %}My Dashboard{% else %}Dashboard{% endif %}">
@@ -79,17 +81,21 @@
                     <span class="nav-label">{% if session['role'] == 'EndUser' %}My Dashboard{% else %}Dashboard{% endif %}</span>
                 </li>
                 {% if session['role'] == 'EndUser' %}
-                <li class="nav-item" onclick="showToast('Submit Request arrives with the ticket module (Sprint 1)', 'info')" title="Submit Request">
+                <li class="nav-item {% if request.endpoint == 'tickets.create_ticket' %}active{% endif %}"
+                    onclick="location.href='{{ url_for('tickets.create_ticket') }}'" title="Submit Request">
                     <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                     <span class="nav-label">Submit Request</span>
                 </li>
                 {% endif %}
-                <li class="nav-item" onclick="showToast('Ticket module lands in Sprint 1 (P1.x)', 'info')" title="{% if session['role'] == 'EndUser' %}My Tickets{% else %}Tickets{% endif %}">
+                <li class="nav-item {% if request.blueprint == 'tickets' and request.endpoint != 'tickets.create_ticket' %}active{% endif %}"
+                    onclick="location.href='{{ url_for('tickets.list_tickets') }}'"
+                    title="{% if session['role'] == 'EndUser' %}My Tickets{% else %}Tickets{% endif %}">
                     <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                     <span class="nav-label">{% if session['role'] == 'EndUser' %}My Tickets{% else %}Tickets{% endif %}</span>
                 </li>
                 {% if session['role'] != 'EndUser' %}
-                <li class="nav-item" onclick="showToast('Resource module lands in Sprint 1 (H1.x)', 'info')" title="Resources">
+                <li class="nav-item {% if request.blueprint == 'resources' %}active{% endif %}"
+                    onclick="location.href='{{ url_for('resources.list_resources') }}'" title="Resources">
                     <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path></svg>
                     <span class="nav-label">Resources</span>
                 </li>

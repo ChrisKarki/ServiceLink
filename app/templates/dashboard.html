@@ -162,7 +162,7 @@
                                 <tbody>
                                     {% for t in tickets %}
                                     <tr class="clickable"
-                                        onclick="showToast('Ticket detail lands with the ticket module (Sprint 1)', 'info')">
+                                        onclick="location.href='{{ url_for('tickets.view_ticket', ticket_id=t.id) }}'">
                                         <td style="font-weight: 500; color: var(--text-primary);">TKT-{{ t.id }}</td>
                                         <td>{{ t.title }}</td>
                                         <td><span class="{{ t.status_badge.cls }}"{% if t.status_badge.style %} style="{{ t.status_badge.style }}"{% endif %}>{{ t.status_label }}</span></td>

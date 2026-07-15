@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}Tickets{% endblock %}
+{% block content %}
+{# Context: tickets (shaped rows), chips [(key,label)], view, q.
+   Scoping is done in SQL (tickets.list_tickets) — this template renders
+   whatever it is given and never widens visibility. #}
+                    <div class="flex-between mb-4">
+                        <h1>{% if session['role'] == 'EndUser' %}My Tickets{% else %}Tickets{% endif %}</h1>
+                        <button class="btn btn-primary"
+                            onclick="location.href='{{ url_for('tickets.create_ticket') }}'">+ New Ticket</button>
+                    </div>
+
+                    <div class="filter-bar">
+                        {% for key, label in chips %}
+                        <a class="filter-pill {% if view == key %}active{% endif %}"
+                            href="{{ url_for('tickets.list_tickets', view=key, q=q or none) }}"
+                            style="text-decoration: none;">{{ label }}</a>
+                        {% endfor %}
+                    </div>
+
+                    <form method="get" action="{{ url_for('tickets.list_tickets') }}" class="mb-4"
+                        style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+                        <input type="hidden" name="view" value="{{ view }}">
+                        <input type="text" name="q" class="form-control" value="{{ q }}"
+                            placeholder="Search title or description..." style="flex: 1; min-width: 260px;">
+                        <button type="submit" class="btn btn-secondary">Search</button>
+                        {% if q %}
+                        <a class="btn btn-ghost" href="{{ url_for('tickets.list_tickets', view=view) }}"
+                            style="text-decoration: none;">Reset</a>
+                        {% endif %}
+                    </form>
+
+                    <div class="panel" style="padding: 0;">
+                        <div class="table-wrapper">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Title</th>
+                                        <th>Category</th>
+                                        <th>Status</th>
+                                        <th>Priority</th>
+                                        {% if session['role'] != 'EndUser' %}
+                                        <th>Submitter</th>
+                                        {% endif %}
+                                        <th>Assignee</th>
+                                        <th>Age</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for t in tickets %}
+                                    <tr class="clickable"
+                                        onclick="location.href='{{ url_for('tickets.view_ticket', ticket_id=t.ticketID) }}'">
+                                        <td style="font-weight: 500; color: var(--text-primary);">TKT-{{ t.ticketID }}</td>
+                                        <td>{{ t.title }}</td>
+                                        <td style="color: var(--text-secondary);">{{ t.categoryName }}</td>
+                                        <td><span class="{{ t.status_badge.cls }}"{% if t.status_badge.style %} style="{{ t.status_badge.style }}"{% endif %}>{{ t.status_label }}</span></td>
+                                        <td><span class="{{ t.priority_badge.cls }}"{% if t.priority_badge.style %} style="{{ t.priority_badge.style }}"{% endif %}>{{ t.priority }}</span></td>
+                                        {% if session['role'] != 'EndUser' %}
+                                        <td>{{ t.submitterName }}</td>
+                                        {% endif %}
+                                        <td>{% if t.unassigned %}<span
+                                                style="color: var(--text-secondary); font-style: italic;">Unassigned</span>{% else %}{{ t.assigneeName }}{% endif %}
+                                        </td>
+                                        <td style="color: var(--text-secondary);">{{ t.age }}</td>
+                                    </tr>
+                                    {% else %}
+                                    <tr>
+                                        <td colspan="8"
+                                            style="text-align: center; color: var(--text-secondary); padding: 32px;">
+                                            No tickets match this view.</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+{% endblock %}
