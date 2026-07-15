@@ -207,10 +207,45 @@
                             </div>
 
                             <div class="section-heading">Comments</div>
+                            {# P2.1 (FR-2.4): `comments` is already filtered server-side — an
+                               End User is never sent Internal notes, so nothing sensitive is in
+                               this markup to hide. The Internal badge is purely cosmetic. #}
                             <div class="card-box-tint">
-                                <span class="text-sm" style="color: var(--text-secondary);">
-                                    Public comments and internal notes land with the comments card in Sprint 2
-                                    (FR-2.4).</span>
+                                {% for c in comments %}
+                                <div style="padding: 12px 0; {% if not loop.last %}border-bottom: 1px solid var(--panel-border);{% endif %}">
+                                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                                        <strong class="text-sm" style="color: var(--text-primary);">{{ c.author }}</strong>
+                                        {% if c.commentType == 'Internal' %}
+                                        <span class="badge"
+                                            style="border: 1px solid var(--warning-color); color: var(--warning-color);">Internal</span>
+                                        {% endif %}
+                                        <span class="text-sm" style="color: var(--text-secondary); margin-left: auto;">{{ c.createdAt.strftime('%b %d, %H:%M') }}</span>
+                                    </div>
+                                    <p class="text-sm"
+                                        style="color: var(--text-primary); white-space: pre-wrap; margin: 0; line-height: 1.55;">{{ c.bodyText }}</p>
+                                </div>
+                                {% else %}
+                                <div class="text-sm" style="color: var(--text-secondary);">No comments yet.</div>
+                                {% endfor %}
+
+                                <form method="post" action="{{ url_for('tickets.add_comment', ticket_id=t.ticketID) }}"
+                                    style="margin-top: 16px; {% if comments %}border-top: 1px solid var(--panel-border); padding-top: 16px;{% endif %}">
+                                    <textarea name="body" class="form-control" rows="3" required
+                                        placeholder="Add a comment..."></textarea>
+                                    <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 10px; flex-wrap: wrap;">
+                                        {% if is_staff %}
+                                        <label class="text-sm"
+                                            style="display: flex; align-items: center; gap: 8px; color: var(--text-secondary); cursor: pointer;">
+                                            <input type="checkbox" name="comment_type" value="Internal"
+                                                style="width: 16px; height: 16px; accent-color: var(--accent-color);">
+                                            Internal note (staff only)
+                                        </label>
+                                        {% else %}
+                                        <span></span>
+                                        {% endif %}
+                                        <button type="submit" class="btn btn-primary btn-sm">Add Comment</button>
+                                    </div>
+                                </form>
                             </div>
 
                             <div class="section-heading">Recent Audit Activity</div>
