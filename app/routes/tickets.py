@@ -61,6 +61,25 @@ STATUS_LABELS = {
     "WaitingOnUser": "Waiting on User", "Resolved": "Resolved", "Closed": "Closed",
 }
 
+# P1.4 (FR-2.2, UC-02) — the legal six-state lifecycle. A transition is legal
+# only if the target is in TRANSITIONS[current]. This is the single source of
+# truth enforced server-side; the detail template only *offers* these same
+# moves, but the endpoint re-checks every request regardless of the UI.
+#   New→InProgress is allowed only by auto-claim (a Technician taking an
+#   unassigned ticket); Assigned/InProgress/Resolved all require an assignee.
+#   Resolved→InProgress reopens (clears resolvedAt); Resolved→Closed finalizes.
+TRANSITIONS = {
+    "New":           {"Assigned", "InProgress"},
+    "Assigned":      {"InProgress"},
+    "InProgress":    {"WaitingOnUser", "Resolved"},
+    "WaitingOnUser": {"InProgress", "Resolved"},
+    "Resolved":      {"Closed", "InProgress"},
+    "Closed":        set(),  # terminal
+}
+
+# States that cannot exist without a technician on the ticket.
+_REQUIRES_ASSIGNEE = ("Assigned", "InProgress", "Resolved")
+
 # Badge presentation — identical mapping to main.py so a ticket looks the
 # same on the dashboard and in this module (Arshdeep's classes, untouched).
 _MUTED = "border: 1px solid var(--panel-border); color: var(--text-secondary);"
@@ -291,10 +310,13 @@ def _get_ticket_or_403(ticket_id):
     return t
 
 
-@bp.get("/tickets/<int:ticket_id>")
-@login_required
-def view_ticket(ticket_id):
-    t = _get_ticket_or_403(ticket_id)
+def _render_detail(t, status_code=200):
+    """Render the ticket detail page for a ticket row `t` (as returned by
+    _get_ticket_or_403). Shared by view_ticket (200) and the change_status
+    error path (400) — a 302 redirect cannot carry a 400 status, and the
+    P1.1 create flow already sets the precedent of re-rendering with 400 on
+    invalid input while a flashed message explains why."""
+    ticket_id = t["ticketID"]
 
     linked = query_all(
         "SELECT r.resourceID, r.resourceTag, r.type, r.make, r.model,"
@@ -373,6 +395,93 @@ def add_comment(ticket_id):
 
     label = "Internal note" if ctype == "Internal" else "Comment"
     flash(f"{label} added.", "success")
+                           is_staff=session["role"] in STAFF,
+                           next_states=sorted(TRANSITIONS[t["status"]]),
+                           status_labels=STATUS_LABELS), status_code
+
+
+@bp.get("/tickets/<int:ticket_id>")
+@login_required
+def view_ticket(ticket_id):
+    t = _get_ticket_or_403(ticket_id)
+    return _render_detail(t)
+
+
+# ---------------------------------------------------------------------------
+# P1.4 — Status transitions (FR-2.2, UC-02)
+# ---------------------------------------------------------------------------
+
+@bp.post("/tickets/<int:ticket_id>/status")
+@roles_required(*STAFF)
+def change_status(ticket_id):
+    """Enforce the legal six-state lifecycle server-side. An illegal
+    transition (or a resolve without a summary, or a forward move on an
+    unassigned ticket a Manager can't claim) returns HTTP 400 and writes
+    NOTHING (the UC-02 acceptance criterion). A legal transition updates the
+    ticket in one parameterized UPDATE, audits the field diffs, and notifies
+    the submitter (FR-2.5)."""
+    t = _get_ticket_or_403(ticket_id)
+    old = t["status"]
+    new = (request.form.get("status") or "").strip()
+    role, uid = session["role"], session["user_id"]
+
+    # Guard 1 — legal edge (the core AC). Unknown or non-adjacent target rejected.
+    if new not in STATUS_LABELS:
+        flash("Unknown ticket status.", "error")
+        return _render_detail(t, 400)
+    if new not in TRANSITIONS[old]:
+        flash(f"Cannot move a ticket from {STATUS_LABELS[old]} to "
+              f"{STATUS_LABELS[new]}.", "error")
+        return _render_detail(t, 400)
+
+    # Build the column set + audit diff as we validate. Column fragments are
+    # constant literals; every value is bound as a parameter (NFR-S4).
+    sets = ["status = %s"]
+    params = [new]
+    changes = {"status": (old, new)}
+
+    # Guard 2 — Assigned/InProgress/Resolved need an assignee. A Technician
+    # auto-claims an unassigned ticket ("...unless claimed"); a Manager/Admin
+    # must route it first.
+    if new in _REQUIRES_ASSIGNEE and t["assignedToUserID"] is None:
+        if role == "Technician":
+            sets.append("assignedToUserID = %s")
+            params.append(uid)
+            changes["assignedToUserID"] = (None, uid)
+        else:
+            flash(f"Assign a technician before moving this ticket into "
+                  f"{STATUS_LABELS[new]}.", "error")
+            return _render_detail(t, 400)
+
+    # Guard 3 — resolving requires a summary and stamps resolvedAt.
+    if new == "Resolved":
+        summary = (request.form.get("resolution_summary") or "").strip()
+        if not summary:
+            flash("A resolution summary is required to resolve a ticket.", "error")
+            return _render_detail(t, 400)
+        now = datetime.now()
+        sets += ["resolvedAt = %s", "resolutionSummary = %s"]
+        params += [now, summary]
+        changes["resolvedAt"] = (t["resolvedAt"], now)
+        changes["resolutionSummary"] = (t["resolutionSummary"], summary)
+
+    # Reopen — Resolved→InProgress clears resolvedAt (the summary stays as history).
+    if old == "Resolved" and new == "InProgress":
+        sets.append("resolvedAt = %s")
+        params.append(None)
+        changes["resolvedAt"] = (t["resolvedAt"], None)
+
+    params.append(ticket_id)
+    execute("UPDATE Ticket SET " + ", ".join(sets) + " WHERE ticketID = %s",
+            tuple(params))
+
+    log_action(uid, "Ticket", ticket_id, "Update", changes=changes,
+               ip=request.remote_addr)
+    notify(t["submittedByUserID"],
+           f"Ticket #{ticket_id} is now {STATUS_LABELS[new]}",
+           f"'{t['title']}' moved from {STATUS_LABELS[old]} to "
+           f"{STATUS_LABELS[new]}.")
+    flash(f"Ticket #{ticket_id} is now {STATUS_LABELS[new]}.", "success")
     return redirect(url_for("tickets.view_ticket", ticket_id=ticket_id))
 
 

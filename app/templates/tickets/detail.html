@@ -190,10 +190,10 @@
                         <div style="display: flex; gap: 12px; align-items: center;">
                             <span class="{{ t.priority_badge.cls }}"{% if t.priority_badge.style %} style="{{ t.priority_badge.style }}"{% endif %}>{{ t.priority }}</span>
                             <span class="{{ t.status_badge.cls }}"{% if t.status_badge.style %} style="{{ t.status_badge.style }}"{% endif %}>{{ t.status_label }}</span>
-                            {% if is_staff %}
-                            <!-- P1.4 status transitions — visible stub, not a silent gap -->
-                            <button class="btn btn-secondary"
-                                onclick="showToast('Status transitions land with P1.4', 'info')">Change Status</button>
+                            {% if is_staff and next_states %}
+                            <!-- P1.4 status transitions (FR-2.2, UC-02). Options come from
+                                 TRANSITIONS[t.status]; the server re-enforces the graph. -->
+                            <button class="btn btn-secondary" onclick="openStatusModal()">Change Status</button>
                             {% endif %}
                         </div>
                     </div>
@@ -292,7 +292,7 @@
                                         {% endif %}
                                     </div>
                                 </div>
-                                <div class="spec-grid-row" style="margin-bottom: 0;">
+                                <div class="spec-grid-row" style="margin-bottom: {{ '20px' if t.resolvedAt else '0' }};">
                                     <div class="spec-item">
                                         <span class="text-sm" style="color: var(--text-secondary);">Submitted By</span>
                                         <span style="color: var(--text-primary); font-weight: 500;">{{ t.submitterName }}</span>
@@ -302,6 +302,21 @@
                                         <span style="color: var(--text-primary); font-weight: 500;">{{ t.createdAt.strftime('%b %d, %Y at %H:%M') }}</span>
                                     </div>
                                 </div>
+                                {% if t.resolvedAt %}
+                                <!-- P1.4: shown once a ticket reaches Resolved/Closed. -->
+                                <div class="spec-grid-row" style="margin-bottom: 0;">
+                                    <div class="spec-item">
+                                        <span class="text-sm" style="color: var(--text-secondary);">Resolved</span>
+                                        <span style="color: var(--text-primary); font-weight: 500;">{{ t.resolvedAt.strftime('%b %d, %Y at %H:%M') }}</span>
+                                    </div>
+                                </div>
+                                {% endif %}
+                                {% if t.resolutionSummary %}
+                                <div class="spec-item" style="margin-top: 16px;">
+                                    <span class="text-sm" style="color: var(--text-secondary);">Resolution Summary</span>
+                                    <span style="color: var(--text-primary); font-weight: 500; white-space: pre-wrap;">{{ t.resolutionSummary }}</span>
+                                </div>
+                                {% endif %}
                             </div>
 
                             <div class="section-heading">Linked Resources</div>
@@ -340,6 +355,69 @@
                             </div>
                         </div>
                     </div>
+
+                    {% if is_staff and next_states %}
+                    <!-- Change Status modal (P1.4, UC-02). The select is limited to the
+                         legal next states; the resolution summary is revealed and required
+                         only when the target is Resolved. The server enforces all of this
+                         again on POST — the UI is a convenience, not the gate. -->
+                    <div class="modal-overlay" id="statusModal"
+                        onclick="if (event.target === this) closeStatusModal()">
+                        <div class="modal-card" style="max-width: 480px;">
+                            <form method="post" action="{{ url_for('tickets.change_status', ticket_id=t.ticketID) }}">
+                                <div class="modal-head">
+                                    <h2 style="margin: 0; font-size: 18px;">Change Status</h2>
+                                    <button type="button" class="icon-btn" onclick="closeStatusModal()" title="Close">
+                                        <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M6 18L18 6M6 6l12 12"></path>
+                                        </svg>
+                                    </button>
+                                </div>
+                                <div style="padding: 4px 24px 8px 24px;">
+                                    <label class="text-sm" for="statusSelect"
+                                        style="color: var(--text-secondary); display: block; margin-bottom: 6px;">New status</label>
+                                    <select name="status" id="statusSelect" class="form-control" onchange="onStatusChange()">
+                                        {% for s in next_states %}
+                                        <option value="{{ s }}">{{ status_labels[s] }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <div id="resolutionBlock" style="display: none; margin-top: 16px;">
+                                        <label class="text-sm" for="resolutionSummary"
+                                            style="color: var(--text-secondary); display: block; margin-bottom: 6px;">
+                                            Resolution summary <span style="color: var(--danger-color);">*</span></label>
+                                        <textarea name="resolution_summary" id="resolutionSummary" class="form-control"
+                                            rows="4" placeholder="Describe how this ticket was resolved..."></textarea>
+                                    </div>
+                                </div>
+                                <div class="modal-foot">
+                                    <span></span>
+                                    <div style="display: flex; gap: 10px;">
+                                        <button type="button" class="btn btn-secondary" onclick="closeStatusModal()">Cancel</button>
+                                        <button type="submit" class="btn btn-primary">Update Status</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <script>
+                        function openStatusModal() {
+                            document.getElementById('statusModal').classList.add('open');
+                            onStatusChange();
+                        }
+                        function closeStatusModal() {
+                            document.getElementById('statusModal').classList.remove('open');
+                        }
+                        function onStatusChange() {
+                            var show = document.getElementById('statusSelect').value === 'Resolved';
+                            document.getElementById('resolutionBlock').style.display = show ? 'block' : 'none';
+                            document.getElementById('resolutionSummary').required = show;
+                        }
+                        document.addEventListener('keydown', function (e) {
+                            if (e.key === 'Escape') closeStatusModal();
+                        });
+                    </script>
+                    {% endif %}
 
                     {% if is_staff %}
                     <!-- Associate Resources modal (H2.1). Search hits
