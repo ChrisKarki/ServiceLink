@@ -22,9 +22,17 @@ Implemented here:
                                       EX-2: Disposed / Lost-Missing resources
                                       link with an explicit warning.
 
+  P2.1  POST /tickets/<id>/comments  — Internal (staff-only) vs Public
+                                      comments (FR-2.4). Internal notes are
+                                      excluded from the End User query itself,
+                                      never merely hidden in the template, so
+                                      an End User response carries zero internal
+                                      content. A Public comment notifies the
+                                      submitter (FR-2.5).
+
 Deferred (visible stubs in the detail template, not silent gaps):
   P1.4  status transitions, resolvedAt, resolution summary
-  P2.x  comments, attachments
+  P2.x  attachments
 
 All mutations go through services.audit.log_action — no local audit INSERTs
 (C0.1 contract). Every user-supplied value is bound as a parameter (NFR-S4).
@@ -326,8 +334,67 @@ def _render_detail(t, status_code=200):
         " WHERE a.entityType = 'Ticket' AND a.entityID = %s"
         " ORDER BY a.timestamp DESC LIMIT 8", (ticket_id,))
 
+    is_staff = session["role"] in STAFF
+
+    # P2.1 (FR-2.4) — comment visibility is enforced HERE, in the query, not in
+    # the template: an End User never receives Internal notes in their response
+    # at all, so a view-source check finds zero internal content (the AC).
+    comment_sql = (
+        "SELECT tc.commentID, tc.commentType, tc.bodyText, tc.createdAt,"
+        "       CONCAT(u.firstName, ' ', u.lastName) AS author"
+        "  FROM TicketComment tc JOIN User u ON u.userID = tc.authorUserID"
+        " WHERE tc.ticketID = %s")
+    if not is_staff:
+        comment_sql += " AND tc.commentType = 'Public'"
+    comment_sql += " ORDER BY tc.createdAt ASC"
+    comments = query_all(comment_sql, (ticket_id,))
+
     return render_template("tickets/detail.html", t=_shape(t),
                            linked=linked, history=history,
+                           comments=comments, is_staff=is_staff)
+
+
+# ---------------------------------------------------------------------------
+# P2.1 — Comments: internal + public (FR-2.4)
+# ---------------------------------------------------------------------------
+
+@bp.post("/tickets/<int:ticket_id>/comments")
+@login_required
+def add_comment(ticket_id):
+    """Add a comment to a ticket. Staff may post Internal (staff-only) or
+    Public notes; everyone else is forced to Public — a non-staff user can
+    never create an Internal note (FR-2.4). A Public comment notifies the
+    submitter, unless they are the author (FR-2.5)."""
+    t = _get_ticket_or_403(ticket_id)   # reuse P1.3 scoping (404 / 403)
+    role, uid = session["role"], session["user_id"]
+
+    body = (request.form.get("body") or "").strip()
+    ctype = request.form.get("comment_type", "Public")
+    # Internal is a staff-only privilege; anything else collapses to Public.
+    if role not in STAFF or ctype not in ("Internal", "Public"):
+        ctype = "Public"
+
+    if not body:
+        flash("Comment cannot be empty.", "error")
+        return redirect(url_for("tickets.view_ticket", ticket_id=ticket_id))
+    if len(body) > 5000:
+        flash("Comment is too long (5000 characters maximum).", "error")
+        return redirect(url_for("tickets.view_ticket", ticket_id=ticket_id))
+
+    comment_id = execute(
+        "INSERT INTO TicketComment (ticketID, authorUserID, commentType, bodyText)"
+        " VALUES (%s, %s, %s, %s)", (ticket_id, uid, ctype, body))
+    log_action(uid, "TicketComment", comment_id, "Create", ip=request.remote_addr)
+
+    # FR-2.5: a Public comment reaches the submitter. Skip self-notification —
+    # the submitter commenting on their own ticket doesn't email themselves.
+    if ctype == "Public" and t["submittedByUserID"] != uid:
+        notify(t["submittedByUserID"],
+               f"New comment on ticket #{ticket_id}",
+               f"A new public comment was added to '{t['title']}'.")
+
+    label = "Internal note" if ctype == "Internal" else "Comment"
+    flash(f"{label} added.", "success")
                            is_staff=session["role"] in STAFF,
                            next_states=sorted(TRANSITIONS[t["status"]]),
                            status_labels=STATUS_LABELS), status_code
