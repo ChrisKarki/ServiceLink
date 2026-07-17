@@ -336,14 +336,18 @@ def view_ticket(ticket_id):
 
     # Conversation (FR-2.4): internal notes are staff-only — filtered in
     # SQL so they never reach an End User's page source.
-    c_sql = ("SELECT c.commentID, c.body, c.isInternal, c.createdAt,"
+    # Schema (schema.sql §TicketComment): bodyText TEXT and
+    # commentType ENUM('Internal','Public') — aliased here so the template
+    # keeps working with .body / .isInternal.
+    c_sql = ("SELECT c.commentID, c.bodyText AS body,"
+             "       (c.commentType = 'Internal') AS isInternal, c.createdAt,"
              "       CONCAT(u.firstName, ' ', u.lastName) AS author,"
              "       UPPER(CONCAT(LEFT(u.firstName,1), LEFT(u.lastName,1))) AS initials,"
              "       u.role AS authorRole"
              "  FROM TicketComment c JOIN User u ON u.userID = c.authorUserID"
              " WHERE c.ticketID = %s")
     if not is_staff:
-        c_sql += " AND c.isInternal = FALSE"
+        c_sql += " AND c.commentType = 'Public'"
     comments = query_all(c_sql + " ORDER BY c.createdAt ASC", (ticket_id,))
 
     history = query_all(
@@ -483,9 +487,10 @@ def add_comment(ticket_id):
     is_internal = session["role"] in STAFF and request.form.get("is_internal") == "1"
 
     comment_id = execute(
-        "INSERT INTO TicketComment (ticketID, authorUserID, body, isInternal,"
-        "  createdAt) VALUES (%s, %s, %s, %s, NOW())",
-        (ticket_id, session["user_id"], body, is_internal))
+        "INSERT INTO TicketComment (ticketID, authorUserID, commentType,"
+        "  bodyText, createdAt) VALUES (%s, %s, %s, %s, NOW())",
+        (ticket_id, session["user_id"],
+         "Internal" if is_internal else "Public", body))
 
     log_action(session["user_id"], "TicketComment", ticket_id, "Create",
                changes={"commentID": (None, comment_id)},
