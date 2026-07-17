@@ -1,9 +1,8 @@
 """ServiceLink application factory.
 
-Adds SECRET_KEY (sessions cannot work without it), session hardening,
-blueprint registration for all live modules, and the 403/404 error
-handlers that back roles_required's abort(403) and the abort(404)
-calls in tickets/resources.
+Replaces the skeleton __init__.py: adds SECRET_KEY (sessions cannot work
+without it), session hardening, and the auth/main blueprints alongside
+the existing tickets/admin stubs.
 """
 
 import os
@@ -30,27 +29,23 @@ def create_app():
     # Set to True once the VM serves HTTPS (NFR-S3):
     app.config["SESSION_COOKIE_SECURE"] = os.environ.get("COOKIE_SECURE") == "1"
 
-    from .routes.admin import bp as admin_bp
     from .routes.auth import bp as auth_bp
     from .routes.main import bp as main_bp
     from .routes.resources import bp as resources_bp
     from .routes.tickets import bp as tickets_bp
+    from .routes.admin import bp as admin_bp
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(main_bp)
-    app.register_blueprint(tickets_bp)
     app.register_blueprint(resources_bp)
+    app.register_blueprint(tickets_bp)
     app.register_blueprint(admin_bp)
 
-    # roles_required aborts with 403 (FR-1.2 denial semantics); render the
-    # branded page instead of Flask's default. 404 covers abort(404) on
-    # unknown ticket/resource IDs.
     @app.errorhandler(403)
-    def forbidden(_e):
+    def forbidden(_):
+        # Friendly page for authenticated users hitting a route their role
+        # does not permit (FR-1.2). Anonymous users never reach here —
+        # login_required redirects them to /login first.
         return render_template("403.html"), 403
-
-    @app.errorhandler(404)
-    def not_found(_e):
-        return render_template("404.html"), 404
 
     return app

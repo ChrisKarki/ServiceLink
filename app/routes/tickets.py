@@ -395,9 +395,12 @@ def add_comment(ticket_id):
 
     label = "Internal note" if ctype == "Internal" else "Comment"
     flash(f"{label} added.", "success")
-                           is_staff=session["role"] in STAFF,
-                           next_states=sorted(TRANSITIONS[t["status"]]),
-                           status_labels=STATUS_LABELS), status_code
+    is_staff=session["role"] in STAFF,
+    next_states=sorted(TRANSITIONS[t["status"]]),
+    status_labels=STATUS_LABELS, status_code
+
+
+@bp.get("/tickets/<int:ticket_id>")
 
 
 @bp.get("/tickets/<int:ticket_id>")
@@ -549,8 +552,9 @@ def link_resource(ticket_id):
         if resource is None:
             continue  # deleted between search and submit — skip silently
         try:
-            execute("INSERT INTO TicketResource (ticketID, resourceID, linkedAt)"
-                    " VALUES (%s, %s, NOW())", (ticket_id, resource_id))
+            execute("INSERT INTO TicketResource (ticketID, resourceID, linkedByUserID, linkedAt)"
+            " VALUES (%s, %s, %s, NOW())",
+        (ticket_id, resource_id, session["user_id"]))
         except IntegrityError:
             # AF-2: composite PK (ticketID, resourceID) already exists.
             # The DB is the source of truth — a pre-check would race.
