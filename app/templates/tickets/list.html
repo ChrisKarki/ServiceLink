@@ -1,78 +1,173 @@
 {% extends "base.html" %}
 {% block title %}Tickets{% endblock %}
+
+{% block page_css %}
+<style>
+    .list-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 280px;
+        gap: 24px;
+        align-items: start;
+    }
+
+    .filter-card {
+        background: var(--panel-bg);
+        border: 1px solid var(--panel-border);
+        border-radius: 12px;
+        padding: 20px;
+        position: sticky;
+        top: 16px;
+    }
+
+    .filter-card .form-group {
+        margin-bottom: 16px;
+    }
+
+    .filter-card .form-label {
+        display: block;
+        margin-bottom: 6px;
+        font-weight: 600;
+        font-size: 13px;
+        color: var(--text-secondary);
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-{# Context: tickets (shaped rows), chips [(key,label)], view, q.
-   Scoping is done in SQL (tickets.list_tickets) — this template renders
-   whatever it is given and never widens visibility. #}
+{# Context from tickets.list_tickets: tickets, chips, view, filters,
+   categories, technicians (staff only), priorities, status_labels.
+   Role scoping is done in SQL — the filter panel narrows within what the
+   role may already see, never widens it. #}
                     <div class="flex-between mb-4">
                         <h1>{% if session['role'] == 'EndUser' %}My Tickets{% else %}Tickets{% endif %}</h1>
                         <button class="btn btn-primary"
                             onclick="location.href='{{ url_for('tickets.create_ticket') }}'">+ New Ticket</button>
                     </div>
 
-                    <div class="filter-bar">
-                        {% for key, label in chips %}
-                        <a class="filter-pill {% if view == key %}active{% endif %}"
-                            href="{{ url_for('tickets.list_tickets', view=key, q=q or none) }}"
-                            style="text-decoration: none;">{{ label }}</a>
-                        {% endfor %}
-                    </div>
+                    <div class="list-grid">
+                        <!-- CENTRE: quick views + table -->
+                        <div>
+                            <div class="filter-bar">
+                                {% for key, label in chips %}
+                                <a class="filter-pill {% if view == key %}active{% endif %}"
+                                    href="{{ url_for('tickets.list_tickets', view=key, q=filters.q or none, status=filters.status, priority=filters.priority, category=filters.category, tech=filters.tech, requester=filters.requester or none) }}"
+                                    style="text-decoration: none;">{{ label }}</a>
+                                {% endfor %}
+                            </div>
 
-                    <form method="get" action="{{ url_for('tickets.list_tickets') }}" class="mb-4"
-                        style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
-                        <input type="hidden" name="view" value="{{ view }}">
-                        <input type="text" name="q" class="form-control" value="{{ q }}"
-                            placeholder="Search title or description..." style="flex: 1; min-width: 260px;">
-                        <button type="submit" class="btn btn-secondary">Search</button>
-                        {% if q %}
-                        <a class="btn btn-ghost" href="{{ url_for('tickets.list_tickets', view=view) }}"
-                            style="text-decoration: none;">Reset</a>
-                        {% endif %}
-                    </form>
-
-                    <div class="panel" style="padding: 0;">
-                        <div class="table-wrapper">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>Title</th>
-                                        <th>Category</th>
-                                        <th>Status</th>
-                                        <th>Priority</th>
-                                        {% if session['role'] != 'EndUser' %}
-                                        <th>Submitter</th>
-                                        {% endif %}
-                                        <th>Assignee</th>
-                                        <th>Age</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for t in tickets %}
-                                    <tr class="clickable"
-                                        onclick="location.href='{{ url_for('tickets.view_ticket', ticket_id=t.ticketID) }}'">
-                                        <td style="font-weight: 500; color: var(--text-primary);">TKT-{{ t.ticketID }}</td>
-                                        <td>{{ t.title }}</td>
-                                        <td style="color: var(--text-secondary);">{{ t.categoryName }}</td>
-                                        <td><span class="{{ t.status_badge.cls }}"{% if t.status_badge.style %} style="{{ t.status_badge.style }}"{% endif %}>{{ t.status_label }}</span></td>
-                                        <td><span class="{{ t.priority_badge.cls }}"{% if t.priority_badge.style %} style="{{ t.priority_badge.style }}"{% endif %}>{{ t.priority }}</span></td>
-                                        {% if session['role'] != 'EndUser' %}
-                                        <td>{{ t.submitterName }}</td>
-                                        {% endif %}
-                                        <td>{% if t.unassigned %}<span
-                                                style="color: var(--text-secondary); font-style: italic;">Unassigned</span>{% else %}{{ t.assigneeName }}{% endif %}
-                                        </td>
-                                        <td style="color: var(--text-secondary);">{{ t.age }}</td>
-                                    </tr>
-                                    {% else %}
-                                    <tr>
-                                        <td colspan="8"
-                                            style="text-align: center; color: var(--text-secondary); padding: 32px;">
-                                            No tickets match this view.</td>
-                                    </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
+                            <div class="panel" style="padding: 0;">
+                                <div class="table-wrapper">
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th>ID</th>
+                                                <th>Title</th>
+                                                <th>Category</th>
+                                                <th>Status</th>
+                                                <th>Priority</th>
+                                                {% if session['role'] != 'EndUser' %}
+                                                <th>Requester</th>
+                                                {% endif %}
+                                                <th>Agent</th>
+                                                <th>Age</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for t in tickets %}
+                                            <tr class="clickable"
+                                                onclick="location.href='{{ url_for('tickets.view_ticket', ticket_id=t.ticketID) }}'">
+                                                <td style="font-weight: 500; color: var(--text-primary);">TKT-{{ t.ticketID }}</td>
+                                                <td>{{ t.title }}</td>
+                                                <td style="color: var(--text-secondary);">{{ t.categoryName }}</td>
+                                                <td><span class="{{ t.status_badge.cls }}"{% if t.status_badge.style %} style="{{ t.status_badge.style }}"{% endif %}>{{ t.status_label }}</span></td>
+                                                <td><span class="{{ t.priority_badge.cls }}"{% if t.priority_badge.style %} style="{{ t.priority_badge.style }}"{% endif %}>{{ t.priority }}</span></td>
+                                                {% if session['role'] != 'EndUser' %}
+                                                <td>{{ t.submitterName }}</td>
+                                                {% endif %}
+                                                <td>{% if t.unassigned %}<span
+                                                        style="color: var(--text-secondary); font-style: italic;">Unassigned</span>{% else %}{{ t.assigneeName }}{% endif %}
+                                                </td>
+                                                <td style="color: var(--text-secondary);">{{ t.age }}</td>
+                                            </tr>
+                                            {% else %}
+                                            <tr>
+                                                <td colspan="8"
+                                                    style="text-align: center; color: var(--text-secondary); padding: 32px;">
+                                                    No tickets match these filters.</td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
                         </div>
+
+                        <!-- RIGHT: filter panel -->
+                        <form method="get" action="{{ url_for('tickets.list_tickets') }}" class="filter-card">
+                            <input type="hidden" name="view" value="{{ view }}">
+                            <div class="flex-between" style="margin-bottom: 16px;">
+                                <span style="font-weight: 700; font-size: 14px; color: var(--text-primary);">Filters</span>
+                                {% if filters.q or filters.status or filters.priority or filters.category or filters.tech or filters.requester %}
+                                <a class="text-sm" href="{{ url_for('tickets.list_tickets', view=view) }}"
+                                    style="color: var(--accent-color); text-decoration: none;">Reset</a>
+                                {% endif %}
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="f-q">Search</label>
+                                <input type="text" id="f-q" name="q" class="form-control" value="{{ filters.q }}"
+                                    placeholder="Title or description...">
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="f-status">Status</label>
+                                <select id="f-status" name="status" class="form-control">
+                                    <option value="">All Statuses</option>
+                                    {% for s, label in status_labels.items() %}
+                                    <option value="{{ s }}" {% if filters.status == s %}selected{% endif %}>{{ label }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="f-priority">Priority</label>
+                                <select id="f-priority" name="priority" class="form-control">
+                                    <option value="">All Priorities</option>
+                                    {% for p in priorities %}
+                                    <option value="{{ p }}" {% if filters.priority == p %}selected{% endif %}>{{ p }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="f-category">Category</label>
+                                <select id="f-category" name="category" class="form-control">
+                                    <option value="">All Categories</option>
+                                    {% for c in categories %}
+                                    <option value="{{ c.categoryID }}" {% if filters.category == c.categoryID %}selected{% endif %}>{{ c.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            {% if session['role'] != 'EndUser' %}
+                            <div class="form-group">
+                                <label class="form-label" for="f-tech">Agent</label>
+                                <select id="f-tech" name="tech" class="form-control">
+                                    <option value="">All Agents</option>
+                                    {% for tech in technicians %}
+                                    <option value="{{ tech.userID }}" {% if filters.tech == tech.userID %}selected{% endif %}>{{ tech.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="f-requester">Requester</label>
+                                <input type="text" id="f-requester" name="requester" class="form-control"
+                                    value="{{ filters.requester }}" placeholder="Name or email...">
+                            </div>
+                            {% endif %}
+
+                            <button type="submit" class="btn btn-primary" style="width: 100%;">Apply</button>
+                        </form>
                     </div>
 {% endblock %}
