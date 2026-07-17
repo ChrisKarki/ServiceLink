@@ -190,10 +190,21 @@
                         <div style="display: flex; gap: 12px; align-items: center;">
                             <span class="{{ t.priority_badge.cls }}"{% if t.priority_badge.style %} style="{{ t.priority_badge.style }}"{% endif %}>{{ t.priority }}</span>
                             <span class="{{ t.status_badge.cls }}"{% if t.status_badge.style %} style="{{ t.status_badge.style }}"{% endif %}>{{ t.status_label }}</span>
+                            {% if t.slaBreached %}
+                            <!-- P2.2: stored breach flag (§4.2), set by the on-request check. -->
+                            <span class="badge"
+                                style="background: var(--danger-color); color: #fff; border: 1px solid var(--danger-color);">SLA Breached</span>
+                            {% endif %}
                             {% if is_staff and next_states %}
                             <!-- P1.4 status transitions (FR-2.2, UC-02). Options come from
                                  TRANSITIONS[t.status]; the server re-enforces the graph. -->
                             <button class="btn btn-secondary" onclick="openStatusModal()">Change Status</button>
+                            {% endif %}
+                            {% if can_reopen %}
+                            <!-- P2.2: submitter self-service reopen inside the policy window. -->
+                            <form method="post" action="{{ url_for('tickets.reopen_ticket', ticket_id=t.ticketID) }}" style="margin: 0;">
+                                <button type="submit" class="btn btn-secondary">Reopen Ticket</button>
+                            </form>
                             {% endif %}
                         </div>
                     </div>
@@ -280,6 +291,28 @@
                                 <div class="spec-item" style="margin-top: 16px;">
                                     <span class="text-sm" style="color: var(--text-secondary);">Resolution Summary</span>
                                     <span style="color: var(--text-primary); font-weight: 500; white-space: pre-wrap;">{{ t.resolutionSummary }}</span>
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            {# P2.2 (FR-2.2): deadlines computed from SLAPolicy; the breach state
+                               shown here is the stored flag (§4.2), not a fresh derivation. #}
+                            <div class="section-heading">SLA</div>
+                            <div class="card-box">
+                                <div class="spec-grid-row" style="margin-bottom: {{ '20px' if sla.breached else '0' }};">
+                                    <div class="spec-item">
+                                        <span class="text-sm" style="color: var(--text-secondary);">Response Due</span>
+                                        <span style="color: var(--text-primary); font-weight: 500;">{{ sla.response_due.strftime('%b %d, %Y at %H:%M') }}</span>
+                                    </div>
+                                    <div class="spec-item">
+                                        <span class="text-sm" style="color: var(--text-secondary);">Resolution Due</span>
+                                        <span style="color: {{ 'var(--danger-color)' if sla.breached else 'var(--text-primary)' }}; font-weight: 500;">{{ sla.resolution_due.strftime('%b %d, %Y at %H:%M') }}</span>
+                                    </div>
+                                </div>
+                                {% if sla.breached %}
+                                <div class="spec-item">
+                                    <span class="text-sm" style="color: var(--text-secondary);">SLA Status</span>
+                                    <span style="color: var(--danger-color); font-weight: 600;">Resolution target missed — escalated to the technician &amp; managers.</span>
                                 </div>
                                 {% endif %}
                             </div>

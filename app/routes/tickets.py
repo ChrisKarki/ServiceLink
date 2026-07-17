@@ -21,16 +21,24 @@ Implemented here:
                                       surfaces as a friendly message;
                                       EX-2: Disposed / Lost-Missing resources
                                       link with an explicit warning.
+  P1.4  POST /tickets/<id>/status     — legal six-state transitions, resolvedAt,
+                                      resolution summary (UC-02).
+  P2.2  SLA tracking (FR-2.2/2.5)     — response/resolution deadlines from
+                                      SLAPolicy; an on-request check flips the
+                                      STORED slaBreached flag and escalates to
+                                      the Technician + Managers exactly once
+                                      (§4.2). POST /tickets/<id>/reopen lets the
+                                      submitter reopen Resolved→InProgress within
+                                      REOPEN_WINDOW_DAYS of resolvedAt.
 
 Deferred (visible stubs in the detail template, not silent gaps):
-  P1.4  status transitions, resolvedAt, resolution summary
   P2.x  comments, attachments
 
 All mutations go through services.audit.log_action — no local audit INSERTs
 (C0.1 contract). Every user-supplied value is bound as a parameter (NFR-S4).
 """
 
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from flask import (Blueprint, abort, flash, redirect, render_template,
                    request, session, url_for)
@@ -71,6 +79,13 @@ TRANSITIONS = {
 
 # States that cannot exist without a technician on the ticket.
 _REQUIRES_ASSIGNEE = ("Assigned", "InProgress", "Resolved")
+
+# P2.2 (FR-2.2) — a submitter may reopen their own resolved ticket only within
+# this many days of resolvedAt; after that they must file a new ticket.
+REOPEN_WINDOW_DAYS = 7
+
+# Statuses whose SLA clock has stopped — no further breach escalation for these.
+_SLA_CLOSED_STATES = ("Resolved", "Closed")
 
 # Badge presentation — identical mapping to main.py so a ticket looks the
 # same on the dashboard and in this module (Arshdeep's classes, untouched).
@@ -302,12 +317,69 @@ def _get_ticket_or_403(ticket_id):
     return t
 
 
+# ---------------------------------------------------------------------------
+# P2.2 — SLA tracking (FR-2.2, FR-2.5)
+# ---------------------------------------------------------------------------
+
+def _sla_for(t):
+    """Compute response/resolution deadlines for a ticket from SLAPolicy.
+    Pure read: no writes, no notifications. `overdue` is the real-time
+    computation (deadline vs. now, or vs. resolvedAt once the clock has
+    stopped); `breached` is the STORED flag (§4.2), which is what escalation
+    is gated on — the two agree once the on-request check has run."""
+    policy = query_one(
+        "SELECT responseTargetMins, resolutionTargetMins FROM SLAPolicy"
+        " WHERE priority = %s", (t["priority"],))
+    created = t["createdAt"]
+    response_due = created + timedelta(minutes=policy["responseTargetMins"])
+    resolution_due = created + timedelta(minutes=policy["resolutionTargetMins"])
+    # The resolution clock stops at resolvedAt; while open it runs to now.
+    clock_stop = t["resolvedAt"] or datetime.now()
+    return {
+        "response_due": response_due,
+        "resolution_due": resolution_due,
+        "overdue": clock_stop > resolution_due,
+        "breached": bool(t["slaBreached"]),
+    }
+
+
+def _check_and_escalate_breach(t):
+    """On-request SLA check (§4.2). If an open ticket has passed its
+    resolution deadline and the stored flag is not yet set, set slaBreached
+    and escalate exactly ONCE — notify the assigned Technician (if any) and
+    every active Manager. Gating on the stored flag is what makes escalation
+    fire a single time, at breach, rather than on every page view. Mutates
+    `t` in place so the current render reflects the new flag."""
+    if t["status"] in _SLA_CLOSED_STATES or t["slaBreached"]:
+        return
+    if not _sla_for(t)["overdue"]:
+        return
+
+    execute("UPDATE Ticket SET slaBreached = TRUE WHERE ticketID = %s",
+            (t["ticketID"],))
+    t["slaBreached"] = 1
+    # System-detected during this request; the viewer is the recorded actor,
+    # mirroring how P1.2 auto-assignment attributes a system action.
+    log_action(session["user_id"], "Ticket", t["ticketID"], "Update",
+               changes={"slaBreached": (False, True)}, ip=request.remote_addr)
+
+    recipients = [t["assignedToUserID"]] if t["assignedToUserID"] else []
+    recipients += [m["userID"] for m in query_all(
+        "SELECT userID FROM User WHERE role = 'Manager' AND status = 'Active'")]
+    for uid in recipients:
+        notify(uid,
+               f"SLA breached on ticket #{t['ticketID']}",
+               f"'{t['title']}' ({t['priority']}) has passed its resolution "
+               "deadline and is now flagged SLA-breached.")
+
+
 def _render_detail(t, status_code=200):
     """Render the ticket detail page for a ticket row `t` (as returned by
     _get_ticket_or_403). Shared by view_ticket (200) and the change_status
     error path (400) — a 302 redirect cannot carry a 400 status, and the
     P1.1 create flow already sets the precedent of re-rendering with 400 on
-    invalid input while a flashed message explains why."""
+    invalid input while a flashed message explains why. Read-only: the
+    on-request breach mutation lives in view_ticket, not here."""
     ticket_id = t["ticketID"]
 
     linked = query_all(
@@ -326,17 +398,29 @@ def _render_detail(t, status_code=200):
         " WHERE a.entityType = 'Ticket' AND a.entityID = %s"
         " ORDER BY a.timestamp DESC LIMIT 8", (ticket_id,))
 
+    # P2.2 — a submitter can reopen their own resolved ticket, but only inside
+    # the policy window. The button is offered only when the action would
+    # actually succeed; reopen_ticket re-checks all of this server-side.
+    can_reopen = (
+        t["status"] == "Resolved"
+        and t["resolvedAt"] is not None
+        and session["user_id"] == t["submittedByUserID"]
+        and datetime.now() <= t["resolvedAt"] + timedelta(days=REOPEN_WINDOW_DAYS))
+
     return render_template("tickets/detail.html", t=_shape(t),
                            linked=linked, history=history,
                            is_staff=session["role"] in STAFF,
                            next_states=sorted(TRANSITIONS[t["status"]]),
-                           status_labels=STATUS_LABELS), status_code
+                           status_labels=STATUS_LABELS,
+                           sla=_sla_for(t), can_reopen=can_reopen,
+                           reopen_days=REOPEN_WINDOW_DAYS), status_code
 
 
 @bp.get("/tickets/<int:ticket_id>")
 @login_required
 def view_ticket(ticket_id):
     t = _get_ticket_or_403(ticket_id)
+    _check_and_escalate_breach(t)   # on-request SLA check (§4.2)
     return _render_detail(t)
 
 
@@ -415,6 +499,50 @@ def change_status(ticket_id):
            f"'{t['title']}' moved from {STATUS_LABELS[old]} to "
            f"{STATUS_LABELS[new]}.")
     flash(f"Ticket #{ticket_id} is now {STATUS_LABELS[new]}.", "success")
+    return redirect(url_for("tickets.view_ticket", ticket_id=ticket_id))
+
+
+# ---------------------------------------------------------------------------
+# P2.2 — Submitter reopen within the policy window (FR-2.2)
+# ---------------------------------------------------------------------------
+
+@bp.post("/tickets/<int:ticket_id>/reopen")
+@login_required
+def reopen_ticket(ticket_id):
+    """Submitter self-service reopen: a Resolved ticket returns to InProgress
+    when the submitter asks within REOPEN_WINDOW_DAYS of resolvedAt. Staff
+    reopen through the status modal (change_status); this route is exclusively
+    the submitter path, so it is not STAFF-gated. Outside the window it is
+    rejected with nothing written (the AC: a day-8 reopen fails)."""
+    t = _get_ticket_or_403(ticket_id)
+
+    if session["user_id"] != t["submittedByUserID"]:
+        abort(403)   # only the person who filed it may reopen it this way
+    if t["status"] != "Resolved":
+        flash("Only a resolved ticket can be reopened.", "error")
+        return redirect(url_for("tickets.view_ticket", ticket_id=ticket_id))
+
+    deadline = (t["resolvedAt"] + timedelta(days=REOPEN_WINDOW_DAYS)
+                if t["resolvedAt"] else None)
+    if deadline is None or datetime.now() > deadline:
+        flash(f"The {REOPEN_WINDOW_DAYS}-day reopen window has closed. "
+              "Please submit a new ticket.", "error")
+        return redirect(url_for("tickets.view_ticket", ticket_id=ticket_id))
+
+    # Resolved→InProgress, clearing resolvedAt (mirrors the change_status
+    # reopen branch). The assignee is retained, so InProgress stays valid.
+    execute("UPDATE Ticket SET status = 'InProgress', resolvedAt = NULL"
+            " WHERE ticketID = %s", (ticket_id,))
+    log_action(session["user_id"], "Ticket", ticket_id, "Update",
+               changes={"status": ("Resolved", "InProgress"),
+                        "resolvedAt": (t["resolvedAt"], None)},
+               ip=request.remote_addr)
+    if t["assignedToUserID"]:
+        notify(t["assignedToUserID"],
+               f"Ticket #{ticket_id} reopened by the submitter",
+               f"'{t['title']}' was reopened within the "
+               f"{REOPEN_WINDOW_DAYS}-day window and is back in progress.")
+    flash("Ticket reopened.", "success")
     return redirect(url_for("tickets.view_ticket", ticket_id=ticket_id))
 
 
