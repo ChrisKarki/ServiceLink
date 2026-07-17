@@ -1,11 +1,167 @@
 {% extends "base.html" %}
 {% block title %}Resources{% endblock %}
+
+{% block page_css %}
+<style>
+    /* Two-column layout: table on the left, filter rail on the right */
+    .res-layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 280px;
+        gap: 24px;
+        align-items: start;
+    }
+
+    @media (max-width: 1100px) {
+        .res-layout { grid-template-columns: 1fr; }
+    }
+
+    /* Filter rail */
+    .filter-rail {
+        background: var(--panel-bg);
+        border: 1px solid var(--panel-border);
+        border-radius: 12px;
+        padding: 20px;
+        position: sticky;
+        top: 24px;
+    }
+
+    .filter-rail-title {
+        font-size: 13px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--text-secondary);
+        margin-bottom: 16px;
+    }
+
+    .filter-group { margin-bottom: 16px; }
+    .filter-group:last-of-type { margin-bottom: 20px; }
+
+    .filter-group label {
+        display: block;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 6px;
+    }
+
+    /* Toolbar: search · showing count · pager */
+    .res-toolbar {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 16px;
+        flex-wrap: wrap;
+    }
+
+    .res-toolbar .showing {
+        font-size: 13px;
+        color: var(--text-secondary);
+        margin-left: auto;
+        white-space: nowrap;
+    }
+
+    .pager {
+        display: flex;
+        gap: 4px;
+        align-items: center;
+    }
+
+    .pager a, .pager span.disabled {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 30px;
+        height: 30px;
+        border: 1px solid var(--panel-border);
+        border-radius: 8px;
+        color: var(--text-primary);
+        text-decoration: none;
+        font-size: 14px;
+        background: var(--panel-bg);
+    }
+
+    .pager a:hover { border-color: var(--accent-color); }
+    .pager span.disabled { color: var(--text-secondary); opacity: 0.4; }
+
+    /* Bulk action bar — hidden until at least one row is checked */
+    .bulk-bar {
+        display: none;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 16px;
+        margin-bottom: 16px;
+        background: var(--card-tint);
+        border: 1px solid var(--accent-color);
+        border-radius: 10px;
+        flex-wrap: wrap;
+    }
+
+    .bulk-bar.visible { display: flex; }
+
+    .bulk-count {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text-primary);
+        white-space: nowrap;
+    }
+
+    /* Sortable headers */
+    th a.sort-link {
+        color: inherit;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        white-space: nowrap;
+    }
+
+    th a.sort-link .sort-arrow {
+        font-size: 10px;
+        color: var(--text-secondary);
+        opacity: 0.6;
+    }
+
+    th a.sort-link.active,
+    th a.sort-link.active .sort-arrow {
+        color: var(--accent-color);
+        opacity: 1;
+    }
+
+    .check-col { width: 36px; }
+
+    .row-check, #check-all {
+        width: 16px;
+        height: 16px;
+        accent-color: var(--accent-color);
+        cursor: pointer;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
+{% macro sort_th(key, label) -%}
+{% set next_dir = 'desc' if sort == key and dir == 'asc' else 'asc' %}
+<th><a class="sort-link {% if sort == key %}active{% endif %}"
+        href="{{ url_for('resources.list_resources', type=filters.type, status=filters.status,
+                         warranty=filters.warranty, q=filters.q, assigned=filters.assigned,
+                         location=filters.location, sort=key, dir=next_dir) }}">{{ label }}
+        <span class="sort-arrow">{% if sort == key %}{{ '&#9650;'|safe if dir == 'asc' else '&#9660;'|safe }}{% else %}&#8645;{% endif %}</span></a>
+</th>
+{%- endmacro %}
+
                     <div class="flex-between mb-4">
                         <h1>Resources</h1>
-                        <button class="btn btn-primary"
-                            onclick="location.href='{{ url_for('resources.new_resource') }}'">+ Add
-                            Resource</button>
+                        <div style="display: flex; gap: 12px; align-items: center;">
+                            <a class="btn btn-secondary"
+                                href="{{ url_for('resources.export_resources', type=filters.type, status=filters.status,
+                                                 warranty=filters.warranty, q=filters.q, assigned=filters.assigned,
+                                                 location=filters.location, sort=sort, dir=dir) }}"
+                                style="text-decoration: none;">Export CSV</a>
+                            <button class="btn btn-primary"
+                                onclick="location.href='{{ url_for('resources.new_resource') }}'">+ Add
+                                Resource</button>
+                        </div>
                     </div>
 
                     <!-- Summary cards (Design Doc 5.5) -->
@@ -33,89 +189,242 @@
                         </div>
                     </div>
 
-                    <!-- Type chips: keep the URL's other filters when switching type -->
-                    <div class="filter-bar">
-                        <a class="filter-pill {% if not filters.type %}active{% endif %}"
-                            href="{{ url_for('resources.list_resources', status=filters.status, warranty=filters.warranty, q=filters.q) }}"
-                            style="text-decoration: none;">All Resources</a>
-                        {% for t in ['Hardware', 'Software', 'Virtual'] %}
-                        <a class="filter-pill {% if filters.type == t %}active{% endif %}"
-                            href="{{ url_for('resources.list_resources', type=t, status=filters.status, warranty=filters.warranty, q=filters.q) }}"
-                            style="text-decoration: none;">{{ t }}</a>
-                        {% endfor %}
-                    </div>
+                    <div class="res-layout">
+                        <!-- LEFT: toolbar + bulk bar + table + pager -->
+                        <div>
+                            <div class="res-toolbar">
+                                <input type="text" name="q" form="filter-form" class="form-control"
+                                    value="{{ filters.q or '' }}"
+                                    placeholder="Search tag, make, model, serial, or location..."
+                                    style="flex: 1; min-width: 240px;">
+                                <span class="showing">
+                                    Showing {{ showing_from }} to {{ showing_to }} of {{ total }}</span>
+                                <div class="pager">
+                                    {% if page > 1 %}
+                                    <a href="{{ url_for('resources.list_resources', type=filters.type, status=filters.status,
+                                                        warranty=filters.warranty, q=filters.q, assigned=filters.assigned,
+                                                        location=filters.location, sort=sort, dir=dir, page=page-1) }}"
+                                        aria-label="Previous page">&lsaquo;</a>
+                                    {% else %}<span class="disabled">&lsaquo;</span>{% endif %}
+                                    {% if page < pages %}
+                                    <a href="{{ url_for('resources.list_resources', type=filters.type, status=filters.status,
+                                                        warranty=filters.warranty, q=filters.q, assigned=filters.assigned,
+                                                        location=filters.location, sort=sort, dir=dir, page=page+1) }}"
+                                        aria-label="Next page">&rsaquo;</a>
+                                    {% else %}<span class="disabled">&rsaquo;</span>{% endif %}
+                                </div>
+                            </div>
 
-                    <!-- Search + status/warranty filters (FR-3.1) -->
-                    <form method="get" action="{{ url_for('resources.list_resources') }}" class="mb-4"
-                        style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
-                        {% if filters.type %}<input type="hidden" name="type" value="{{ filters.type }}">{% endif %}
-                        <input type="text" name="q" class="form-control" value="{{ filters.q }}"
-                            placeholder="Search tag, make, model, serial, or location..."
-                            style="flex: 1; min-width: 260px;">
-                        <select name="status" class="form-control" style="width: auto; padding: 8px 12px;">
-                            <option value="">All Statuses</option>
-                            {% for s in statuses %}
-                            <option value="{{ s }}" {% if filters.status == s %}selected{% endif %}>{{ status_labels[s] }}</option>
-                            {% endfor %}
-                        </select>
-                        <select name="warranty" class="form-control" style="width: auto; padding: 8px 12px;">
-                            <option value="">All Warranties</option>
-                            <option value="active" {% if filters.warranty == 'active' %}selected{% endif %}>Under warranty</option>
-                            <option value="expired" {% if filters.warranty == 'expired' %}selected{% endif %}>Warranty expired</option>
-                        </select>
-                        <button type="submit" class="btn btn-secondary">Filter</button>
-                        {% if filters.q or filters.status or filters.warranty %}
-                        <a class="btn btn-ghost" href="{{ url_for('resources.list_resources', type=filters.type) }}"
-                            style="text-decoration: none;">Reset</a>
-                        {% endif %}
-                    </form>
+                            <form method="post" action="{{ url_for('resources.bulk_update') }}" id="bulk-form">
+                                <input type="hidden" name="return" value="{{ request.full_path }}">
 
-                    <div class="panel" style="padding: 0;">
-                        <div class="table-wrapper">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Resource Tag</th>
-                                        <th>Type</th>
-                                        <th>Make &amp; Model</th>
-                                        <th>Serial No.</th>
-                                        <th>Assigned User</th>
-                                        <th>Location</th>
-                                        <th>Status</th>
-                                        <th>Warranty</th>
-                                        <th>Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for r in resources %}
-                                    <tr class="clickable"
-                                        onclick="if (event.target.tagName !== 'BUTTON') location.href='{{ url_for('resources.view_resource', resource_id=r.resourceID) }}'">
-                                        <td style="font-weight: 500; color: var(--text-primary); font-family: monospace;">
-                                            {{ r.resourceTag }}</td>
-                                        <td>{{ r.type }}</td>
-                                        <td>{{ r.make }} {{ r.model }}</td>
-                                        <td style="font-family: monospace; color: var(--text-secondary);">
-                                            {{ r.serialNumber or '—' }}</td>
-                                        <td>{% if r.assignedName %}{{ r.assignedName }}{% else %}<span
-                                                style="color: var(--text-secondary); font-style: italic;">Unassigned</span>{% endif %}
-                                        </td>
-                                        <td style="color: var(--text-secondary);">{{ r.location }}</td>
-                                        <td><span class="{{ r.status_badge.cls }}"{% if r.status_badge.style %} style="{{ r.status_badge.style }}"{% endif %}>{{ r.status_label }}</span></td>
-                                        <td style="color: var(--{{ 'text-secondary' if r.under_warranty else 'warning-color' }});">
-                                            {{ r.warranty_label }}</td>
-                                        <td><button class="btn btn-secondary btn-sm"
-                                                onclick="location.href='{{ url_for('resources.edit_resource', resource_id=r.resourceID) }}'">Edit</button>
-                                        </td>
-                                    </tr>
-                                    {% else %}
-                                    <tr>
-                                        <td colspan="9"
-                                            style="text-align: center; color: var(--text-secondary); padding: 32px;">
-                                            No resources match these filters.</td>
-                                    </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
+                                <div class="bulk-bar" id="bulk-bar">
+                                    <span class="bulk-count" id="bulk-count">0 selected</span>
+                                    <select name="action" id="bulk-action" class="form-control"
+                                        style="width: auto; padding: 8px 12px;">
+                                        <option value="status">Set status</option>
+                                        <option value="assign">Assign to</option>
+                                        <option value="location">Set location</option>
+                                    </select>
+
+                                    <select name="value" id="bulk-value-status" class="form-control"
+                                        style="width: auto; padding: 8px 12px;">
+                                        {% for s in statuses %}
+                                        <option value="{{ s }}">{{ status_labels[s] }}</option>
+                                        {% endfor %}
+                                    </select>
+
+                                    <select name="value" id="bulk-value-assign" class="form-control"
+                                        style="width: auto; padding: 8px 12px; display: none;" disabled>
+                                        <option value="">Unassigned</option>
+                                        {% for u in users %}
+                                        <option value="{{ u.userID }}">{{ u.name }} ({{ u.role }})</option>
+                                        {% endfor %}
+                                    </select>
+
+                                    <input type="text" name="value" id="bulk-value-location" class="form-control"
+                                        maxlength="120" placeholder="New location"
+                                        style="width: 220px; display: none;" disabled>
+
+                                    <button type="submit" class="btn btn-primary btn-sm">Apply to selected</button>
+                                    <button type="button" class="btn btn-ghost btn-sm" id="bulk-clear">Clear</button>
+                                </div>
+
+                                <div class="panel" style="padding: 0;">
+                                    <div class="table-wrapper">
+                                        <table>
+                                            <thead>
+                                                <tr>
+                                                    <th class="check-col"><input type="checkbox" id="check-all"
+                                                            aria-label="Select all on this page"></th>
+                                                    {{ sort_th('tag', 'Resource Tag') }}
+                                                    {{ sort_th('type', 'Type') }}
+                                                    {{ sort_th('model', 'Make & Model') }}
+                                                    {{ sort_th('serial', 'Serial No.') }}
+                                                    {{ sort_th('assigned', 'Assigned User') }}
+                                                    {{ sort_th('location', 'Location') }}
+                                                    {{ sort_th('status', 'Status') }}
+                                                    {{ sort_th('warranty', 'Warranty') }}
+                                                    <th>Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for r in resources %}
+                                                <tr class="clickable"
+                                                    onclick="if (!['BUTTON','INPUT','A'].includes(event.target.tagName)) location.href='{{ url_for('resources.view_resource', resource_id=r.resourceID) }}'">
+                                                    <td class="check-col"><input type="checkbox" class="row-check"
+                                                            name="ids" value="{{ r.resourceID }}"
+                                                            aria-label="Select {{ r.resourceTag }}"></td>
+                                                    <td style="font-weight: 500; color: var(--text-primary); font-family: monospace;">
+                                                        {{ r.resourceTag }}</td>
+                                                    <td>{{ r.type }}</td>
+                                                    <td>{{ r.make }} {{ r.model }}</td>
+                                                    <td style="font-family: monospace; color: var(--text-secondary);">
+                                                        {{ r.serialNumber or '—' }}</td>
+                                                    <td>{% if r.assignedName %}{{ r.assignedName }}{% else %}<span
+                                                            style="color: var(--text-secondary); font-style: italic;">Unassigned</span>{% endif %}
+                                                    </td>
+                                                    <td style="color: var(--text-secondary);">{{ r.location }}</td>
+                                                    <td><span class="{{ r.status_badge.cls }}"{% if r.status_badge.style %} style="{{ r.status_badge.style }}"{% endif %}>{{ r.status_label }}</span></td>
+                                                    <td style="color: var(--{{ 'text-secondary' if r.under_warranty else 'warning-color' }});">
+                                                        {{ r.warranty_label }}</td>
+                                                    <td><button type="button" class="btn btn-secondary btn-sm"
+                                                            onclick="location.href='{{ url_for('resources.edit_resource', resource_id=r.resourceID) }}'">Edit</button>
+                                                    </td>
+                                                </tr>
+                                                {% else %}
+                                                <tr>
+                                                    <td colspan="10"
+                                                        style="text-align: center; color: var(--text-secondary); padding: 32px;">
+                                                        No resources match these filters.</td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </form>
+
+                            {% if pages > 1 %}
+                            <div style="display: flex; justify-content: center; margin-top: 16px;">
+                                <span class="text-sm" style="color: var(--text-secondary);">
+                                    Page {{ page }} of {{ pages }}</span>
+                            </div>
+                            {% endif %}
                         </div>
+
+                        <!-- RIGHT: filter rail -->
+                        <aside class="filter-rail">
+                            <div class="filter-rail-title">Filters</div>
+                            <form method="get" action="{{ url_for('resources.list_resources') }}" id="filter-form">
+                                <input type="hidden" name="sort" value="{{ sort }}">
+                                <input type="hidden" name="dir" value="{{ dir }}">
+
+                                <div class="filter-group">
+                                    <label for="f-type">Resource Type</label>
+                                    <select class="form-control" id="f-type" name="type">
+                                        <option value="">All Resources</option>
+                                        {% for t in ['Hardware', 'Software', 'Virtual'] %}
+                                        <option value="{{ t }}" {% if filters.type == t %}selected{% endif %}>{{ t }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+
+                                <div class="filter-group">
+                                    <label for="f-status">Status</label>
+                                    <select class="form-control" id="f-status" name="status">
+                                        <option value="">All Statuses</option>
+                                        {% for s in statuses %}
+                                        <option value="{{ s }}" {% if filters.status == s %}selected{% endif %}>{{ status_labels[s] }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+
+                                <div class="filter-group">
+                                    <label for="f-assigned">Used By</label>
+                                    <input type="text" class="form-control" id="f-assigned" name="assigned"
+                                        value="{{ filters.assigned or '' }}" placeholder="Name">
+                                </div>
+
+                                <div class="filter-group">
+                                    <label for="f-location">Location</label>
+                                    <input type="text" class="form-control" id="f-location" name="location"
+                                        value="{{ filters.location or '' }}" placeholder="e.g. Surrey HQ">
+                                </div>
+
+                                <div class="filter-group">
+                                    <label for="f-warranty">Warranty</label>
+                                    <select class="form-control" id="f-warranty" name="warranty">
+                                        <option value="">All Warranties</option>
+                                        <option value="active" {% if filters.warranty == 'active' %}selected{% endif %}>Under warranty</option>
+                                        <option value="expired" {% if filters.warranty == 'expired' %}selected{% endif %}>Warranty expired</option>
+                                    </select>
+                                </div>
+
+                                <div style="display: flex; gap: 8px;">
+                                    <button type="submit" class="btn btn-primary" style="flex: 1;">Apply</button>
+                                    <a class="btn btn-ghost" href="{{ url_for('resources.list_resources') }}"
+                                        style="text-decoration: none;">Reset</a>
+                                </div>
+                            </form>
+                        </aside>
                     </div>
+
+<script>
+(function () {
+    var checkAll = document.getElementById('check-all');
+    var rowChecks = Array.prototype.slice.call(document.querySelectorAll('.row-check'));
+    var bulkBar = document.getElementById('bulk-bar');
+    var bulkCount = document.getElementById('bulk-count');
+    var bulkAction = document.getElementById('bulk-action');
+    var valueControls = {
+        status: document.getElementById('bulk-value-status'),
+        assign: document.getElementById('bulk-value-assign'),
+        location: document.getElementById('bulk-value-location')
+    };
+
+    function refresh() {
+        var n = rowChecks.filter(function (c) { return c.checked; }).length;
+        bulkCount.textContent = n + ' selected';
+        bulkBar.classList.toggle('visible', n > 0);
+        if (checkAll) {
+            checkAll.checked = n > 0 && n === rowChecks.length;
+            checkAll.indeterminate = n > 0 && n < rowChecks.length;
+        }
+    }
+
+    function switchValueControl() {
+        var active = bulkAction.value;
+        Object.keys(valueControls).forEach(function (key) {
+            var el = valueControls[key];
+            var on = key === active;
+            el.disabled = !on;                 /* only the active control submits name="value" */
+            el.style.display = on ? '' : 'none';
+        });
+    }
+
+    if (checkAll) {
+        checkAll.addEventListener('change', function () {
+            rowChecks.forEach(function (c) { c.checked = checkAll.checked; });
+            refresh();
+        });
+    }
+    rowChecks.forEach(function (c) { c.addEventListener('change', refresh); });
+    bulkAction.addEventListener('change', switchValueControl);
+
+    document.getElementById('bulk-clear').addEventListener('click', function () {
+        rowChecks.forEach(function (c) { c.checked = false; });
+        refresh();
+    });
+
+    document.getElementById('bulk-form').addEventListener('submit', function (e) {
+        if (!rowChecks.some(function (c) { return c.checked; })) {
+            e.preventDefault();
+        }
+    });
+
+    switchValueControl();
+    refresh();
+})();
+</script>
 {% endblock %}
