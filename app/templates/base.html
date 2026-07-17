@@ -24,11 +24,13 @@
                 </div>
             </div>
             <span class="brand-text">ServiceLink</span>
-            <div class="search-container" style="position: relative; display: flex; align-items: center; width: 400px; margin-left: 10px;">
+            <form class="search-container" method="get" action="{{ url_for('tickets.list_tickets') }}"
+                style="position: relative; display: flex; align-items: center; width: 400px; margin-left: 10px;">
+                <input type="hidden" name="view" value="all">
                 <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-secondary); pointer-events: none;">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                <input type="text" class="search-input" placeholder="Search tickets, articles, resources..." style="padding-left: 38px; width: 100%;">
-            </div>
+                <input type="text" name="q" class="search-input" placeholder="Search tickets..." style="padding-left: 38px; width: 100%;">
+            </form>
         </div>
         <div class="topbar-actions">
             <button class="icon-btn theme-toggle" onclick="toggleTheme()" title="Toggle dark / light mode">
@@ -43,7 +45,7 @@
                     <div class="dropdown-header">Notifications</div>
                     <div class="dropdown-item">
                         <div class="text-sm" style="color: var(--text-primary); font-weight: 500;">Notification centre</div>
-                        <div class="text-sm" style="font-size: 12px; margin-top: 4px;">In-app notifications arrive with the ticket module (Sprint 1). Email-shaped output currently logs to logs/notifications.log.</div>
+                        <div class="text-sm" style="font-size: 12px; margin-top: 4px;">In-app notifications arrive in a later sprint. Assignment and reply alerts are currently delivered as email-shaped output in logs/notifications.log.</div>
                     </div>
                 </div>
             </div>
@@ -71,8 +73,9 @@
     <div class="app-layout">
         <nav class="sidebar minimized" id="sidebar">
             <ul class="nav-menu">
-                {# Live route. Everything below it lands with its module's sprint;
-                   dead links are visible stubs, not broken url_for() calls. #}
+                {# Dashboard, tickets, and resources are live routes. KB /
+                   Reports / Team land with their sprints; those stay as visible
+                   toast stubs, never broken url_for() calls. #}
                 <li class="nav-item {% if request.endpoint == 'main.dashboard' %}active{% endif %}"
                     onclick="location.href='{{ url_for('main.dashboard') }}'"
                     title="{% if session['role'] == 'EndUser' %}My Dashboard{% else %}Dashboard{% endif %}">
@@ -80,12 +83,14 @@
                     <span class="nav-label">{% if session['role'] == 'EndUser' %}My Dashboard{% else %}Dashboard{% endif %}</span>
                 </li>
                 {% if session['role'] == 'EndUser' %}
-                <li class="nav-item" onclick="showToast('Submit Request arrives with the ticket module (Sprint 1)', 'info')" title="Submit Request">
+                <li class="nav-item {% if request.endpoint == 'tickets.create_ticket' %}active{% endif %}"
+                    onclick="location.href='{{ url_for('tickets.create_ticket') }}'" title="Submit Request">
                     <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                     <span class="nav-label">Submit Request</span>
                 </li>
                 {% endif %}
-                <li class="nav-item" onclick="showToast('Ticket module lands in Sprint 1 (P1.x)', 'info')" title="{% if session['role'] == 'EndUser' %}My Tickets{% else %}Tickets{% endif %}">
+                <li class="nav-item {% if request.blueprint == 'tickets' and request.endpoint != 'tickets.create_ticket' %}active{% endif %}"
+                    onclick="location.href='{{ url_for('tickets.list_tickets') }}'" title="{% if session['role'] == 'EndUser' %}My Tickets{% else %}Tickets{% endif %}">
                     <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                     <span class="nav-label">{% if session['role'] == 'EndUser' %}My Tickets{% else %}Tickets{% endif %}</span>
                 </li>
