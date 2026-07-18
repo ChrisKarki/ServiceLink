@@ -371,7 +371,7 @@
 
                             <div class="section-heading" style="margin-top: 4px;">Edit Properties</div>
                             <form class="card-box" style="padding: 18px; margin-bottom: 16px;"
-                                method="post" action="{{ url_for('resources.update_properties', resource_id=r.resourceID) }}">
+                                method="post" action="{{ url_for('resources.view_resource', resource_id=r.resourceID) }}">
                                 <div class="rail-form-group">
                                     <label for="qp-status">Resource State</label>
                                     <select class="form-control" id="qp-status" name="status" style="font-weight: 600;">

@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}Administration · SLA Targets{% endblock %}
+
+{% block content %}
+{% include "admin/_subnav.html" with context %}
+
+{% set priority_styles = {
+    'Critical': 'border: 1px solid var(--danger-color); color: var(--danger-color);',
+    'High':     'border: 1px solid var(--warning-color); color: var(--warning-color);',
+    'Medium':   'border: 1px solid var(--accent-color); color: var(--accent-color);',
+    'Low':      'border: 1px solid var(--panel-border); color: var(--text-secondary);'
+} %}
+
+<div style="margin-top: 18px; border: 1px solid var(--panel-border); border-radius: 12px; overflow: hidden; max-width: 860px;">
+    <table style="width: 100%; border-collapse: collapse;">
+        <thead>
+            <tr style="border-bottom: 1px solid var(--panel-border);">
+                {% for h in ['Priority', 'Response target (mins)', 'Resolution target (mins)', ''] %}
+                <th class="text-sm" style="text-align: left; padding: 12px 16px; color: var(--text-secondary); font-weight: 500;">{{ h }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for p in policies %}
+            <tr style="border-bottom: 1px solid var(--panel-border);">
+                {# A <form> can't wrap <td>s (browsers hoist it out and the
+                   inputs detach), so each row's inputs bind to an out-of-table
+                   form element via the HTML5 form="" attribute. #}
+                <td style="padding: 14px 16px;">
+                    <span class="badge" style="{{ priority_styles[p.priority] }}">{{ p.priority }}</span>
+                </td>
+                <td style="padding: 14px 16px;">
+                    <input type="number" name="responseTargetMins" value="{{ p.responseTargetMins }}"
+                           form="sla-form-{{ p.priority }}"
+                           min="1" max="129600" required class="search-input" style="padding: 8px 12px; width: 140px;">
+                </td>
+                <td style="padding: 14px 16px;">
+                    <input type="number" name="resolutionTargetMins" value="{{ p.resolutionTargetMins }}"
+                           form="sla-form-{{ p.priority }}"
+                           min="1" max="129600" required class="search-input" style="padding: 8px 12px; width: 140px;">
+                </td>
+                <td style="padding: 14px 16px;">
+                    <button type="submit" form="sla-form-{{ p.priority }}" class="badge badge-status-resolved" style="cursor: pointer; padding: 8px 18px; border: none;">Save</button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% for p in policies %}
+<form id="sla-form-{{ p.priority }}" method="post"
+      action="{{ url_for('admin.update_sla', priority=p.priority) }}"></form>
+{% endfor %}
+<div class="text-sm" style="color: var(--text-secondary); margin-top: 12px; max-width: 860px;">
+    Targets are read live by the FR-2.5 escalation checks — changes apply to new
+    SLA calculations immediately. The response target must not exceed the
+    resolution target. Every change is written to the audit log with old and
+    new values.
+</div>
+{% endblock %}

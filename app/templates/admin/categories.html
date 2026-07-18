@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block title %}Administration · Categories{% endblock %}
+
+{% block content %}
+{% include "admin/_subnav.html" with context %}
+
+<div style="display: flex; gap: 20px; margin-top: 18px; align-items: flex-start; flex-wrap: wrap;">
+
+    <div style="flex: 2; min-width: 380px; border: 1px solid var(--panel-border); border-radius: 12px; overflow: hidden;">
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="border-bottom: 1px solid var(--panel-border);">
+                    {% for h in ['Category', 'Tickets', 'Status', 'Actions'] %}
+                    <th class="text-sm" style="text-align: left; padding: 12px 16px; color: var(--text-secondary); font-weight: 500;">{{ h }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for c in categories %}
+                <tr style="border-bottom: 1px solid var(--panel-border);">
+                    <td style="padding: 12px 16px;">
+                        <form method="post" action="{{ url_for('admin.rename_category', category_id=c.categoryID) }}"
+                              style="margin: 0; display: flex; gap: 8px; align-items: center;">
+                            <input type="text" name="name" value="{{ c.name }}" maxlength="80" required
+                                   class="search-input" style="padding: 6px 10px; width: 220px;">
+                            <button type="submit" class="badge" style="cursor: pointer; padding: 6px 12px; background: none; border: 1px solid var(--panel-border); color: var(--text-secondary);">Rename</button>
+                        </form>
+                    </td>
+                    <td class="text-sm" style="padding: 12px 16px; color: var(--text-secondary);">{{ c.ticketCount }}</td>
+                    <td style="padding: 12px 16px;">
+                        {% if c.isActive %}
+                        <span class="badge badge-status-resolved">Active</span>
+                        {% else %}
+                        <span class="badge" style="border: 1px solid var(--panel-border); color: var(--text-secondary);">Inactive</span>
+                        {% endif %}
+                    </td>
+                    <td style="padding: 12px 16px;">
+                        <form method="post" action="{{ url_for('admin.toggle_category', category_id=c.categoryID) }}" style="margin: 0;"
+                              {% if c.isActive %}onsubmit="return confirm('Deactivate ' + {{ c.name | tojson }} + '? It disappears from the submit form; existing tickets keep it.');"{% endif %}>
+                            {% if c.isActive %}
+                            <button type="submit" class="badge" style="cursor: pointer; padding: 6px 14px; background: none; border: 1px solid var(--warning-color); color: var(--warning-color);">Deactivate</button>
+                            {% else %}
+                            <button type="submit" class="badge" style="cursor: pointer; padding: 6px 14px; background: none; border: 1px solid var(--accent-color); color: var(--accent-color);">Activate</button>
+                            {% endif %}
+                        </form>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="4" style="padding: 32px; text-align: center; color: var(--text-secondary);">
+                        No categories yet — create the first one on the right.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div style="flex: 1; min-width: 280px; border: 1px solid var(--panel-border); border-radius: 12px; padding: 20px;">
+        <div style="color: var(--text-primary); font-weight: 600; margin-bottom: 6px;">New category</div>
+        <div class="text-sm" style="color: var(--text-secondary); margin-bottom: 14px;">
+            Active categories appear on the ticket submit form and drive
+            round-robin technician assignment.
+        </div>
+        <form method="post" action="{{ url_for('admin.create_category') }}" style="display: flex; gap: 8px;">
+            <input type="text" name="name" placeholder="e.g. Network" maxlength="80" required
+                   class="search-input" style="padding: 8px 12px; flex: 1;">
+            <button type="submit" class="badge badge-status-resolved" style="cursor: pointer; padding: 8px 16px; border: none;">Create</button>
+        </form>
+        <div class="text-sm" style="color: var(--text-secondary); margin-top: 14px;">
+            Categories can't be deleted once tickets reference them — deactivate
+            instead so ticket history stays intact.
+        </div>
+    </div>
+</div>
+{% endblock %}
