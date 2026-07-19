@@ -9,7 +9,7 @@
         gap: 8px;
         font-size: 13px;
         color: var(--text-secondary);
-        margin-bottom: 24px;
+        margin-bottom: 20px;
         flex-wrap: wrap;
     }
 
@@ -33,29 +33,50 @@
         font-weight: 500;
     }
 
-    .resource-header-bar {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 24px;
-        margin-bottom: 28px;
-        flex-wrap: wrap;
-    }
-
-    .dashboard-grid-2 {
+    /* Freshservice-style layout: tabbed content left, property rail right */
+    .ticket-grid {
         display: grid;
-        grid-template-columns: 2fr 1fr;
-        gap: 32px;
+        grid-template-columns: minmax(0, 1fr) 340px;
+        gap: 24px;
         align-items: start;
     }
 
-    .section-heading {
-        font-size: 15px;
-        font-weight: 700;
+    .tab-bar {
+        display: flex;
+        gap: 4px;
+        border-bottom: 1px solid var(--panel-border);
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+    }
+
+    .tab-btn {
+        background: none;
+        border: none;
+        border-bottom: 2px solid transparent;
+        color: var(--text-secondary);
+        font-size: 14px;
+        font-weight: 500;
+        padding: 10px 16px;
+        cursor: pointer;
+        transition: color 0.15s, border-color 0.15s;
+    }
+
+    .tab-btn:hover {
         color: var(--text-primary);
-        margin-bottom: 16px;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
+    }
+
+    .tab-btn.active {
+        color: var(--accent-color);
+        border-bottom-color: var(--accent-color);
+        font-weight: 600;
+    }
+
+    .tab-pane {
+        display: none;
+    }
+
+    .tab-pane.active {
+        display: block;
     }
 
     .card-box {
@@ -63,28 +84,87 @@
         border: 1px solid var(--panel-border);
         border-radius: 12px;
         padding: 22px;
-        margin-bottom: 24px;
+        margin-bottom: 20px;
     }
 
     .card-box-tint {
         background: var(--card-tint);
         border: 1px solid var(--panel-border);
         border-radius: 12px;
-        padding: 22px;
-        margin-bottom: 24px;
-    }
-
-    .spec-grid-row {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 20px;
+        padding: 18px 22px;
         margin-bottom: 20px;
     }
 
-    .spec-item {
+    .section-heading {
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--text-secondary);
+        margin-bottom: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    /* Right rail */
+    .rail-card {
+        background: var(--panel-bg);
+        border: 1px solid var(--panel-border);
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 16px;
+    }
+
+    .rail-row {
         display: flex;
-        flex-direction: column;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        padding: 6px 0;
+    }
+
+    .sla-chip {
+        display: inline-flex;
+        align-items: center;
         gap: 6px;
+        border-radius: 6px;
+        padding: 4px 10px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .sla-ok { border: 1px solid var(--accent-color); color: var(--accent-color); }
+    .sla-overdue { border: 1px solid var(--danger-color); color: var(--danger-color); }
+    .sla-met { border: 1px solid var(--panel-border); color: var(--text-secondary); }
+
+    /* Conversation */
+    .comment-item {
+        display: flex;
+        gap: 14px;
+        padding: 14px 0;
+        border-bottom: 1px solid var(--panel-border);
+    }
+
+    .comment-item:last-of-type {
+        border-bottom: none;
+    }
+
+    .comment-internal {
+        background: var(--card-tint);
+        border: 1px dashed var(--warning-color);
+        border-radius: 10px;
+        padding: 14px;
+        margin: 8px 0;
+    }
+
+    .form-label {
+        display: block;
+        margin-bottom: 6px;
+        font-weight: 600;
+        font-size: 13px;
+        color: var(--text-primary);
+    }
+
+    .form-group {
+        margin-bottom: 16px;
     }
 
     /* Associate Resources modal (H2.1) */
@@ -171,34 +251,26 @@
 {% endblock %}
 
 {% block content %}
-{# Context: t (shaped ticket), linked (resources on this ticket),
-   linkable (staff only — resources not yet linked), history (audit rows),
-   is_staff (bool). Scoping enforced server-side in _get_ticket_or_403. #}
+{# Freshservice-style detail: tabbed content (Details / Assets / Activity /
+   Resolution) on the left, property rail on the right. Context comes from
+   tickets.view_ticket: t, linked, comments, history, sla, is_staff,
+   can_reopen, reopen_days, technicians, categories, priorities, statuses,
+   status_labels. #}
                     <div class="kb-breadcrumb">
                         <a href="{{ url_for('tickets.list_tickets') }}">Tickets</a>
                         <span class="separator">/</span>
                         <span class="current">TKT-{{ t.ticketID }}</span>
                     </div>
 
-                    <div class="resource-header-bar">
-                        <div>
-                            <h1 style="margin: 0 0 6px 0; font-size: 24px;">
-                                TKT-{{ t.ticketID }} &middot; {{ t.title }}</h1>
-                            <span class="text-sm" style="color: var(--text-secondary);">
-                                Submitted by {{ t.submitterName }} &middot; {{ t.categoryName }} &middot; {{ t.age }}</span>
-                        </div>
-                        <div style="display: flex; gap: 12px; align-items: center;">
+                    <div class="flex-between" style="margin-bottom: 6px; gap: 16px; flex-wrap: wrap;">
+                        <h1 style="margin: 0; font-size: 24px;">{{ t.title }}</h1>
+                        <div style="display: flex; gap: 10px; align-items: center;">
                             <span class="{{ t.priority_badge.cls }}"{% if t.priority_badge.style %} style="{{ t.priority_badge.style }}"{% endif %}>{{ t.priority }}</span>
                             <span class="{{ t.status_badge.cls }}"{% if t.status_badge.style %} style="{{ t.status_badge.style }}"{% endif %}>{{ t.status_label }}</span>
                             {% if t.slaBreached %}
                             <!-- P2.2: stored breach flag (§4.2), set by the on-request check. -->
                             <span class="badge"
                                 style="background: var(--danger-color); color: #fff; border: 1px solid var(--danger-color);">SLA Breached</span>
-                            {% endif %}
-                            {% if is_staff and next_states %}
-                            <!-- P1.4 status transitions (FR-2.2, UC-02). Options come from
-                                 TRANSITIONS[t.status]; the server re-enforces the graph. -->
-                            <button class="btn btn-secondary" onclick="openStatusModal()">Change Status</button>
                             {% endif %}
                             {% if can_reopen %}
                             <!-- P2.2: submitter self-service reopen inside the policy window. -->
@@ -208,220 +280,268 @@
                             {% endif %}
                         </div>
                     </div>
+                    <div class="text-sm" style="color: var(--text-secondary); margin-bottom: 20px;">
+                        <strong style="color: var(--text-primary);">{{ t.submitterName }}</strong>
+                        reported {{ t.age }} ({{ t.createdAt.strftime('%a, %b %d %Y, %I:%M %p') }})
+                        &middot; TKT-{{ t.ticketID }} &middot; {{ t.categoryName }}
+                    </div>
 
-                    <div class="dashboard-grid-2">
-                        <!-- LEFT: description + activity -->
+                    <div class="ticket-grid">
+                        <!-- LEFT: tabbed content -->
                         <div>
-                            <div class="section-heading">Description</div>
-                            <div class="card-box">
-                                <p style="color: var(--text-primary); white-space: pre-wrap; margin: 0; line-height: 1.6;">{{ t.description }}</p>
+                            <div class="tab-bar">
+                                <button type="button" class="tab-btn active" data-tab="tab-details" onclick="showTab(this)">Details</button>
+                                <button type="button" class="tab-btn" data-tab="tab-assets" onclick="showTab(this)">Resources
+                                    <span class="badge" style="border: 1px solid var(--panel-border); color: var(--text-secondary); margin-left: 4px;">{{ linked|length }}</span></button>
+                                <button type="button" class="tab-btn" data-tab="tab-activity" onclick="showTab(this)">Activity</button>
+                                <button type="button" class="tab-btn" data-tab="tab-resolution" onclick="showTab(this)">Resolution</button>
                             </div>
 
-                            <div class="section-heading">Comments</div>
-                            <div class="card-box-tint">
-                                <span class="text-sm" style="color: var(--text-secondary);">
-                                    Public comments and internal notes land with the comments card in Sprint 2
-                                    (FR-2.4).</span>
-                            </div>
+                            <!-- TAB: Details = description + conversation -->
+                            <div class="tab-pane active" id="tab-details">
+                                <div class="section-heading">Description</div>
+                                <div class="card-box">
+                                    <p style="color: var(--text-primary); white-space: pre-wrap; margin: 0; line-height: 1.6;">{{ t.description }}</p>
+                                </div>
 
-                            <div class="section-heading">Recent Audit Activity</div>
-                            <div class="card-box-tint">
-                                {% for h in history %}
-                                <div
-                                    style="display: flex; justify-content: space-between; padding: 10px 0; {% if not loop.last %}border-bottom: 1px solid var(--panel-border);{% endif %}">
-                                    <span class="text-sm" style="color: var(--text-primary);">
-                                        <strong>{{ h.actor }}</strong> {{ h.action|lower }}d this ticket</span>
-                                    <span class="text-sm" style="color: var(--text-secondary);">{{ h.timestamp.strftime('%b %d, %H:%M') }}</span>
+                                <div class="section-heading">Conversation
+                                    <span class="badge" style="border: 1px solid var(--panel-border); color: var(--text-secondary); margin-left: 4px;">{{ comments|length }}</span>
                                 </div>
-                                {% else %}
-                                <div class="text-sm" style="color: var(--text-secondary);">No audit activity recorded
-                                    yet.</div>
-                                {% endfor %}
-                            </div>
-                        </div>
+                                <div class="card-box">
+                                    {% for c in comments %}
+                                    {% if c.isInternal %}
+                                    <div class="comment-internal">
+                                        <div class="flex-between" style="margin-bottom: 6px;">
+                                            <span class="text-sm" style="font-weight: 600; color: var(--warning-color);">
+                                                Internal note &middot; {{ c.author }} ({{ c.authorRole }})</span>
+                                            <span class="text-sm" style="color: var(--text-secondary);">{{ c.createdAt.strftime('%b %d, %I:%M %p') }}</span>
+                                        </div>
+                                        <div class="text-sm" style="color: var(--text-primary); white-space: pre-wrap; line-height: 1.5;">{{ c.body }}</div>
+                                    </div>
+                                    {% else %}
+                                    <div class="comment-item">
+                                        <div class="avatar" style="width: 36px; height: 36px; font-size: 12px; flex-shrink: 0;">{{ c.initials }}</div>
+                                        <div style="min-width: 0; flex: 1;">
+                                            <div class="flex-between" style="margin-bottom: 4px;">
+                                                <span class="text-sm" style="font-weight: 600; color: var(--text-primary);">
+                                                    {{ c.author }}
+                                                    <span style="color: var(--text-secondary); font-weight: 400;">&middot; {{ c.authorRole }}</span></span>
+                                                <span class="text-sm" style="color: var(--text-secondary);">{{ c.createdAt.strftime('%b %d, %I:%M %p') }}</span>
+                                            </div>
+                                            <div class="text-sm" style="color: var(--text-primary); white-space: pre-wrap; line-height: 1.5;">{{ c.body }}</div>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                    {% else %}
+                                    <div class="text-sm" style="color: var(--text-secondary);">No replies yet.</div>
+                                    {% endfor %}
 
-                        <!-- RIGHT: meta + linked resources (H2.1) -->
-                        <div>
-                            <div class="section-heading">Details</div>
-                            <div class="card-box">
-                                <div class="spec-grid-row">
-                                    <div class="spec-item">
-                                        <span class="text-sm" style="color: var(--text-secondary);">Status</span>
-                                        <span style="color: var(--text-primary); font-weight: 600;">{{ t.status_label }}</span>
-                                    </div>
-                                    <div class="spec-item">
-                                        <span class="text-sm" style="color: var(--text-secondary);">Priority</span>
-                                        <span style="color: var(--text-primary); font-weight: 600;">{{ t.priority }}</span>
-                                    </div>
-                                </div>
-                                <div class="spec-grid-row">
-                                    <div class="spec-item">
-                                        <span class="text-sm" style="color: var(--text-secondary);">Category</span>
-                                        <span style="color: var(--text-primary); font-weight: 500;">{{ t.categoryName }}</span>
-                                    </div>
-                                    <div class="spec-item">
-                                        <span class="text-sm" style="color: var(--text-secondary);">Assignee</span>
-                                        {% if t.unassigned %}
-                                        <span style="color: var(--text-secondary); font-style: italic;">Unassigned</span>
-                                        {% else %}
-                                        <span style="color: var(--text-primary); font-weight: 500;">{{ t.assigneeName }}</span>
-                                        {% endif %}
-                                    </div>
-                                </div>
-                                <div class="spec-grid-row" style="margin-bottom: {{ '20px' if t.resolvedAt else '0' }};">
-                                    <div class="spec-item">
-                                        <span class="text-sm" style="color: var(--text-secondary);">Submitted By</span>
-                                        <span style="color: var(--text-primary); font-weight: 500;">{{ t.submitterName }}</span>
-                                    </div>
-                                    <div class="spec-item">
-                                        <span class="text-sm" style="color: var(--text-secondary);">Created</span>
-                                        <span style="color: var(--text-primary); font-weight: 500;">{{ t.createdAt.strftime('%b %d, %Y at %H:%M') }}</span>
-                                    </div>
-                                </div>
-                                {% if t.resolvedAt %}
-                                <!-- P1.4: shown once a ticket reaches Resolved/Closed. -->
-                                <div class="spec-grid-row" style="margin-bottom: 0;">
-                                    <div class="spec-item">
-                                        <span class="text-sm" style="color: var(--text-secondary);">Resolved</span>
-                                        <span style="color: var(--text-primary); font-weight: 500;">{{ t.resolvedAt.strftime('%b %d, %Y at %H:%M') }}</span>
-                                    </div>
-                                </div>
-                                {% endif %}
-                                {% if t.resolutionSummary %}
-                                <div class="spec-item" style="margin-top: 16px;">
-                                    <span class="text-sm" style="color: var(--text-secondary);">Resolution Summary</span>
-                                    <span style="color: var(--text-primary); font-weight: 500; white-space: pre-wrap;">{{ t.resolutionSummary }}</span>
-                                </div>
-                                {% endif %}
-                            </div>
-
-                            {# P2.2 (FR-2.2): deadlines computed from SLAPolicy; the breach state
-                               shown here is the stored flag (§4.2), not a fresh derivation. #}
-                            <div class="section-heading">SLA</div>
-                            <div class="card-box">
-                                <div class="spec-grid-row" style="margin-bottom: {{ '20px' if sla.breached else '0' }};">
-                                    <div class="spec-item">
-                                        <span class="text-sm" style="color: var(--text-secondary);">Response Due</span>
-                                        <span style="color: var(--text-primary); font-weight: 500;">{{ sla.response_due.strftime('%b %d, %Y at %H:%M') }}</span>
-                                    </div>
-                                    <div class="spec-item">
-                                        <span class="text-sm" style="color: var(--text-secondary);">Resolution Due</span>
-                                        <span style="color: {{ 'var(--danger-color)' if sla.breached else 'var(--text-primary)' }}; font-weight: 500;">{{ sla.resolution_due.strftime('%b %d, %Y at %H:%M') }}</span>
-                                    </div>
-                                </div>
-                                {% if sla.breached %}
-                                <div class="spec-item">
-                                    <span class="text-sm" style="color: var(--text-secondary);">SLA Status</span>
-                                    <span style="color: var(--danger-color); font-weight: 600;">Resolution target missed — escalated to the technician &amp; managers.</span>
-                                </div>
-                                {% endif %}
-                            </div>
-
-                            <div class="section-heading">Linked Resources</div>
-                            <div class="card-box" style="padding: 16px;">
-                                {% for r in linked %}
-                                <div
-                                    style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px; background: var(--card-tint); border: 1px solid var(--panel-border); border-radius: 10px; margin-bottom: 10px;">
-                                    <div style="min-width: 0;">
-                                        <a href="{{ url_for('resources.view_resource', resource_id=r.resourceID) if is_staff else '#' }}"
-                                            style="color: var(--text-primary); font-weight: 600; font-family: monospace; text-decoration: none;">{{ r.resourceTag }}</a>
-                                        {% if r.status in ('Disposed', 'LostMissing') %}
-                                        <span class="badge"
-                                            style="border: 1px solid var(--warning-color); color: var(--warning-color); margin-left: 6px;">{{ 'Disposed' if r.status == 'Disposed' else 'Lost / Missing' }}</span>
-                                        {% endif %}
-                                        <span class="text-sm"
-                                            style="color: var(--text-secondary); display: block; margin-top: 2px;">{{ r.make }} {{ r.model }} &middot; {{ r.type }}</span>
-                                    </div>
-                                    {% if is_staff %}
-                                    <form method="post"
-                                        action="{{ url_for('tickets.unlink_resource', ticket_id=t.ticketID) }}">
-                                        <input type="hidden" name="resource_id" value="{{ r.resourceID }}">
-                                        <button type="submit" class="btn btn-ghost btn-sm"
-                                            style="color: var(--danger-color);">Unlink</button>
+                                    <form method="post" action="{{ url_for('tickets.add_comment', ticket_id=t.ticketID) }}"
+                                        style="margin-top: 18px; padding-top: 18px; border-top: 1px solid var(--panel-border);">
+                                        <div class="form-group">
+                                            <label class="form-label" for="comment-body">Reply</label>
+                                            <textarea id="comment-body" name="body" rows="3" class="form-control"
+                                                placeholder="Write a reply..."></textarea>
+                                        </div>
+                                        <div class="flex-between">
+                                            {% if is_staff %}
+                                            <label class="text-sm" style="display: flex; align-items: center; gap: 8px; color: var(--text-primary); cursor: pointer;">
+                                                <input type="checkbox" name="is_internal" value="1"
+                                                    style="width: 15px; height: 15px; accent-color: var(--warning-color);">
+                                                Internal note (staff only)
+                                            </label>
+                                            {% else %}<span></span>{% endif %}
+                                            <button type="submit" class="btn btn-primary">Post</button>
+                                        </div>
                                     </form>
+                                </div>
+                            </div>
+
+                            <!-- TAB: Resources (H2.1) -->
+                            <div class="tab-pane" id="tab-assets">
+                                <div class="flex-between" style="margin-bottom: 12px;">
+                                    <div class="section-heading" style="margin-bottom: 0;">Linked Resources</div>
+                                    {% if is_staff %}
+                                    <button type="button" class="btn btn-secondary" onclick="openResourceModal()">+ Associate Resources</button>
                                     {% endif %}
                                 </div>
-                                {% else %}
-                                <div class="text-sm" style="padding: 8px; color: var(--text-secondary);">
-                                    No resources linked to this ticket.</div>
-                                {% endfor %}
+                                <div class="card-box" style="padding: 16px;">
+                                    {% for r in linked %}
+                                    <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px; background: var(--card-tint); border: 1px solid var(--panel-border); border-radius: 10px; margin-bottom: 10px;">
+                                        <div style="min-width: 0;">
+                                            <a href="{{ url_for('resources.view_resource', resource_id=r.resourceID) if is_staff else '#' }}"
+                                                style="color: var(--text-primary); font-weight: 600; font-family: monospace; text-decoration: none;">{{ r.resourceTag }}</a>
+                                            {% if r.status in ('Disposed', 'LostMissing') %}
+                                            <span class="badge" style="border: 1px solid var(--warning-color); color: var(--warning-color); margin-left: 6px;">{{ 'Disposed' if r.status == 'Disposed' else 'Lost / Missing' }}</span>
+                                            {% endif %}
+                                            <span class="text-sm" style="color: var(--text-secondary); display: block; margin-top: 2px;">
+                                                {{ r.make }} {{ r.model }} &middot; {{ r.type }} &middot; linked {{ r.linkedAt.strftime('%b %d, %Y') }}</span>
+                                        </div>
+                                        {% if is_staff %}
+                                        <form method="post" action="{{ url_for('tickets.unlink_resource', ticket_id=t.ticketID) }}">
+                                            <input type="hidden" name="resource_id" value="{{ r.resourceID }}">
+                                            <button type="submit" class="btn btn-ghost btn-sm" style="color: var(--danger-color);">Unlink</button>
+                                        </form>
+                                        {% endif %}
+                                    </div>
+                                    {% else %}
+                                    <div class="text-sm" style="padding: 8px; color: var(--text-secondary);">No resources linked to this ticket.</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
 
+                            <!-- TAB: Activity = audit trail (FR-6.2) -->
+                            <div class="tab-pane" id="tab-activity">
+                                <div class="section-heading">Audit Activity</div>
+                                <div class="card-box">
+                                    {% for h in history %}
+                                    <div style="display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; {% if not loop.last %}border-bottom: 1px solid var(--panel-border);{% endif %}">
+                                        <span class="text-sm" style="color: var(--text-primary);">
+                                            <strong>{{ h.actor }}</strong> &middot; {{ h.action }}</span>
+                                        <span class="text-sm" style="color: var(--text-secondary); flex-shrink: 0;">{{ h.timestamp.strftime('%b %d, %Y %I:%M %p') }}</span>
+                                    </div>
+                                    {% else %}
+                                    <div class="text-sm" style="color: var(--text-secondary);">No audit activity recorded yet.</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+
+                            <!-- TAB: Resolution -->
+                            <div class="tab-pane" id="tab-resolution">
+                                <div class="section-heading">Resolution Notes</div>
                                 {% if is_staff %}
-                                <button type="button" class="btn btn-secondary" style="width: 100%; margin-top: 6px;"
-                                    onclick="openResourceModal()">+ Associate Resources</button>
+                                <form method="post" action="{{ url_for('tickets.save_resolution', ticket_id=t.ticketID) }}" class="card-box">
+                                    <textarea name="resolutionSummary" rows="6" class="form-control"
+                                        placeholder="Describe how this ticket was resolved...">{{ t.resolutionSummary or '' }}</textarea>
+                                    <div style="display: flex; justify-content: flex-end; margin-top: 12px;">
+                                        <button type="submit" class="btn btn-primary">Save Resolution</button>
+                                    </div>
+                                </form>
+                                {% else %}
+                                <div class="card-box">
+                                    {% if t.resolutionSummary %}
+                                    <p style="color: var(--text-primary); white-space: pre-wrap; margin: 0; line-height: 1.6;">{{ t.resolutionSummary }}</p>
+                                    {% else %}
+                                    <span class="text-sm" style="color: var(--text-secondary);">No resolution notes yet.</span>
+                                    {% endif %}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- RIGHT: property rail -->
+                        <div>
+                            <!-- SLA card (FR-2.5, backed by SLAPolicy; breach state is the
+                                 stored flag (§4.2), set by the on-request check). -->
+                            <div class="rail-card">
+                                <div class="rail-row" style="padding-top: 0;">
+                                    <span class="text-sm" style="color: var(--text-secondary);">Status</span>
+                                    <span style="font-weight: 700; color: var(--text-primary);">{{ t.status_label }}</span>
+                                </div>
+                                {% if sla %}
+                                <div class="rail-row">
+                                    <div>
+                                        <div class="text-sm" style="color: var(--text-secondary);">Resolution due</div>
+                                        <div class="text-sm" style="color: var(--text-primary); font-weight: 500;">{{ sla.due_label }}</div>
+                                    </div>
+                                    <span class="sla-chip {{ 'sla-overdue' if sla.state == 'overdue' or (sla.state == 'closed' and sla.breached) else ('sla-met' if sla.state == 'closed' else 'sla-ok') }}">
+                                        <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                        {{ sla.timer }}</span>
+                                </div>
+                                {% if sla.breached %}
+                                <div class="rail-row">
+                                    <span class="text-sm" style="color: var(--danger-color); font-weight: 600;">
+                                        Resolution target missed &mdash; escalated to the technician &amp; managers.</span>
+                                </div>
+                                {% endif %}
+                                {% else %}
+                                <div class="rail-row">
+                                    <span class="text-sm" style="color: var(--text-secondary);">Resolution due</span>
+                                    <span class="text-sm" style="color: var(--text-secondary);">No SLA policy for {{ t.priority }}</span>
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Requester information -->
+                            <div class="rail-card">
+                                <div class="section-heading">Requester Information</div>
+                                <div style="display: flex; gap: 12px; align-items: center;">
+                                    <div class="avatar" style="width: 40px; height: 40px; font-size: 14px;">{{ (t.submitterName.split(' ')[0][:1] ~ t.submitterName.split(' ')[-1][:1])|upper }}</div>
+                                    <div>
+                                        <div style="color: var(--text-primary); font-weight: 600;">{{ t.submitterName }}</div>
+                                        <div class="text-sm" style="color: var(--text-secondary);">Submitted {{ t.createdAt.strftime('%b %d, %Y %I:%M %p') }}</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Properties (staff: editable form; End User: read-only) -->
+                            <div class="rail-card">
+                                <div class="section-heading">Properties</div>
+                                {% if is_staff %}
+                                <form method="post" action="{{ url_for('tickets.update_properties', ticket_id=t.ticketID) }}">
+                                    <div class="form-group">
+                                        <label class="form-label" for="prop-status">Status *</label>
+                                        {# P1.4 (FR-2.2, UC-02): only the current status and its legal
+                                           next states (TRANSITIONS) are offered; the server
+                                           re-enforces the graph on every request regardless. #}
+                                        <select id="prop-status" name="status" class="form-control">
+                                            {% for s in statuses %}
+                                            {% if s == t.status or s in next_states %}
+                                            <option value="{{ s }}" {% if t.status == s %}selected{% endif %}>{{ status_labels[s] }}</option>
+                                            {% endif %}
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label" for="prop-priority">Priority *</label>
+                                        <select id="prop-priority" name="priority" class="form-control">
+                                            {% for p in priorities %}
+                                            <option value="{{ p }}" {% if t.priority == p %}selected{% endif %}>{{ p }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label" for="prop-agent">Agent</label>
+                                        <select id="prop-agent" name="assignedToUserID" class="form-control">
+                                            <option value="">Unassigned</option>
+                                            {% for tech in technicians %}
+                                            <option value="{{ tech.userID }}" {% if t.assignedToUserID == tech.userID %}selected{% endif %}>{{ tech.name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label" for="prop-category">Category *</label>
+                                        <select id="prop-category" name="categoryID" class="form-control">
+                                            {% for cat in categories %}
+                                            <option value="{{ cat.categoryID }}" {% if t.categoryID == cat.categoryID %}selected{% endif %}>{{ cat.name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary" style="width: 100%;">Update</button>
+                                    <div class="text-sm" style="color: var(--text-secondary); margin-top: 10px;">
+                                        Changes are audit-logged with old and new values (FR-6.2).</div>
+                                </form>
+                                {% else %}
+                                <div class="rail-row"><span class="text-sm" style="color: var(--text-secondary);">Priority</span><span class="text-sm" style="color: var(--text-primary); font-weight: 500;">{{ t.priority }}</span></div>
+                                <div class="rail-row"><span class="text-sm" style="color: var(--text-secondary);">Category</span><span class="text-sm" style="color: var(--text-primary); font-weight: 500;">{{ t.categoryName }}</span></div>
+                                <div class="rail-row"><span class="text-sm" style="color: var(--text-secondary);">Agent</span><span class="text-sm" style="color: var(--text-primary); font-weight: 500;">{% if t.unassigned %}Unassigned{% else %}{{ t.assigneeName }}{% endif %}</span></div>
+                                <div class="rail-row"><span class="text-sm" style="color: var(--text-secondary);">Created</span><span class="text-sm" style="color: var(--text-primary); font-weight: 500;">{{ t.createdAt.strftime('%b %d, %Y') }}</span></div>
                                 {% endif %}
                             </div>
                         </div>
                     </div>
 
-                    {% if is_staff and next_states %}
-                    <!-- Change Status modal (P1.4, UC-02). The select is limited to the
-                         legal next states; the resolution summary is revealed and required
-                         only when the target is Resolved. The server enforces all of this
-                         again on POST — the UI is a convenience, not the gate. -->
-                    <div class="modal-overlay" id="statusModal"
-                        onclick="if (event.target === this) closeStatusModal()">
-                        <div class="modal-card" style="max-width: 480px;">
-                            <form method="post" action="{{ url_for('tickets.change_status', ticket_id=t.ticketID) }}">
-                                <div class="modal-head">
-                                    <h2 style="margin: 0; font-size: 18px;">Change Status</h2>
-                                    <button type="button" class="icon-btn" onclick="closeStatusModal()" title="Close">
-                                        <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M6 18L18 6M6 6l12 12"></path>
-                                        </svg>
-                                    </button>
-                                </div>
-                                <div style="padding: 4px 24px 8px 24px;">
-                                    <label class="text-sm" for="statusSelect"
-                                        style="color: var(--text-secondary); display: block; margin-bottom: 6px;">New status</label>
-                                    <select name="status" id="statusSelect" class="form-control" onchange="onStatusChange()">
-                                        {% for s in next_states %}
-                                        <option value="{{ s }}">{{ status_labels[s] }}</option>
-                                        {% endfor %}
-                                    </select>
-                                    <div id="resolutionBlock" style="display: none; margin-top: 16px;">
-                                        <label class="text-sm" for="resolutionSummary"
-                                            style="color: var(--text-secondary); display: block; margin-bottom: 6px;">
-                                            Resolution summary <span style="color: var(--danger-color);">*</span></label>
-                                        <textarea name="resolution_summary" id="resolutionSummary" class="form-control"
-                                            rows="4" placeholder="Describe how this ticket was resolved..."></textarea>
-                                    </div>
-                                </div>
-                                <div class="modal-foot">
-                                    <span></span>
-                                    <div style="display: flex; gap: 10px;">
-                                        <button type="button" class="btn btn-secondary" onclick="closeStatusModal()">Cancel</button>
-                                        <button type="submit" class="btn btn-primary">Update Status</button>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
                     <script>
-                        function openStatusModal() {
-                            document.getElementById('statusModal').classList.add('open');
-                            onStatusChange();
+                        function showTab(btn) {
+                            document.querySelectorAll('.tab-btn').forEach(function (b) { b.classList.remove('active'); });
+                            document.querySelectorAll('.tab-pane').forEach(function (p) { p.classList.remove('active'); });
+                            btn.classList.add('active');
+                            document.getElementById(btn.dataset.tab).classList.add('active');
                         }
-                        function closeStatusModal() {
-                            document.getElementById('statusModal').classList.remove('open');
-                        }
-                        function onStatusChange() {
-                            var show = document.getElementById('statusSelect').value === 'Resolved';
-                            document.getElementById('resolutionBlock').style.display = show ? 'block' : 'none';
-                            document.getElementById('resolutionSummary').required = show;
-                        }
-                        document.addEventListener('keydown', function (e) {
-                            if (e.key === 'Escape') closeStatusModal();
-                        });
                     </script>
-                    {% endif %}
 
                     {% if is_staff %}
-                    <!-- Associate Resources modal (H2.1). Search hits
-                         tickets.search_linkable (JSON, LIMIT 20) as you type;
-                         selections survive re-searches via a JS Set and are
-                         posted as resource_ids[] to tickets.link_resource. -->
                     <div class="modal-overlay" id="resourceModal" onclick="if (event.target === this) closeResourceModal()">
                         <div class="modal-card">
                             <div class="modal-head">
