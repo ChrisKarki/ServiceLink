@@ -399,3 +399,108 @@ def update_sla(priority):
     flash(f"{priority} SLA targets updated. New tickets pick these up "
           "immediately.", "success")
     return redirect(url_for("admin.list_sla"))
+
+
+# ===========================================================================
+# Panel 4 — Audit log (FR-6.2, depends C3.2)
+# ===========================================================================
+#
+# Read-only, Administrator-only, paginated. Every row can expand its
+# field-level AuditLogChange children, so the trail reads as
+# "Chris Karki updated Resource #12 — assetState: Available -> InUse"
+# rather than just "Chris Karki updated". Audit rows are immutable
+# (NFR-S6): this panel offers no edit or delete affordance, on purpose.
+
+AUDIT_ENTITY_TYPES = ("Ticket", "Resource", "User", "KBArticle",
+                      "TicketComment", "TicketResource",
+                      "Category", "SLAPolicy")
+AUDIT_ACTIONS = ("Create", "Update", "Delete", "Link", "Unlink")
+AUDIT_PER_PAGE = 50
+
+ACTION_BADGES = {
+    "Create": "border: 1px solid var(--accent-color); color: var(--accent-color);",
+    "Update": "border: 1px solid var(--warning-color); color: var(--warning-color);",
+    "Delete": "border: 1px solid var(--danger-color); color: var(--danger-color);",
+    "Link":   "border: 1px solid var(--panel-border); color: var(--text-primary);",
+    "Unlink": "border: 1px solid var(--panel-border); color: var(--text-secondary);",
+}
+
+
+@bp.get("/audit")
+@roles_required("Administrator")
+def list_audit():
+    # --- validate filters (whitelist, never interpolated: NFR-S4) -----
+    f_entity = request.args.get("entity") or None
+    f_entity = f_entity if f_entity in AUDIT_ENTITY_TYPES else None
+    f_action = request.args.get("action") or None
+    f_action = f_action if f_action in AUDIT_ACTIONS else None
+    f_actor = request.args.get("actor") or ""
+    f_actor = int(f_actor) if f_actor.isdigit() else None
+    f_entity_id = (request.args.get("entity_id") or "").strip()
+    f_entity_id = int(f_entity_id) if f_entity_id.isdigit() else None
+
+    raw_page = request.args.get("page") or "1"
+    page = int(raw_page) if raw_page.isdigit() else 1
+    page = max(page, 1)
+
+    where, params = " WHERE 1=1", []
+    if f_entity:
+        where += " AND a.entityType = %s"
+        params.append(f_entity)
+    if f_action:
+        where += " AND a.action = %s"
+        params.append(f_action)
+    if f_actor is not None:
+        where += " AND a.actorID = %s"
+        params.append(f_actor)
+    if f_entity_id is not None:
+        where += " AND a.entityID = %s"
+        params.append(f_entity_id)
+
+    total_row = query_one(
+        "SELECT COUNT(*) AS n FROM AuditLog a" + where, tuple(params))
+    total = int(total_row["n"] or 0) if total_row else 0
+    pages = max((total + AUDIT_PER_PAGE - 1) // AUDIT_PER_PAGE, 1)
+    page = min(page, pages)
+    offset = (page - 1) * AUDIT_PER_PAGE
+
+    entries = query_all(
+        "SELECT a.logID, a.actorID, a.entityType, a.entityID, a.action,"
+        "       a.ipAddress, a.createdAt,"
+        "       u.firstName, u.lastName, u.email"
+        "  FROM AuditLog a"
+        "  LEFT JOIN User u ON u.userID = a.actorID"
+        + where +
+        " ORDER BY a.logID DESC"
+        " LIMIT %s OFFSET %s",
+        tuple(params + [AUDIT_PER_PAGE, offset]))
+
+    # --- field-level changes for the visible page, one query ----------
+    changes_by_log = {}
+    if entries:
+        ids = [e["logID"] for e in entries]
+        placeholders = ", ".join(["%s"] * len(ids))
+        change_rows = query_all(
+            "SELECT logID, fieldName, oldValue, newValue"
+            "  FROM AuditLogChange"
+            " WHERE logID IN (" + placeholders + ")"
+            " ORDER BY changeID",
+            tuple(ids))
+        for row in change_rows:
+            changes_by_log.setdefault(row["logID"], []).append(row)
+
+    # --- actor dropdown: only users who actually have audit rows ------
+    actors = query_all(
+        "SELECT DISTINCT u.userID, u.firstName, u.lastName"
+        "  FROM AuditLog a JOIN User u ON u.userID = a.actorID"
+        " ORDER BY u.lastName, u.firstName", ())
+
+    return render_template(
+        "admin/audit.html",
+        entries=entries, changes_by_log=changes_by_log,
+        actors=actors,
+        entity_types=AUDIT_ENTITY_TYPES, actions=AUDIT_ACTIONS,
+        action_badges=ACTION_BADGES,
+        f_entity=f_entity, f_action=f_action, f_actor=f_actor,
+        f_entity_id=f_entity_id,
+        page=page, pages=pages, total=total, per_page=AUDIT_PER_PAGE)
