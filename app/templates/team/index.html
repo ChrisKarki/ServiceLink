@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}Team{% endblock %}
+
+{% block content %}
+<div style="display: flex; align-items: flex-end; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+    <div>
+        <h1 style="margin: 0; color: var(--text-primary); font-size: 22px;">Team</h1>
+        <div class="text-sm" style="color: var(--text-secondary); margin-top: 4px;">
+            Technician and manager workload (C3.2). Account changes live in Administration.
+        </div>
+    </div>
+    {% if unassigned_open %}
+    <span class="badge" style="border: 1px solid var(--warning-color); color: var(--warning-color); padding: 6px 14px;">
+        {{ unassigned_open }} open ticket{{ '' if unassigned_open == 1 else 's' }} unassigned
+    </span>
+    {% endif %}
+</div>
+
+<div style="margin-top: 18px; border: 1px solid var(--panel-border); border-radius: 12px; overflow: hidden;">
+    <table style="width: 100%; border-collapse: collapse;">
+        <thead>
+            <tr style="border-bottom: 1px solid var(--panel-border);">
+                {% for h in ['Member', 'Role', 'Status', 'Open load', 'In progress', 'Resolved / Closed', 'Last login'] %}
+                <th class="text-sm" style="text-align: left; padding: 12px 16px; color: var(--text-secondary); font-weight: 500;">{{ h }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for m in members %}
+            <tr style="border-bottom: 1px solid var(--panel-border);">
+                <td style="padding: 12px 16px;">
+                    <div style="color: var(--text-primary); font-weight: 500;">{{ m.firstName }} {{ m.lastName }}</div>
+                    <div class="text-sm" style="color: var(--text-secondary);">{{ m.email }}</div>
+                </td>
+                <td class="text-sm" style="padding: 12px 16px; color: var(--text-primary);">{{ m.role }}</td>
+                <td style="padding: 12px 16px;">
+                    {% if m.status == 'Active' %}
+                    <span class="badge badge-status-resolved">Active</span>
+                    {% else %}
+                    <span class="badge" style="border: 1px solid var(--danger-color); color: var(--danger-color);">{{ m.status }}</span>
+                    {% endif %}
+                </td>
+                <td style="padding: 12px 16px; min-width: 160px;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div style="flex: 1; height: 8px; border-radius: 4px; background: var(--panel-border); overflow: hidden;">
+                            <div style="height: 100%; width: {{ m.load_pct }}%; background: var(--accent-color); border-radius: 4px;"></div>
+                        </div>
+                        <span class="text-sm" style="color: var(--text-primary); width: 24px; text-align: right;">{{ m.open }}</span>
+                    </div>
+                </td>
+                <td class="text-sm" style="padding: 12px 16px; color: var(--text-secondary);">{{ m.in_progress }}</td>
+                <td class="text-sm" style="padding: 12px 16px; color: var(--text-secondary);">{{ m.resolved }}</td>
+                <td class="text-sm" style="padding: 12px 16px; color: var(--text-secondary);">
+                    {{ m.lastLoginAt.strftime('%b %d, %Y %H:%M') if m.lastLoginAt else 'Never' }}
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="7" style="padding: 32px; text-align: center; color: var(--text-secondary);">
+                    No technicians or managers yet.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

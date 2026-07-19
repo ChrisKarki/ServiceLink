@@ -9,7 +9,7 @@
         gap: 8px;
         font-size: 13px;
         color: var(--text-secondary);
-        margin-bottom: 24px;
+        margin-bottom: 20px;
         flex-wrap: wrap;
     }
 
@@ -33,29 +33,50 @@
         font-weight: 500;
     }
 
-    .resource-header-bar {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 24px;
-        margin-bottom: 28px;
-        flex-wrap: wrap;
-    }
-
-    .dashboard-grid-2 {
+    /* Freshservice-style layout: tabbed content left, property rail right */
+    .ticket-grid {
         display: grid;
-        grid-template-columns: 2fr 1fr;
-        gap: 32px;
+        grid-template-columns: minmax(0, 1fr) 340px;
+        gap: 24px;
         align-items: start;
     }
 
-    .section-heading {
-        font-size: 15px;
-        font-weight: 700;
+    .tab-bar {
+        display: flex;
+        gap: 4px;
+        border-bottom: 1px solid var(--panel-border);
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+    }
+
+    .tab-btn {
+        background: none;
+        border: none;
+        border-bottom: 2px solid transparent;
+        color: var(--text-secondary);
+        font-size: 14px;
+        font-weight: 500;
+        padding: 10px 16px;
+        cursor: pointer;
+        transition: color 0.15s, border-color 0.15s;
+    }
+
+    .tab-btn:hover {
         color: var(--text-primary);
-        margin-bottom: 16px;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
+    }
+
+    .tab-btn.active {
+        color: var(--accent-color);
+        border-bottom-color: var(--accent-color);
+        font-weight: 600;
+    }
+
+    .tab-pane {
+        display: none;
+    }
+
+    .tab-pane.active {
+        display: block;
     }
 
     .card-box {
@@ -63,28 +84,98 @@
         border: 1px solid var(--panel-border);
         border-radius: 12px;
         padding: 22px;
-        margin-bottom: 24px;
+        margin-bottom: 20px;
     }
 
     .card-box-tint {
         background: var(--card-tint);
         border: 1px solid var(--panel-border);
         border-radius: 12px;
-        padding: 22px;
-        margin-bottom: 24px;
-    }
-
-    .spec-grid-row {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 20px;
+        padding: 18px 22px;
         margin-bottom: 20px;
     }
 
-    .spec-item {
+    .section-heading {
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--text-secondary);
+        margin-bottom: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    /* Right rail */
+    .rail-card {
+        background: var(--panel-bg);
+        border: 1px solid var(--panel-border);
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 16px;
+    }
+
+    .rail-row {
         display: flex;
-        flex-direction: column;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        padding: 6px 0;
+    }
+
+    .sla-chip {
+        display: inline-flex;
+        align-items: center;
         gap: 6px;
+        border-radius: 6px;
+        padding: 4px 10px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .sla-ok {
+        border: 1px solid var(--accent-color);
+        color: var(--accent-color);
+    }
+
+    .sla-overdue {
+        border: 1px solid var(--danger-color);
+        color: var(--danger-color);
+    }
+
+    .sla-met {
+        border: 1px solid var(--panel-border);
+        color: var(--text-secondary);
+    }
+
+    /* Conversation */
+    .comment-item {
+        display: flex;
+        gap: 14px;
+        padding: 14px 0;
+        border-bottom: 1px solid var(--panel-border);
+    }
+
+    .comment-item:last-of-type {
+        border-bottom: none;
+    }
+
+    .comment-internal {
+        background: var(--card-tint);
+        border: 1px dashed var(--warning-color);
+        border-radius: 10px;
+        padding: 14px;
+        margin: 8px 0;
+    }
+
+    .form-label {
+        display: block;
+        margin-bottom: 6px;
+        font-weight: 600;
+        font-size: 13px;
+        color: var(--text-primary);
+    }
+
+    .form-group {
+        margin-bottom: 16px;
     }
 
     /* Associate Resources modal (H2.1) */
@@ -171,450 +262,726 @@
 {% endblock %}
 
 {% block content %}
-{# Context: t (shaped ticket), linked (resources on this ticket),
-   linkable (staff only — resources not yet linked), history (audit rows),
-   is_staff (bool). Scoping enforced server-side in _get_ticket_or_403. #}
-                    <div class="kb-breadcrumb">
-                        <a href="{{ url_for('tickets.list_tickets') }}">Tickets</a>
-                        <span class="separator">/</span>
-                        <span class="current">TKT-{{ t.ticketID }}</span>
+{# Freshservice-style detail: tabbed content (Details / Assets / Activity /
+Resolution) on the left, property rail on the right. Context comes from
+tickets.view_ticket: t, linked, comments, history, sla, is_staff,
+can_reopen, reopen_days, technicians, categories, priorities, statuses,
+status_labels, next_states, escalation (P2.3: None for End Users). #}
+<div class="kb-breadcrumb">
+    <a href="{{ url_for('tickets.list_tickets') }}">Tickets</a>
+    <span class="separator">/</span>
+    <span class="current">TKT-{{ t.ticketID }}</span>
+</div>
+
+<div class="flex-between" style="margin-bottom: 6px; gap: 16px; flex-wrap: wrap;">
+    <h1 style="margin: 0; font-size: 24px;">{{ t.title }}</h1>
+    <div style="display: flex; gap: 10px; align-items: center;">
+        <span class="{{ t.priority_badge.cls }}" {% if t.priority_badge.style %} style="{{ t.priority_badge.style }}" {%
+            endif %}>{{ t.priority }}</span>
+        <span class="{{ t.status_badge.cls }}" {% if t.status_badge.style %} style="{{ t.status_badge.style }}" {% endif
+            %}>{{ t.status_label }}</span>
+        {% if t.slaBreached %}
+        <!-- P2.2: stored breach flag (§4.2), set by the on-request check. -->
+        <span class="badge"
+            style="background: var(--danger-color); color: #fff; border: 1px solid var(--danger-color);">SLA
+            Breached</span>
+        {% endif %}
+        {% if escalation %}
+        <!-- P2.3: derived escalation flag (staff-only), from the audit trail. -->
+        <span class="badge"
+            style="background: var(--warning-color); color: #fff; border: 1px solid var(--warning-color);">Escalated</span>
+        {% endif %}
+        {% if is_staff %}
+        <!-- P2.3: escalate to management with a mandatory justification. -->
+        <button type="button" class="btn btn-secondary" onclick="openEscalateModal()">Escalate</button>
+        {% endif %}
+        {% if can_reopen %}
+        <!-- P2.2: submitter self-service reopen inside the policy window. -->
+        <form method="post" action="{{ url_for('tickets.reopen_ticket', ticket_id=t.ticketID) }}" style="margin: 0;">
+            <button type="submit" class="btn btn-secondary">Reopen Ticket</button>
+        </form>
+        {% endif %}
+    </div>
+</div>
+<div class="text-sm" style="color: var(--text-secondary); margin-bottom: 20px;">
+    <strong style="color: var(--text-primary);">{{ t.submitterName }}</strong>
+    reported {{ t.age }} ({{ t.createdAt.strftime('%a, %b %d %Y, %I:%M %p') }})
+    &middot; TKT-{{ t.ticketID }} &middot; {{ t.categoryName }}
+</div>
+
+<div class="ticket-grid">
+    <!-- LEFT: tabbed content -->
+    <div>
+        <div class="tab-bar">
+            <button type="button" class="tab-btn active" data-tab="tab-details" onclick="showTab(this)">Details</button>
+            <button type="button" class="tab-btn" data-tab="tab-assets" onclick="showTab(this)">Resources
+                <span class="badge"
+                    style="border: 1px solid var(--panel-border); color: var(--text-secondary); margin-left: 4px;">{{
+                    linked|length }}</span></button>
+            <button type="button" class="tab-btn" data-tab="tab-activity" onclick="showTab(this)">Activity</button>
+            <button type="button" class="tab-btn" data-tab="tab-resolution" onclick="showTab(this)">Resolution</button>
+        </div>
+
+        <!-- TAB: Details = description + conversation -->
+        <div class="tab-pane active" id="tab-details">
+            <div class="section-heading">Description</div>
+            <div class="card-box">
+                <p style="color: var(--text-primary); white-space: pre-wrap; margin: 0; line-height: 1.6;">{{
+                    t.description }}</p>
+            </div>
+
+            {% if escalation %}
+            {# P2.3 (staff-only): the latest escalation justification is an
+               internal note (FR-2.4); `escalation` is None for End Users. #}
+            <div class="card-box" style="border-left: 3px solid var(--warning-color);">
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                    <span class="badge"
+                        style="background: var(--warning-color); color: #fff; border: 1px solid var(--warning-color);">Escalated</span>
+                    <span class="text-sm" style="color: var(--text-secondary);">
+                        by {{ escalation.actor }} &middot; {{ escalation.at.strftime('%b %d, %Y at %H:%M') }}</span>
+                </div>
+                <p class="text-sm"
+                    style="color: var(--text-primary); white-space: pre-wrap; margin: 0; line-height: 1.55;">{{
+                    escalation.justification }}</p>
+            </div>
+            {% endif %}
+
+            <div class="section-heading">Conversation
+                <span class="badge"
+                    style="border: 1px solid var(--panel-border); color: var(--text-secondary); margin-left: 4px;">{{
+                    comments|length }}</span>
+            </div>
+            <div class="card-box">
+                {% for c in comments %}
+                {% if c.isInternal %}
+                <div class="comment-internal">
+                    <div class="flex-between" style="margin-bottom: 6px;">
+                        <span class="text-sm" style="font-weight: 600; color: var(--warning-color);">
+                            Internal note &middot; {{ c.author }} ({{ c.authorRole }})</span>
+                        <span class="text-sm" style="color: var(--text-secondary);">{{ c.createdAt.strftime('%b %d,
+                            %I:%M %p') }}</span>
                     </div>
-
-                    <div class="resource-header-bar">
-                        <div>
-                            <h1 style="margin: 0 0 6px 0; font-size: 24px;">
-                                TKT-{{ t.ticketID }} &middot; {{ t.title }}</h1>
-                            <span class="text-sm" style="color: var(--text-secondary);">
-                                Submitted by {{ t.submitterName }} &middot; {{ t.categoryName }} &middot; {{ t.age }}</span>
+                    <div class="text-sm" style="color: var(--text-primary); white-space: pre-wrap; line-height: 1.5;">{{
+                        c.body }}</div>
+                </div>
+                {% else %}
+                <div class="comment-item">
+                    <div class="avatar" style="width: 36px; height: 36px; font-size: 12px; flex-shrink: 0;">{{
+                        c.initials }}</div>
+                    <div style="min-width: 0; flex: 1;">
+                        <div class="flex-between" style="margin-bottom: 4px;">
+                            <span class="text-sm" style="font-weight: 600; color: var(--text-primary);">
+                                {{ c.author }}
+                                <span style="color: var(--text-secondary); font-weight: 400;">&middot; {{ c.authorRole
+                                    }}</span></span>
+                            <span class="text-sm" style="color: var(--text-secondary);">{{ c.createdAt.strftime('%b %d,
+                                %I:%M %p') }}</span>
                         </div>
-                        <div style="display: flex; gap: 12px; align-items: center;">
-                            <span class="{{ t.priority_badge.cls }}"{% if t.priority_badge.style %} style="{{ t.priority_badge.style }}"{% endif %}>{{ t.priority }}</span>
-                            <span class="{{ t.status_badge.cls }}"{% if t.status_badge.style %} style="{{ t.status_badge.style }}"{% endif %}>{{ t.status_label }}</span>
-                            {% if escalation %}
-                            <!-- P2.3: derived escalation flag (staff-only), from the audit trail. -->
-                            <span class="badge"
-                                style="background: var(--warning-color); color: #fff; border: 1px solid var(--warning-color);">Escalated</span>
-                            {% endif %}
-                            {% if is_staff and next_states %}
-                            <!-- P1.4 status transitions (FR-2.2, UC-02). Options come from
-                                 TRANSITIONS[t.status]; the server re-enforces the graph. -->
-                            <button class="btn btn-secondary" onclick="openStatusModal()">Change Status</button>
-                            {% endif %}
-                            {% if is_staff %}
-                            <!-- P2.3: escalate to management with a mandatory justification. -->
-                            <button class="btn btn-secondary" onclick="openEscalateModal()">Escalate</button>
-                            {% endif %}
-                        </div>
-                    </div>
-
-                    <div class="dashboard-grid-2">
-                        <!-- LEFT: description + activity -->
-                        <div>
-                            <div class="section-heading">Description</div>
-                            <div class="card-box">
-                                <p style="color: var(--text-primary); white-space: pre-wrap; margin: 0; line-height: 1.6;">{{ t.description }}</p>
-                            </div>
-
-                            {% if escalation %}
-                            {# P2.3 (staff-only): the latest escalation justification is an
-                               internal note (FR-2.4); `escalation` is None for End Users. #}
-                            <div class="card-box"
-                                style="border-left: 3px solid var(--warning-color); margin-bottom: 24px;">
-                                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
-                                    <span class="badge"
-                                        style="background: var(--warning-color); color: #fff; border: 1px solid var(--warning-color);">Escalated</span>
-                                    <span class="text-sm" style="color: var(--text-secondary);">
-                                        by {{ escalation.actor }} &middot; {{ escalation.at.strftime('%b %d, %Y at %H:%M') }}</span>
-                                </div>
-                                <p class="text-sm"
-                                    style="color: var(--text-primary); white-space: pre-wrap; margin: 0; line-height: 1.55;">{{ escalation.justification }}</p>
-                            </div>
-                            {% endif %}
-
-                            <div class="section-heading">Comments</div>
-                            <div class="card-box-tint">
-                                <span class="text-sm" style="color: var(--text-secondary);">
-                                    Public comments and internal notes land with the comments card in Sprint 2
-                                    (FR-2.4).</span>
-                            </div>
-
-                            <div class="section-heading">Recent Audit Activity</div>
-                            <div class="card-box-tint">
-                                {% for h in history %}
-                                <div
-                                    style="display: flex; justify-content: space-between; padding: 10px 0; {% if not loop.last %}border-bottom: 1px solid var(--panel-border);{% endif %}">
-                                    <span class="text-sm" style="color: var(--text-primary);">
-                                        <strong>{{ h.actor }}</strong> {{ h.action|lower }}d this ticket</span>
-                                    <span class="text-sm" style="color: var(--text-secondary);">{{ h.timestamp.strftime('%b %d, %H:%M') }}</span>
-                                </div>
-                                {% else %}
-                                <div class="text-sm" style="color: var(--text-secondary);">No audit activity recorded
-                                    yet.</div>
-                                {% endfor %}
-                            </div>
-                        </div>
-
-                        <!-- RIGHT: meta + linked resources (H2.1) -->
-                        <div>
-                            <div class="section-heading">Details</div>
-                            <div class="card-box">
-                                <div class="spec-grid-row">
-                                    <div class="spec-item">
-                                        <span class="text-sm" style="color: var(--text-secondary);">Status</span>
-                                        <span style="color: var(--text-primary); font-weight: 600;">{{ t.status_label }}</span>
-                                    </div>
-                                    <div class="spec-item">
-                                        <span class="text-sm" style="color: var(--text-secondary);">Priority</span>
-                                        <span style="color: var(--text-primary); font-weight: 600;">{{ t.priority }}</span>
-                                    </div>
-                                </div>
-                                <div class="spec-grid-row">
-                                    <div class="spec-item">
-                                        <span class="text-sm" style="color: var(--text-secondary);">Category</span>
-                                        <span style="color: var(--text-primary); font-weight: 500;">{{ t.categoryName }}</span>
-                                    </div>
-                                    <div class="spec-item">
-                                        <span class="text-sm" style="color: var(--text-secondary);">Assignee</span>
-                                        {% if t.unassigned %}
-                                        <span style="color: var(--text-secondary); font-style: italic;">Unassigned</span>
-                                        {% else %}
-                                        <span style="color: var(--text-primary); font-weight: 500;">{{ t.assigneeName }}</span>
-                                        {% endif %}
-                                    </div>
-                                </div>
-                                <div class="spec-grid-row" style="margin-bottom: {{ '20px' if t.resolvedAt else '0' }};">
-                                    <div class="spec-item">
-                                        <span class="text-sm" style="color: var(--text-secondary);">Submitted By</span>
-                                        <span style="color: var(--text-primary); font-weight: 500;">{{ t.submitterName }}</span>
-                                    </div>
-                                    <div class="spec-item">
-                                        <span class="text-sm" style="color: var(--text-secondary);">Created</span>
-                                        <span style="color: var(--text-primary); font-weight: 500;">{{ t.createdAt.strftime('%b %d, %Y at %H:%M') }}</span>
-                                    </div>
-                                </div>
-                                {% if t.resolvedAt %}
-                                <!-- P1.4: shown once a ticket reaches Resolved/Closed. -->
-                                <div class="spec-grid-row" style="margin-bottom: 0;">
-                                    <div class="spec-item">
-                                        <span class="text-sm" style="color: var(--text-secondary);">Resolved</span>
-                                        <span style="color: var(--text-primary); font-weight: 500;">{{ t.resolvedAt.strftime('%b %d, %Y at %H:%M') }}</span>
-                                    </div>
-                                </div>
-                                {% endif %}
-                                {% if t.resolutionSummary %}
-                                <div class="spec-item" style="margin-top: 16px;">
-                                    <span class="text-sm" style="color: var(--text-secondary);">Resolution Summary</span>
-                                    <span style="color: var(--text-primary); font-weight: 500; white-space: pre-wrap;">{{ t.resolutionSummary }}</span>
-                                </div>
-                                {% endif %}
-                            </div>
-
-                            <div class="section-heading">Linked Resources</div>
-                            <div class="card-box" style="padding: 16px;">
-                                {% for r in linked %}
-                                <div
-                                    style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px; background: var(--card-tint); border: 1px solid var(--panel-border); border-radius: 10px; margin-bottom: 10px;">
-                                    <div style="min-width: 0;">
-                                        <a href="{{ url_for('resources.view_resource', resource_id=r.resourceID) if is_staff else '#' }}"
-                                            style="color: var(--text-primary); font-weight: 600; font-family: monospace; text-decoration: none;">{{ r.resourceTag }}</a>
-                                        {% if r.status in ('Disposed', 'LostMissing') %}
-                                        <span class="badge"
-                                            style="border: 1px solid var(--warning-color); color: var(--warning-color); margin-left: 6px;">{{ 'Disposed' if r.status == 'Disposed' else 'Lost / Missing' }}</span>
-                                        {% endif %}
-                                        <span class="text-sm"
-                                            style="color: var(--text-secondary); display: block; margin-top: 2px;">{{ r.make }} {{ r.model }} &middot; {{ r.type }}</span>
-                                    </div>
-                                    {% if is_staff %}
-                                    <form method="post"
-                                        action="{{ url_for('tickets.unlink_resource', ticket_id=t.ticketID) }}">
-                                        <input type="hidden" name="resource_id" value="{{ r.resourceID }}">
-                                        <button type="submit" class="btn btn-ghost btn-sm"
-                                            style="color: var(--danger-color);">Unlink</button>
-                                    </form>
-                                    {% endif %}
-                                </div>
-                                {% else %}
-                                <div class="text-sm" style="padding: 8px; color: var(--text-secondary);">
-                                    No resources linked to this ticket.</div>
-                                {% endfor %}
-
-                                {% if is_staff %}
-                                <button type="button" class="btn btn-secondary" style="width: 100%; margin-top: 6px;"
-                                    onclick="openResourceModal()">+ Associate Resources</button>
-                                {% endif %}
-                            </div>
+                        <div class="text-sm"
+                            style="color: var(--text-primary); white-space: pre-wrap; line-height: 1.5;">{{ c.body }}
                         </div>
                     </div>
+                </div>
+                {% endif %}
+                {% else %}
+                <div class="text-sm" style="color: var(--text-secondary);">No replies yet.</div>
+                {% endfor %}
 
-                    {% if is_staff and next_states %}
-                    <!-- Change Status modal (P1.4, UC-02). The select is limited to the
-                         legal next states; the resolution summary is revealed and required
-                         only when the target is Resolved. The server enforces all of this
-                         again on POST — the UI is a convenience, not the gate. -->
-                    <div class="modal-overlay" id="statusModal"
-                        onclick="if (event.target === this) closeStatusModal()">
-                        <div class="modal-card" style="max-width: 480px;">
-                            <form method="post" action="{{ url_for('tickets.change_status', ticket_id=t.ticketID) }}">
-                                <div class="modal-head">
-                                    <h2 style="margin: 0; font-size: 18px;">Change Status</h2>
-                                    <button type="button" class="icon-btn" onclick="closeStatusModal()" title="Close">
-                                        <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M6 18L18 6M6 6l12 12"></path>
-                                        </svg>
-                                    </button>
-                                </div>
-                                <div style="padding: 4px 24px 8px 24px;">
-                                    <label class="text-sm" for="statusSelect"
-                                        style="color: var(--text-secondary); display: block; margin-bottom: 6px;">New status</label>
-                                    <select name="status" id="statusSelect" class="form-control" onchange="onStatusChange()">
-                                        {% for s in next_states %}
-                                        <option value="{{ s }}">{{ status_labels[s] }}</option>
-                                        {% endfor %}
-                                    </select>
-                                    <div id="resolutionBlock" style="display: none; margin-top: 16px;">
-                                        <label class="text-sm" for="resolutionSummary"
-                                            style="color: var(--text-secondary); display: block; margin-bottom: 6px;">
-                                            Resolution summary <span style="color: var(--danger-color);">*</span></label>
-                                        <textarea name="resolution_summary" id="resolutionSummary" class="form-control"
-                                            rows="4" placeholder="Describe how this ticket was resolved..."></textarea>
-                                    </div>
-                                </div>
-                                <div class="modal-foot">
-                                    <span></span>
-                                    <div style="display: flex; gap: 10px;">
-                                        <button type="button" class="btn btn-secondary" onclick="closeStatusModal()">Cancel</button>
-                                        <button type="submit" class="btn btn-primary">Update Status</button>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
+                <form method="post" action="{{ url_for('tickets.add_comment', ticket_id=t.ticketID) }}"
+                    style="margin-top: 18px; padding-top: 18px; border-top: 1px solid var(--panel-border);">
+                    <div class="form-group">
+                        <label class="form-label" for="comment-body">Reply</label>
+                        <textarea id="comment-body" name="body" rows="3" class="form-control"
+                            placeholder="Write a reply..."></textarea>
                     </div>
-                    <script>
-                        function openStatusModal() {
-                            document.getElementById('statusModal').classList.add('open');
-                            onStatusChange();
-                        }
-                        function closeStatusModal() {
-                            document.getElementById('statusModal').classList.remove('open');
-                        }
-                        function onStatusChange() {
-                            var show = document.getElementById('statusSelect').value === 'Resolved';
-                            document.getElementById('resolutionBlock').style.display = show ? 'block' : 'none';
-                            document.getElementById('resolutionSummary').required = show;
-                        }
-                        document.addEventListener('keydown', function (e) {
-                            if (e.key === 'Escape') closeStatusModal();
-                        });
-                    </script>
-                    {% endif %}
+                    <div class="flex-between">
+                        {% if is_staff %}
+                        <label class="text-sm"
+                            style="display: flex; align-items: center; gap: 8px; color: var(--text-primary); cursor: pointer;">
+                            <input type="checkbox" name="is_internal" value="1"
+                                style="width: 15px; height: 15px; accent-color: var(--warning-color);">
+                            Internal note (staff only)
+                        </label>
+                        {% else %}<span></span>{% endif %}
+                        <button type="submit" class="btn btn-primary">Post</button>
+                    </div>
+                </form>
+            </div>
+        </div>
 
+        <!-- TAB: Resources (H2.1) -->
+        <div class="tab-pane" id="tab-assets">
+            <div class="flex-between" style="margin-bottom: 12px;">
+                <div class="section-heading" style="margin-bottom: 0;">Linked Resources</div>
+                {% if is_staff %}
+                <button type="button" class="btn btn-secondary" onclick="openResourceModal()">+ Associate
+                    Resources</button>
+                {% endif %}
+            </div>
+            <div class="card-box" style="padding: 16px;">
+                {% for r in linked %}
+                <div
+                    style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px; background: var(--card-tint); border: 1px solid var(--panel-border); border-radius: 10px; margin-bottom: 10px;">
+                    <div style="min-width: 0;">
+                        <a href="{{ url_for('resources.view_resource', resource_id=r.resourceID) if is_staff else '#' }}"
+                            style="color: var(--text-primary); font-weight: 600; font-family: monospace; text-decoration: none;">{{
+                            r.resourceTag }}</a>
+                        {% if r.status in ('Disposed', 'LostMissing') %}
+                        <span class="badge"
+                            style="border: 1px solid var(--warning-color); color: var(--warning-color); margin-left: 6px;">{{
+                            'Disposed' if r.status == 'Disposed' else 'Lost / Missing' }}</span>
+                        {% endif %}
+                        <span class="text-sm" style="color: var(--text-secondary); display: block; margin-top: 2px;">
+                            {{ r.make }} {{ r.model }} &middot; {{ r.type }} &middot; linked {{ r.linkedAt.strftime('%b
+                            %d, %Y') }}</span>
+                    </div>
                     {% if is_staff %}
-                    <!-- Escalate modal (P2.3, UC-02 AF-3). The justification is mandatory;
-                         `required` is a convenience — escalate_ticket rejects an empty
-                         justification server-side with a 400 (the AC). -->
-                    <div class="modal-overlay" id="escalateModal"
-                        onclick="if (event.target === this) closeEscalateModal()">
-                        <div class="modal-card" style="max-width: 480px;">
-                            <form method="post" action="{{ url_for('tickets.escalate_ticket', ticket_id=t.ticketID) }}">
-                                <div class="modal-head">
-                                    <h2 style="margin: 0; font-size: 18px;">Escalate to Management</h2>
-                                    <button type="button" class="icon-btn" onclick="closeEscalateModal()" title="Close">
-                                        <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M6 18L18 6M6 6l12 12"></path>
-                                        </svg>
-                                    </button>
-                                </div>
-                                <div style="padding: 4px 24px 8px 24px;">
-                                    <label class="text-sm" for="escalationJustification"
-                                        style="color: var(--text-secondary); display: block; margin-bottom: 6px;">
-                                        Justification <span style="color: var(--danger-color);">*</span></label>
-                                    <textarea name="justification" id="escalationJustification" class="form-control"
-                                        rows="4" required
-                                        placeholder="Why does this ticket need management attention?"></textarea>
-                                    <span class="text-sm" style="color: var(--text-secondary); display: block; margin-top: 8px;">
-                                        Every active manager will be notified.</span>
-                                </div>
-                                <div class="modal-foot">
-                                    <span></span>
-                                    <div style="display: flex; gap: 10px;">
-                                        <button type="button" class="btn btn-secondary" onclick="closeEscalateModal()">Cancel</button>
-                                        <button type="submit" class="btn btn-primary">Escalate</button>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                    <script>
-                        function openEscalateModal() {
-                            document.getElementById('escalateModal').classList.add('open');
-                            document.getElementById('escalationJustification').focus();
-                        }
-                        function closeEscalateModal() {
-                            document.getElementById('escalateModal').classList.remove('open');
-                        }
-                        document.addEventListener('keydown', function (e) {
-                            if (e.key === 'Escape') closeEscalateModal();
-                        });
-                    </script>
+                    <form method="post" action="{{ url_for('tickets.unlink_resource', ticket_id=t.ticketID) }}">
+                        <input type="hidden" name="resource_id" value="{{ r.resourceID }}">
+                        <button type="submit" class="btn btn-ghost btn-sm"
+                            style="color: var(--danger-color);">Unlink</button>
+                    </form>
                     {% endif %}
+                </div>
+                {% else %}
+                <div class="text-sm" style="padding: 8px; color: var(--text-secondary);">No resources linked to this
+                    ticket.</div>
+                {% endfor %}
+            </div>
+        </div>
 
+        <!-- TAB: Activity = audit trail (FR-6.2) -->
+        <div class="tab-pane" id="tab-activity">
+            <div class="section-heading">Audit Activity</div>
+            <div class="card-box">
+                {% for h in history %}
+                <div
+                    style="padding: 10px 0; {% if not loop.last %}border-bottom: 1px solid var(--panel-border);{% endif %}">
+                    <div style="display: flex; justify-content: space-between; gap: 12px;">
+                        <span class="text-sm" style="color: var(--text-primary);">{{ h.summary }}</span>
+                        <span class="text-sm" style="color: var(--text-secondary); white-space: nowrap;">{{
+                            h.timestamp.strftime('%b %d, %H:%M') }}</span>
+                    </div>
+                    {% if h.changes|length > 1 %}
+                    {% for c in h.changes %}
+                    <div class="text-sm" style="margin-top: 4px; padding-left: 12px; color: var(--text-secondary);">
+                        {{ c.label }}: {{ c.old }} → <span style="color: var(--text-primary);">{{ c.new }}</span>
+                    </div>
+                    {% endfor %}
+                    {% endif %}
+                </div>
+                {% else %}
+                <div class="text-sm" style="color: var(--text-secondary);">No audit activity recorded yet.</div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- TAB: Resolution -->
+        <div class="tab-pane" id="tab-resolution">
+
+            <div class="section-heading">Resolution Notes</div>
+            {% if is_staff %}
+            <form method="post" action="{{ url_for('tickets.save_resolution', ticket_id=t.ticketID) }}"
+                class="card-box">
+                <textarea name="resolutionSummary" rows="6" class="form-control"
+                    placeholder="Describe how this ticket was resolved...">{{ t.resolutionSummary or '' }}</textarea>
+                <div style="display: flex; justify-content: flex-end; margin-top: 12px;">
+                    <button type="submit" class="btn btn-primary">Save Resolution</button>
+                </div>
+            </form>
+            {% else %}
+            <div class="card-box">
+                {% if t.resolutionSummary %}
+                <p style="color: var(--text-primary); white-space: pre-wrap; margin: 0; line-height: 1.6;">{{
+                    t.resolutionSummary }}</p>
+                {% else %}
+                <span class="text-sm" style="color: var(--text-secondary);">No resolution notes yet.</span>
+                {% endif %}
+            </div>
+            {% endif %}
+
+            <div class="flex-between" style="margin: 20px 0 12px 0;">
+                <div class="section-heading" style="margin-bottom: 0;">Resolution Article</div>
+                {% if is_staff %}
+                <button type="button" class="btn btn-secondary" onclick="openKbModal()">
+                    {{ 'Change Article' if kb_article else '+ Attach KB Article' }}</button>
+                {% endif %}
+            </div>
+            <div class="card-box" style="padding: 16px;">
+                {% if kb_article %}
+                <div
+                    style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px; background: var(--card-tint); border: 1px solid var(--panel-border); border-radius: 10px;">
+                    <div style="min-width: 0;">
+                        <a href="{{ url_for('kb.view_article', article_id=kb_article.articleID) }}"
+                            style="color: var(--text-primary); font-weight: 600; text-decoration: none;">
+                            KB-{{ kb_article.articleID }} &middot; {{ kb_article.title }}</a>
+                        <span class="text-sm" style="color: var(--text-secondary); display: block; margin-top: 2px;">
+                            {{ kb_article.visibility }} article designated as this ticket's resolution.</span>
+                    </div>
                     {% if is_staff %}
-                    <!-- Associate Resources modal (H2.1). Search hits
-                         tickets.search_linkable (JSON, LIMIT 20) as you type;
-                         selections survive re-searches via a JS Set and are
-                         posted as resource_ids[] to tickets.link_resource. -->
-                    <div class="modal-overlay" id="resourceModal" onclick="if (event.target === this) closeResourceModal()">
-                        <div class="modal-card">
-                            <div class="modal-head">
-                                <h2 style="margin: 0; font-size: 18px;">Associate Resources</h2>
-                                <button type="button" class="icon-btn" onclick="closeResourceModal()" title="Close">
-                                    <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M6 18L18 6M6 6l12 12"></path>
-                                    </svg>
-                                </button>
-                            </div>
-                            <div style="padding: 0 24px 14px 24px;">
-                                <input type="text" id="resSearch" class="form-control"
-                                    placeholder="Search tag, make, model, serial, or location..."
-                                    autocomplete="off" oninput="debouncedSearch()">
-                            </div>
-                            <div class="modal-body" id="resResults">
-                                <div class="text-sm" style="color: var(--text-secondary); padding: 12px 2px;">Loading...</div>
-                            </div>
-                            <div class="modal-foot">
-                                <span class="text-sm" style="color: var(--text-secondary);" id="resCount">0 selected</span>
-                                <div style="display: flex; gap: 10px;">
-                                    <button type="button" class="btn btn-secondary" onclick="closeResourceModal()">Cancel</button>
-                                    <form method="post" id="resLinkForm"
-                                        action="{{ url_for('tickets.link_resource', ticket_id=t.ticketID) }}">
-                                        <button type="submit" class="btn btn-primary" id="resLinkBtn" disabled>Associate</button>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <script>
-                        (function () {
-                            const SEARCH_URL = "{{ url_for('tickets.search_linkable', ticket_id=t.ticketID) }}";
-                            const selected = new Map();   // resourceID -> resourceTag
-                            let timer = null;
-
-                            window.openResourceModal = function () {
-                                document.getElementById('resourceModal').classList.add('open');
-                                document.getElementById('resSearch').value = '';
-                                document.getElementById('resSearch').focus();
-                                runSearch('');
-                            };
-
-                            window.closeResourceModal = function () {
-                                document.getElementById('resourceModal').classList.remove('open');
-                            };
-
-                            window.debouncedSearch = function () {
-                                clearTimeout(timer);
-                                timer = setTimeout(function () {
-                                    runSearch(document.getElementById('resSearch').value.trim());
-                                }, 250);
-                            };
-
-                            document.addEventListener('keydown', function (e) {
-                                if (e.key === 'Escape') closeResourceModal();
-                            });
-
-                            function runSearch(q) {
-                                fetch(SEARCH_URL + '?q=' + encodeURIComponent(q))
-                                    .then(function (r) { return r.json(); })
-                                    .then(function (data) { render(data.results); })
-                                    .catch(function () {
-                                        document.getElementById('resResults').innerHTML =
-                                            '<div class="text-sm" style="color: var(--danger-color); padding: 12px 2px;">' +
-                                            'Search failed. Check your connection and try again.</div>';
-                                    });
-                            }
-
-                            // All row content is set via textContent — resource
-                            // fields are user-entered data, never trusted as HTML.
-                            function render(results) {
-                                const box = document.getElementById('resResults');
-                                box.innerHTML = '';
-                                if (!results.length) {
-                                    const d = document.createElement('div');
-                                    d.className = 'text-sm';
-                                    d.style.cssText = 'color: var(--text-secondary); padding: 12px 2px;';
-                                    d.textContent = 'No unlinked resources match that search.';
-                                    box.appendChild(d);
-                                    return;
-                                }
-                                results.forEach(function (r) {
-                                    const row = document.createElement('div');
-                                    row.className = 'res-row' + (selected.has(r.resourceID) ? ' selected' : '');
-
-                                    const cb = document.createElement('input');
-                                    cb.type = 'checkbox';
-                                    cb.checked = selected.has(r.resourceID);
-
-                                    const info = document.createElement('div');
-                                    info.style.cssText = 'min-width: 0; flex: 1;';
-                                    const top = document.createElement('div');
-                                    const tag = document.createElement('strong');
-                                    tag.style.cssText = 'color: var(--text-primary); font-family: monospace;';
-                                    tag.textContent = r.resourceTag;
-                                    top.appendChild(tag);
-                                    if (r.status === 'Disposed' || r.status === 'LostMissing') {
-                                        const warn = document.createElement('span');
-                                        warn.className = 'badge';
-                                        warn.style.cssText = 'border: 1px solid var(--warning-color); color: var(--warning-color); margin-left: 8px;';
-                                        warn.textContent = r.status_label;
-                                        top.appendChild(warn);
-                                    }
-                                    const sub = document.createElement('span');
-                                    sub.className = 'text-sm';
-                                    sub.style.cssText = 'color: var(--text-secondary); display: block; margin-top: 2px;';
-                                    sub.textContent = r.make + ' ' + r.model + ' \u00b7 ' + r.type +
-                                        (r.assignedName ? ' \u00b7 ' + r.assignedName : '') +
-                                        (r.location ? ' \u00b7 ' + r.location : '');
-                                    info.appendChild(top);
-                                    info.appendChild(sub);
-
-                                    row.appendChild(cb);
-                                    row.appendChild(info);
-                                    row.onclick = function () {
-                                        if (selected.has(r.resourceID)) {
-                                            selected.delete(r.resourceID);
-                                        } else {
-                                            selected.set(r.resourceID, r.resourceTag);
-                                        }
-                                        cb.checked = selected.has(r.resourceID);
-                                        row.classList.toggle('selected', cb.checked);
-                                        updateCount();
-                                    };
-                                    box.appendChild(row);
-                                });
-                            }
-
-                            function updateCount() {
-                                document.getElementById('resCount').textContent = selected.size + ' selected';
-                                document.getElementById('resLinkBtn').disabled = selected.size === 0;
-                            }
-
-                            // Selections made across different searches all
-                            // submit — hidden inputs are rebuilt from the Set.
-                            document.getElementById('resLinkForm').addEventListener('submit', function () {
-                                const form = this;
-                                form.querySelectorAll('input[name="resource_ids"]').forEach(function (el) { el.remove(); });
-                                selected.forEach(function (_tag, id) {
-                                    const h = document.createElement('input');
-                                    h.type = 'hidden';
-                                    h.name = 'resource_ids';
-                                    h.value = id;
-                                    form.appendChild(h);
-                                });
-                            });
-                        })();
-                    </script>
+                    <form method="post" action="{{ url_for('kb.link_ticket_article', ticket_id=t.ticketID) }}">
+                        <input type="hidden" name="article_id" value="">
+                        <button type="submit" class="btn btn-ghost btn-sm"
+                            style="color: var(--danger-color);">Remove</button>
+                    </form>
                     {% endif %}
+                </div>
+                {% else %}
+                <div class="text-sm" style="color: var(--text-secondary);">
+                    No resolution article designated{% if is_staff %} — attach the KB article
+                    that resolves this ticket before closing it (FR-4.2){% endif %}.</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- RIGHT: property rail -->
+    <div>
+        <!-- SLA card (FR-2.5, backed by SLAPolicy; breach state is the
+                                 stored flag (§4.2), set by the on-request check). -->
+        <div class="rail-card">
+            <div class="rail-row" style="padding-top: 0;">
+                <span class="text-sm" style="color: var(--text-secondary);">Status</span>
+                <span style="font-weight: 700; color: var(--text-primary);">{{ t.status_label }}</span>
+            </div>
+            {% if sla %}
+            <div class="rail-row">
+                <div>
+                    <div class="text-sm" style="color: var(--text-secondary);">Resolution due</div>
+                    <div class="text-sm" style="color: var(--text-primary); font-weight: 500;">{{ sla.due_label }}</div>
+                </div>
+                <span
+                    class="sla-chip {{ 'sla-overdue' if sla.state == 'overdue' or (sla.state == 'closed' and sla.breached) else ('sla-met' if sla.state == 'closed' else 'sla-ok') }}">
+                    <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    {{ sla.timer }}</span>
+            </div>
+            {% if sla.breached %}
+            <div class="rail-row">
+                <span class="text-sm" style="color: var(--danger-color); font-weight: 600;">
+                    Resolution target missed &mdash; escalated to the technician &amp; managers.</span>
+            </div>
+            {% endif %}
+            {% else %}
+            <div class="rail-row">
+                <span class="text-sm" style="color: var(--text-secondary);">Resolution due</span>
+                <span class="text-sm" style="color: var(--text-secondary);">No SLA policy for {{ t.priority }}</span>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Requester information -->
+        <div class="rail-card">
+            <div class="section-heading">Requester Information</div>
+            <div style="display: flex; gap: 12px; align-items: center;">
+                <div class="avatar" style="width: 40px; height: 40px; font-size: 14px;">{{ (t.submitterName.split('
+                    ')[0][:1] ~ t.submitterName.split(' ')[-1][:1])|upper }}</div>
+                <div>
+                    <div style="color: var(--text-primary); font-weight: 600;">{{ t.submitterName }}</div>
+                    <div class="text-sm" style="color: var(--text-secondary);">Submitted {{ t.createdAt.strftime('%b %d,
+                        %Y %I:%M %p') }}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Properties (staff: editable form; End User: read-only) -->
+        <div class="rail-card">
+            <div class="section-heading">Properties</div>
+            {% if is_staff %}
+            <form method="post" action="{{ url_for('tickets.update_properties', ticket_id=t.ticketID) }}">
+                <div class="form-group">
+                    <label class="form-label" for="prop-status">Status *</label>
+                    {# P1.4 (FR-2.2, UC-02): only the current status and its legal
+                    next states (TRANSITIONS) are offered; the server
+                    re-enforces the graph on every request regardless. #}
+                    <select id="prop-status" name="status" class="form-control">
+                        {% for s in statuses %}
+                        {% if s == t.status or s in next_states %}
+                        <option value="{{ s }}" {% if t.status==s %}selected{% endif %}>{{ status_labels[s] }}</option>
+                        {% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="prop-priority">Priority *</label>
+                    <select id="prop-priority" name="priority" class="form-control">
+                        {% for p in priorities %}
+                        <option value="{{ p }}" {% if t.priority==p %}selected{% endif %}>{{ p }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="prop-agent">Agent</label>
+                    <select id="prop-agent" name="assignedToUserID" class="form-control">
+                        <option value="">Unassigned</option>
+                        {% for tech in technicians %}
+                        <option value="{{ tech.userID }}" {% if t.assignedToUserID==tech.userID %}selected{% endif %}>{{
+                            tech.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="prop-category">Category *</label>
+                    <select id="prop-category" name="categoryID" class="form-control">
+                        {% for cat in categories %}
+                        <option value="{{ cat.categoryID }}" {% if t.categoryID==cat.categoryID %}selected{% endif %}>{{
+                            cat.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Update</button>
+                <div class="text-sm" style="color: var(--text-secondary); margin-top: 10px;">
+                    Changes are audit-logged with old and new values (FR-6.2).</div>
+            </form>
+            {% else %}
+            <div class="rail-row"><span class="text-sm" style="color: var(--text-secondary);">Priority</span><span
+                    class="text-sm" style="color: var(--text-primary); font-weight: 500;">{{ t.priority }}</span></div>
+            <div class="rail-row"><span class="text-sm" style="color: var(--text-secondary);">Category</span><span
+                    class="text-sm" style="color: var(--text-primary); font-weight: 500;">{{ t.categoryName }}</span>
+            </div>
+            <div class="rail-row"><span class="text-sm" style="color: var(--text-secondary);">Agent</span><span
+                    class="text-sm" style="color: var(--text-primary); font-weight: 500;">{% if t.unassigned
+                    %}Unassigned{% else %}{{ t.assigneeName }}{% endif %}</span></div>
+            <div class="rail-row"><span class="text-sm" style="color: var(--text-secondary);">Created</span><span
+                    class="text-sm" style="color: var(--text-primary); font-weight: 500;">{{ t.createdAt.strftime('%b
+                    %d, %Y') }}</span></div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+    function showTab(btn) {
+        document.querySelectorAll('.tab-btn').forEach(function (b) { b.classList.remove('active'); });
+        document.querySelectorAll('.tab-pane').forEach(function (p) { p.classList.remove('active'); });
+        btn.classList.add('active');
+        document.getElementById(btn.dataset.tab).classList.add('active');
+    }
+</script>
+
+{% if is_staff %}
+<!-- Escalate modal (P2.3, UC-02 AF-3). The justification is mandatory;
+     `required` is a convenience — escalate_ticket rejects an empty
+     justification server-side with a 400 (the AC). -->
+<div class="modal-overlay" id="escalateModal" onclick="if (event.target === this) closeEscalateModal()">
+    <div class="modal-card" style="max-width: 480px;">
+        <form method="post" action="{{ url_for('tickets.escalate_ticket', ticket_id=t.ticketID) }}">
+            <div class="modal-head">
+                <h2 style="margin: 0; font-size: 18px;">Escalate to Management</h2>
+                <button type="button" class="icon-btn" onclick="closeEscalateModal()" title="Close">
+                    <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                        </path>
+                    </svg>
+                </button>
+            </div>
+            <div style="padding: 4px 24px 8px 24px;">
+                <label class="text-sm" for="escalationJustification"
+                    style="color: var(--text-secondary); display: block; margin-bottom: 6px;">
+                    Justification <span style="color: var(--danger-color);">*</span></label>
+                <textarea name="justification" id="escalationJustification" class="form-control" rows="4" required
+                    placeholder="Why does this ticket need management attention?"></textarea>
+                <span class="text-sm" style="color: var(--text-secondary); display: block; margin-top: 8px;">
+                    Every active manager will be notified.</span>
+            </div>
+            <div class="modal-foot">
+                <span></span>
+                <div style="display: flex; gap: 10px;">
+                    <button type="button" class="btn btn-secondary" onclick="closeEscalateModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Escalate</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function openEscalateModal() {
+        document.getElementById('escalateModal').classList.add('open');
+        document.getElementById('escalationJustification').focus();
+    }
+    function closeEscalateModal() {
+        document.getElementById('escalateModal').classList.remove('open');
+    }
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') closeEscalateModal();
+    });
+</script>
+
+<div class="modal-overlay" id="resourceModal" onclick="if (event.target === this) closeResourceModal()">
+    <div class="modal-card">
+        <div class="modal-head">
+            <h2 style="margin: 0; font-size: 18px;">Associate Resources</h2>
+            <button type="button" class="icon-btn" onclick="closeResourceModal()" title="Close">
+                <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                    </path>
+                </svg>
+            </button>
+        </div>
+        <div style="padding: 0 24px 14px 24px;">
+            <input type="text" id="resSearch" class="form-control"
+                placeholder="Search tag, make, model, serial, or location..." autocomplete="off"
+                oninput="debouncedSearch()">
+        </div>
+        <div class="modal-body" id="resResults">
+            <div class="text-sm" style="color: var(--text-secondary); padding: 12px 2px;">Loading...</div>
+        </div>
+        <div class="modal-foot">
+            <span class="text-sm" style="color: var(--text-secondary);" id="resCount">0 selected</span>
+            <div style="display: flex; gap: 10px;">
+                <button type="button" class="btn btn-secondary" onclick="closeResourceModal()">Cancel</button>
+                <form method="post" id="resLinkForm"
+                    action="{{ url_for('tickets.link_resource', ticket_id=t.ticketID) }}">
+                    <button type="submit" class="btn btn-primary" id="resLinkBtn" disabled>Associate</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function () {
+        const SEARCH_URL = "{{ url_for('tickets.search_linkable', ticket_id=t.ticketID) }}";
+        const selected = new Map();   // resourceID -> resourceTag
+        let timer = null;
+
+        window.openResourceModal = function () {
+            document.getElementById('resourceModal').classList.add('open');
+            document.getElementById('resSearch').value = '';
+            document.getElementById('resSearch').focus();
+            runSearch('');
+        };
+
+        window.closeResourceModal = function () {
+            document.getElementById('resourceModal').classList.remove('open');
+        };
+
+        window.debouncedSearch = function () {
+            clearTimeout(timer);
+            timer = setTimeout(function () {
+                runSearch(document.getElementById('resSearch').value.trim());
+            }, 250);
+        };
+
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') closeResourceModal();
+        });
+
+        function runSearch(q) {
+            fetch(SEARCH_URL + '?q=' + encodeURIComponent(q))
+                .then(function (r) { return r.json(); })
+                .then(function (data) { render(data.results); })
+                .catch(function () {
+                    document.getElementById('resResults').innerHTML =
+                        '<div class="text-sm" style="color: var(--danger-color); padding: 12px 2px;">' +
+                        'Search failed. Check your connection and try again.</div>';
+                });
+        }
+
+        // All row content is set via textContent — resource
+        // fields are user-entered data, never trusted as HTML.
+        function render(results) {
+            const box = document.getElementById('resResults');
+            box.innerHTML = '';
+            if (!results.length) {
+                const d = document.createElement('div');
+                d.className = 'text-sm';
+                d.style.cssText = 'color: var(--text-secondary); padding: 12px 2px;';
+                d.textContent = 'No unlinked resources match that search.';
+                box.appendChild(d);
+                return;
+            }
+            results.forEach(function (r) {
+                const row = document.createElement('div');
+                row.className = 'res-row' + (selected.has(r.resourceID) ? ' selected' : '');
+
+                const cb = document.createElement('input');
+                cb.type = 'checkbox';
+                cb.checked = selected.has(r.resourceID);
+
+                const info = document.createElement('div');
+                info.style.cssText = 'min-width: 0; flex: 1;';
+                const top = document.createElement('div');
+                const tag = document.createElement('strong');
+                tag.style.cssText = 'color: var(--text-primary); font-family: monospace;';
+                tag.textContent = r.resourceTag;
+                top.appendChild(tag);
+                if (r.status === 'Disposed' || r.status === 'LostMissing') {
+                    const warn = document.createElement('span');
+                    warn.className = 'badge';
+                    warn.style.cssText = 'border: 1px solid var(--warning-color); color: var(--warning-color); margin-left: 8px;';
+                    warn.textContent = r.status_label;
+                    top.appendChild(warn);
+                }
+                const sub = document.createElement('span');
+                sub.className = 'text-sm';
+                sub.style.cssText = 'color: var(--text-secondary); display: block; margin-top: 2px;';
+                sub.textContent = r.make + ' ' + r.model + ' \u00b7 ' + r.type +
+                    (r.assignedName ? ' \u00b7 ' + r.assignedName : '') +
+                    (r.location ? ' \u00b7 ' + r.location : '');
+                info.appendChild(top);
+                info.appendChild(sub);
+
+                row.appendChild(cb);
+                row.appendChild(info);
+                row.onclick = function () {
+                    if (selected.has(r.resourceID)) {
+                        selected.delete(r.resourceID);
+                    } else {
+                        selected.set(r.resourceID, r.resourceTag);
+                    }
+                    cb.checked = selected.has(r.resourceID);
+                    row.classList.toggle('selected', cb.checked);
+                    updateCount();
+                };
+                box.appendChild(row);
+            });
+        }
+
+        function updateCount() {
+            document.getElementById('resCount').textContent = selected.size + ' selected';
+            document.getElementById('resLinkBtn').disabled = selected.size === 0;
+        }
+
+        // Selections made across different searches all
+        // submit — hidden inputs are rebuilt from the Set.
+        document.getElementById('resLinkForm').addEventListener('submit', function () {
+            const form = this;
+            form.querySelectorAll('input[name="resource_ids"]').forEach(function (el) { el.remove(); });
+            selected.forEach(function (_tag, id) {
+                const h = document.createElement('input');
+                h.type = 'hidden';
+                h.name = 'resource_ids';
+                h.value = id;
+                form.appendChild(h);
+            });
+        });
+    })();
+</script>
+
+<div class="modal-overlay" id="kbModal" onclick="if (event.target === this) closeKbModal()">
+    <div class="modal-card" style="max-width: 620px;">
+        <div class="modal-head">
+            <h2 style="margin: 0; font-size: 18px;">Attach Resolution Article</h2>
+            <button type="button" class="icon-btn" onclick="closeKbModal()" title="Close">
+                <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                    </path>
+                </svg>
+            </button>
+        </div>
+        <div style="padding: 0 24px 14px 24px;">
+            <input type="text" id="kbSearch" class="form-control" placeholder="Search title, body, or tags..."
+                autocomplete="off" oninput="debouncedKbSearch()">
+        </div>
+        <div class="modal-body" id="kbResults">
+            <div class="text-sm" style="color: var(--text-secondary); padding: 12px 2px;">Loading...</div>
+        </div>
+    </div>
+</div>
+
+<form method="post" id="kbLinkForm" style="display: none;"
+    action="{{ url_for('kb.link_ticket_article', ticket_id=t.ticketID) }}">
+    <input type="hidden" name="article_id" id="kbLinkArticleId" value="">
+</form>
+
+<script>
+    (function () {
+        const KB_SEARCH_URL = "{{ url_for('kb.search_articles') }}";
+        let kbTimer = null;
+
+        window.openKbModal = function () {
+            document.getElementById('kbModal').classList.add('open');
+            const s = document.getElementById('kbSearch');
+            s.value = '';
+            s.focus();
+            kbRun('');
+        };
+
+        window.closeKbModal = function () {
+            document.getElementById('kbModal').classList.remove('open');
+        };
+
+        window.debouncedKbSearch = function () {
+            clearTimeout(kbTimer);
+            kbTimer = setTimeout(function () {
+                kbRun(document.getElementById('kbSearch').value.trim());
+            }, 250);
+        };
+
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') closeKbModal();
+        });
+
+        function kbRun(q) {
+            fetch(KB_SEARCH_URL + '?q=' + encodeURIComponent(q))
+                .then(function (r) { return r.json(); })
+                .then(function (data) { kbRender(data.results); })
+                .catch(function () {
+                    const box = document.getElementById('kbResults');
+                    box.innerHTML = '';
+                    const d = document.createElement('div');
+                    d.className = 'text-sm';
+                    d.style.cssText = 'color: var(--danger-color); padding: 12px 2px;';
+                    d.textContent = 'Search failed. Check your connection and try again.';
+                    box.appendChild(d);
+                });
+        }
+
+        // All row content is set via textContent — titles are
+        // user-entered data, never trusted as HTML. Only
+        // Published articles are selectable (the server
+        // rejects anything else regardless).
+        function kbRender(results) {
+            const box = document.getElementById('kbResults');
+            box.innerHTML = '';
+            const published = results.filter(function (a) {
+                return a.status === 'Published';
+            });
+            if (!published.length) {
+                const d = document.createElement('div');
+                d.className = 'text-sm';
+                d.style.cssText = 'color: var(--text-secondary); padding: 12px 2px;';
+                d.textContent = 'No published articles match that search.';
+                box.appendChild(d);
+                return;
+            }
+            published.forEach(function (a) {
+                const row = document.createElement('div');
+                row.className = 'res-row';
+
+                const info = document.createElement('div');
+                info.style.cssText = 'min-width: 0; flex: 1;';
+                const top = document.createElement('div');
+                const id = document.createElement('strong');
+                id.style.cssText = 'color: var(--text-primary); font-family: monospace;';
+                id.textContent = 'KB-' + a.articleID;
+                top.appendChild(id);
+                const title = document.createElement('span');
+                title.style.cssText = 'color: var(--text-primary); margin-left: 8px; font-weight: 600;';
+                title.textContent = a.title;
+                top.appendChild(title);
+                const sub = document.createElement('span');
+                sub.className = 'text-sm';
+                sub.style.cssText = 'color: var(--text-secondary); display: block; margin-top: 2px;';
+                sub.textContent = a.category + ' \u00b7 ' + a.visibility +
+                    ' \u00b7 ' + a.author;
+                info.appendChild(top);
+                info.appendChild(sub);
+
+                row.appendChild(info);
+                row.onclick = function () {
+                    document.getElementById('kbLinkArticleId').value = a.articleID;
+                    document.getElementById('kbLinkForm').submit();
+                };
+                box.appendChild(row);
+            });
+        }
+    })();
+</script>
+
+{% endif %}
 {% endblock %}

@@ -1,0 +1,19 @@
+<div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+    <div>
+        <h1 style="margin: 0; color: var(--text-primary); font-size: 22px;">Administration</h1>
+        <div class="text-sm" style="color: var(--text-secondary); margin-top: 4px;">
+            User accounts, categories, SLA targets, and the audit trail (FR-6.1 / FR-6.2)
+        </div>
+    </div>
+    <div style="display: flex; gap: 6px; border: 1px solid var(--panel-border); border-radius: 10px; padding: 4px;">
+        {% for endpoint, label in [('admin.list_users', 'Users'),
+                                   ('admin.list_categories', 'Categories'),
+                                   ('admin.list_sla', 'SLA Targets'),
+                                   ('admin.list_audit', 'Audit Log')] %}
+        <a href="{{ url_for(endpoint) }}"
+           style="text-decoration: none; padding: 8px 16px; border-radius: 8px; font-size: 14px;
+                  {% if request.endpoint == endpoint %}background: var(--accent-color); color: #fff;
+                  {% else %}color: var(--text-secondary);{% endif %}">{{ label }}</a>
+        {% endfor %}
+    </div>
+</div>

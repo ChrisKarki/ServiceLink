@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+{% block title %}Administration · Users{% endblock %}
+
+{% block content %}
+{% include "admin/_subnav.html" with context %}
+
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 16px; margin: 18px 0 14px; flex-wrap: wrap;">
+    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+        {% for key, label, count in [('pending', 'Pending', counts.pending),
+                                     ('active', 'Active', counts.active),
+                                     ('suspended', 'Suspended', counts.suspended),
+                                     ('all', 'All', counts.total)] %}
+        <a href="{{ url_for('admin.list_users', tab=key, role=f_role, q=q) }}"
+           class="badge" style="text-decoration: none; padding: 6px 14px; cursor: pointer;
+                  {% if tab == key %}background: var(--accent-color); color: #fff; border: 1px solid var(--accent-color);
+                  {% else %}border: 1px solid var(--panel-border); color: var(--text-secondary);{% endif %}">
+            {{ label }} ({{ count }})
+        </a>
+        {% endfor %}
+    </div>
+    <form method="get" action="{{ url_for('admin.list_users') }}" style="display: flex; gap: 8px; align-items: center;">
+        <input type="hidden" name="tab" value="{{ tab }}">
+        <select name="role" class="search-input" style="width: 150px; padding: 8px 10px;">
+            <option value="">All roles</option>
+            {% for r in roles %}
+            <option value="{{ r }}" {% if f_role == r %}selected{% endif %}>{{ r }}</option>
+            {% endfor %}
+        </select>
+        <input type="text" name="q" value="{{ q }}" placeholder="Search name or email..."
+               class="search-input" style="width: 220px; padding: 8px 12px;">
+        <button type="submit" class="icon-btn" title="Filter" style="border: 1px solid var(--panel-border); border-radius: 8px;">
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+        </button>
+    </form>
+</div>
+
+<div style="border: 1px solid var(--panel-border); border-radius: 12px; overflow: hidden;">
+    <table style="width: 100%; border-collapse: collapse;">
+        <thead>
+            <tr style="border-bottom: 1px solid var(--panel-border);">
+                {% for h in ['User', 'Role', 'Status', 'Registered', 'Last login', 'Actions'] %}
+                <th class="text-sm" style="text-align: left; padding: 12px 16px; color: var(--text-secondary); font-weight: 500;">{{ h }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for u in users %}
+            <tr style="border-bottom: 1px solid var(--panel-border);">
+                <td style="padding: 12px 16px;">
+                    <div style="color: var(--text-primary); font-weight: 500;">
+                        {{ u.firstName }} {{ u.lastName }}
+                        {% if u.userID == current_user_id %}
+                        <span class="text-sm" style="color: var(--text-secondary);">(you)</span>
+                        {% endif %}
+                    </div>
+                    <div class="text-sm" style="color: var(--text-secondary);">{{ u.email }}</div>
+                </td>
+                <td style="padding: 12px 16px;">
+                    {% if u.userID == current_user_id %}
+                    <span style="color: var(--text-primary);">{{ u.role }}</span>
+                    {% else %}
+                    <form method="post" action="{{ url_for('admin.change_role', user_id=u.userID) }}" style="margin: 0;">
+                        <select name="role" class="search-input" style="width: 140px; padding: 6px 8px;"
+                                onchange="if (confirm('Change ' + {{ (u.firstName ~ ' ' ~ u.lastName) | tojson }} + '\'s role to ' + this.value + '?')) { this.form.submit(); } else { this.selectedIndex = {{ roles.index(u.role) }}; }">
+                            {% for r in roles %}
+                            <option value="{{ r }}" {% if u.role == r %}selected{% endif %}>{{ r }}</option>
+                            {% endfor %}
+                        </select>
+                    </form>
+                    {% endif %}
+                </td>
+                <td style="padding: 12px 16px;">
+                    {% set b = status_badges[u.status] %}
+                    <span class="{{ b.cls }}" style="{{ b.style }}">{{ status_labels[u.status] }}</span>
+                </td>
+                <td class="text-sm" style="padding: 12px 16px; color: var(--text-secondary);">
+                    {{ u.createdAt.strftime('%b %d, %Y') if u.createdAt else '—' }}
+                </td>
+                <td class="text-sm" style="padding: 12px 16px; color: var(--text-secondary);">
+                    {{ u.lastLoginAt.strftime('%b %d, %Y %H:%M') if u.lastLoginAt else 'Never' }}
+                </td>
+                <td style="padding: 12px 16px;">
+                    <div style="display: flex; gap: 8px;">
+                        {% if u.status == 'PendingApproval' %}
+                        <form method="post" action="{{ url_for('admin.approve_user', user_id=u.userID) }}" style="margin: 0;">
+                            <button type="submit" class="badge badge-status-resolved" style="cursor: pointer; padding: 6px 14px; border: none;">Approve</button>
+                        </form>
+                        {% endif %}
+                        {% if u.status != 'Suspended' and u.userID != current_user_id %}
+                        <form method="post" action="{{ url_for('admin.suspend_user', user_id=u.userID) }}" style="margin: 0;"
+                              onsubmit="return confirm('Suspend ' + {{ (u.firstName ~ ' ' ~ u.lastName) | tojson }} + '? They will be signed out and unable to log in.');">
+                            <button type="submit" class="badge" style="cursor: pointer; padding: 6px 14px; background: none; border: 1px solid var(--danger-color); color: var(--danger-color);">Suspend</button>
+                        </form>
+                        {% endif %}
+                        {% if u.status == 'Suspended' %}
+                        <form method="post" action="{{ url_for('admin.reactivate_user', user_id=u.userID) }}" style="margin: 0;">
+                            <button type="submit" class="badge" style="cursor: pointer; padding: 6px 14px; background: none; border: 1px solid var(--accent-color); color: var(--accent-color);">Reactivate</button>
+                        </form>
+                        {% endif %}
+                    </div>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="6" style="padding: 32px; text-align: center; color: var(--text-secondary);">
+                    No accounts match this filter.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

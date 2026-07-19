@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% block title %}Knowledge Base{% endblock %}
+
+{% block page_css %}
+<style>
+    .kb-toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+    }
+
+    .kb-search {
+        display: flex;
+        gap: 10px;
+        flex: 1;
+        min-width: 280px;
+        max-width: 480px;
+    }
+
+    .kb-table tbody tr {
+        cursor: pointer;
+        transition: background 0.15s ease;
+    }
+
+    .kb-table tbody tr:hover td { background: var(--button-secondary-bg); }
+    .kb-table td.kb-id { font-weight: 500; color: var(--text-primary); white-space: nowrap; }
+    .kb-table td.kb-title { color: var(--text-primary); }
+</style>
+{% endblock %}
+
+{% block content %}
+{# Context from kb.list_articles: articles, chips (staff only), view, q,
+   pending_count (approvers only), is_staff.
+   FR-4.1 scoping is done in SQL — an End User's page can only ever contain
+   Published + Public rows, so this template needs no visibility logic. #}
+                    <div class="flex-between mb-4">
+                        <h1>Knowledge Base</h1>
+                        {% if is_staff %}
+                        <button class="btn btn-primary"
+                            onclick="location.href='{{ url_for('kb.new_article') }}'">+ New Article</button>
+                        {% endif %}
+                    </div>
+
+                    {% if pending_count %}
+                    <div class="panel"
+                        style="border-left: 4px solid var(--warning-color); margin-bottom: 20px; padding: 14px 18px;">
+                        <span class="text-sm" style="color: var(--text-primary);">
+                            <strong>{{ pending_count }}</strong>
+                            article{{ 's' if pending_count != 1 }} awaiting your approval.</span>
+                        <a class="text-sm" href="{{ url_for('kb.list_articles', view='pending') }}"
+                            style="color: var(--accent-color); text-decoration: none; margin-left: 8px;">Review</a>
+                    </div>
+                    {% endif %}
+
+                    <div class="kb-toolbar">
+                        {% if chips %}
+                        <div class="filter-bar" style="margin-bottom: 0;">
+                            {% for key, label in chips %}
+                            <a class="filter-pill {% if view == key %}active{% endif %}"
+                                href="{{ url_for('kb.list_articles', view=key, q=q or none) }}"
+                                style="text-decoration: none;">{{ label }}</a>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+
+                        <form class="kb-search" method="get" action="{{ url_for('kb.list_articles') }}">
+                            <input type="hidden" name="view" value="{{ view }}">
+                            <input type="text" name="q" class="form-control" value="{{ q }}"
+                                placeholder="Search title, body, or tags...">
+                            <button type="submit" class="btn btn-secondary">Search</button>
+                        </form>
+                    </div>
+
+                    <div class="panel" style="padding: 0;">
+                        <div class="table-wrapper">
+                            <table class="kb-table">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Title</th>
+                                        <th>Author</th>
+                                        {% if is_staff %}
+                                        <th>Status</th>
+                                        <th>Visibility</th>
+                                        {% endif %}
+                                        <th>Published</th>
+                                        <th>Created</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for a in articles %}
+                                    <tr onclick="location.href='{{ url_for('kb.view_article', article_id=a.articleID) }}'">
+                                        <td class="kb-id">KB-{{ a.articleID }}</td>
+                                        <td class="kb-title">{{ a.title }}</td>
+                                        <td style="white-space: nowrap;">{{ a.authorName }}</td>
+                                        {% if is_staff %}
+                                        <td><span class="{{ a.status_badge.cls }}"{% if a.status_badge.style %} style="{{ a.status_badge.style }}"{% endif %}>{{ a.status_label }}</span></td>
+                                        <td><span class="{{ a.visibility_badge.cls }}"{% if a.visibility_badge.style %} style="{{ a.visibility_badge.style }}"{% endif %}>{{ a.visibility }}</span></td>
+                                        {% endif %}
+                                        <td style="color: var(--text-secondary); white-space: nowrap;">{{ a.published_label or '—' }}</td>
+                                        <td style="color: var(--text-secondary); white-space: nowrap;">{{ a.created_label }}</td>
+                                    </tr>
+                                    {% else %}
+                                    <tr>
+                                        <td colspan="{{ 7 if is_staff else 5 }}"
+                                            style="text-align: center; color: var(--text-secondary); padding: 32px;">
+                                            {% if q %}No articles match your search.{% else %}No articles here yet.{% endif %}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+{% endblock %}

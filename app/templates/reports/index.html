@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}Reports{% endblock %}
+
+{% block content %}
+<div>
+    <h1 style="margin: 0; color: var(--text-primary); font-size: 22px;">Reports</h1>
+    <div class="text-sm" style="color: var(--text-secondary); margin-top: 4px;">
+        Ticket volume, breakdowns, and SLA context (C3.1)
+    </div>
+</div>
+
+<div style="display: flex; gap: 16px; margin-top: 18px; flex-wrap: wrap;">
+    {% for label, value in [('Total tickets', total),
+                            ('Open', open_count),
+                            ('Resolved / Closed', resolved_count),
+                            ('Avg resolution (hrs)', avg_hours if avg_hours is not none else '—')] %}
+    <div style="flex: 1; min-width: 170px; border: 1px solid var(--panel-border); border-radius: 12px; padding: 18px 20px;">
+        <div class="text-sm" style="color: var(--text-secondary);">{{ label }}</div>
+        <div style="color: var(--text-primary); font-size: 28px; font-weight: 600; margin-top: 6px;">{{ value }}</div>
+    </div>
+    {% endfor %}
+</div>
+
+<div style="display: flex; gap: 16px; margin-top: 16px; flex-wrap: wrap; align-items: flex-start;">
+    {% for title, bars in [('By status', status_bars),
+                           ('By priority', priority_bars),
+                           ('By category', category_bars)] %}
+    <div style="flex: 1; min-width: 280px; border: 1px solid var(--panel-border); border-radius: 12px; padding: 20px;">
+        <div style="color: var(--text-primary); font-weight: 600; margin-bottom: 14px;">{{ title }}</div>
+        {% for label, count, pct in bars %}
+        <div style="margin-bottom: 10px;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                <span class="text-sm" style="color: var(--text-primary);">{{ label }}</span>
+                <span class="text-sm" style="color: var(--text-secondary);">{{ count }}</span>
+            </div>
+            <div style="height: 8px; border-radius: 4px; background: var(--panel-border); overflow: hidden;">
+                <div style="height: 100%; width: {{ pct }}%; background: var(--accent-color); border-radius: 4px;"></div>
+            </div>
+        </div>
+        {% else %}
+        <div class="text-sm" style="color: var(--text-secondary);">No data yet.</div>
+        {% endfor %}
+    </div>
+    {% endfor %}
+</div>
+
+<div style="margin-top: 16px; border: 1px solid var(--panel-border); border-radius: 12px; overflow: hidden; max-width: 860px;">
+    <table style="width: 100%; border-collapse: collapse;">
+        <thead>
+            <tr style="border-bottom: 1px solid var(--panel-border);">
+                {% for h in ['Priority', 'Tickets', 'Response target (mins)', 'Resolution target (mins)'] %}
+                <th class="text-sm" style="text-align: left; padding: 12px 16px; color: var(--text-secondary); font-weight: 500;">{{ h }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for p in priorities %}
+            <tr style="border-bottom: 1px solid var(--panel-border);">
+                <td style="padding: 12px 16px; color: var(--text-primary);">{{ p }}</td>
+                <td class="text-sm" style="padding: 12px 16px; color: var(--text-secondary);">
+                    {% for label, count, pct in priority_bars %}{% if label == p %}{{ count }}{% endif %}{% endfor %}
+                </td>
+                <td class="text-sm" style="padding: 12px 16px; color: var(--text-secondary);">
+                    {{ sla[p].responseTargetMins if p in sla else '—' }}
+                </td>
+                <td class="text-sm" style="padding: 12px 16px; color: var(--text-secondary);">
+                    {{ sla[p].resolutionTargetMins if p in sla else '—' }}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
