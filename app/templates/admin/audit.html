@@ -48,7 +48,7 @@
             {% for e in entries %}
             <tr style="border-bottom: 1px solid var(--panel-border); vertical-align: top;">
                 <td class="text-sm" style="padding: 12px 16px; color: var(--text-secondary); white-space: nowrap;">
-                    {{ e.createdAt.strftime('%b %d, %Y %H:%M:%S') if e.createdAt else '—' }}
+                    {{ e.ts.strftime('%b %d, %Y %H:%M:%S') if e.ts else '—' }}
                 </td>
                 <td style="padding: 12px 16px;">
                     {% if e.firstName %}
@@ -66,6 +66,10 @@
                 </td>
                 <td style="padding: 12px 16px;">
                     {% set changes = changes_by_log.get(e.logID) %}
+                    <div class="text-sm" style="color: var(--text-primary); margin-bottom: {% if changes %}6px{% else %}0{% endif %};">
+                        {% if e.firstName %}{{ e.firstName }} {{ e.lastName }}{% else %}User #{{ e.actorID }}{% endif %}
+                        {{ e.verb }} {{ e.entityType }}{% if e.entityID %} #{{ e.entityID }}{% endif %}{% if changes %}:{% endif %}
+                    </div>
                     {% if changes %}
                     <div style="display: flex; flex-direction: column; gap: 4px;">
                         {% for c in changes %}
@@ -77,8 +81,6 @@
                         </div>
                         {% endfor %}
                     </div>
-                    {% else %}
-                    <span class="text-sm" style="color: var(--text-secondary);">—</span>
                     {% endif %}
                 </td>
                 <td class="text-sm" style="padding: 12px 16px; color: var(--text-secondary); white-space: nowrap;">

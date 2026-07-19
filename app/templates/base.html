@@ -73,9 +73,7 @@
     <div class="app-layout">
         <nav class="sidebar minimized" id="sidebar">
             <ul class="nav-menu">
-                {# Dashboard, tickets, and resources are live routes. KB /
-                   Reports / Team land with their sprints; those stay as visible
-                   toast stubs, never broken url_for() calls. #}
+                {# All sidebar entries are live routes as of this sprint. #}
                 <li class="nav-item {% if request.endpoint == 'main.dashboard' %}active{% endif %}"
                     onclick="location.href='{{ url_for('main.dashboard') }}'"
                     title="{% if session['role'] == 'EndUser' %}My Dashboard{% else %}Dashboard{% endif %}">
@@ -107,11 +105,13 @@
                     <span class="nav-label">Knowledge Base</span>
                 </li>
                 {% if session['role'] in ('Manager', 'Administrator') %}
-                <li class="nav-item" onclick="showToast('Reports land in Sprint 3 (C3.1)', 'info')" title="Reports">
+                <li class="nav-item {% if request.blueprint == 'reports' %}active{% endif %}"
+                    onclick="location.href='{{ url_for('reports.index') }}'" title="Reports">
                     <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
                     <span class="nav-label">Reports</span>
                 </li>
-                <li class="nav-item" onclick="showToast('Team management lands in Sprint 3 (C3.2)', 'info')" title="Team">
+                <li class="nav-item {% if request.blueprint == 'team' %}active{% endif %}"
+                    onclick="location.href='{{ url_for('team.index') }}'" title="Team">
                     <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
                     <span class="nav-label">Team</span>
                 </li>

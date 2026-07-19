@@ -417,6 +417,11 @@ AUDIT_ENTITY_TYPES = ("Ticket", "Resource", "User", "KBArticle",
 AUDIT_ACTIONS = ("Create", "Update", "Delete", "Link", "Unlink")
 AUDIT_PER_PAGE = 50
 
+# Past-tense verbs for the human-readable summary line, e.g.
+# "Chris Karki updated Resource #12 — assetState: Available -> InUse".
+ACTION_VERBS = {"Create": "created", "Update": "updated",
+                "Delete": "deleted", "Link": "linked", "Unlink": "unlinked"}
+
 ACTION_BADGES = {
     "Create": "border: 1px solid var(--accent-color); color: var(--accent-color);",
     "Update": "border: 1px solid var(--warning-color); color: var(--warning-color);",
@@ -464,16 +469,26 @@ def list_audit():
     page = min(page, pages)
     offset = (page - 1) * AUDIT_PER_PAGE
 
+    # SELECT a.* on purpose: the timestamp column name has drifted between
+    # the assumed schema and the deployed one before (createdAt vs
+    # timestamp vs loggedAt -> 1054). Pull every AuditLog column and
+    # resolve the timestamp key in Python so this view survives drift.
     entries = query_all(
-        "SELECT a.logID, a.actorID, a.entityType, a.entityID, a.action,"
-        "       a.ipAddress, a.createdAt,"
-        "       u.firstName, u.lastName, u.email"
+        "SELECT a.*, u.firstName, u.lastName, u.email"
         "  FROM AuditLog a"
         "  LEFT JOIN User u ON u.userID = a.actorID"
         + where +
         " ORDER BY a.logID DESC"
         " LIMIT %s OFFSET %s",
         tuple(params + [AUDIT_PER_PAGE, offset]))
+
+    ts_candidates = ("createdAt", "timestamp", "loggedAt", "actionTimestamp",
+                     "occurredAt", "createdOn", "created_at", "actionDate",
+                     "logDate", "eventTime")
+    for e in entries:
+        e["ts"] = next((e[k] for k in ts_candidates
+                        if k in e and e[k] is not None), None)
+        e["verb"] = ACTION_VERBS.get(e["action"], e["action"].lower())
 
     # --- field-level changes for the visible page, one query ----------
     changes_by_log = {}
@@ -484,7 +499,7 @@ def list_audit():
             "SELECT logID, fieldName, oldValue, newValue"
             "  FROM AuditLogChange"
             " WHERE logID IN (" + placeholders + ")"
-            " ORDER BY changeID",
+            " ORDER BY logID, fieldName",  # PK is (logID, fieldName); no changeID
             tuple(ids))
         for row in change_rows:
             changes_by_log.setdefault(row["logID"], []).append(row)

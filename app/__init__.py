@@ -35,6 +35,8 @@ def create_app():
     from .routes.tickets import bp as tickets_bp
     from .routes.admin import bp as admin_bp
     from .routes.kb import bp as kb_bp
+    from .routes.reports import bp as reports_bp
+    from .routes.team import bp as team_bp
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(main_bp)
@@ -42,6 +44,8 @@ def create_app():
     app.register_blueprint(tickets_bp)
     app.register_blueprint(admin_bp)
     app.register_blueprint(kb_bp)
+    app.register_blueprint(reports_bp)
+    app.register_blueprint(team_bp)
 
     @app.errorhandler(403)
     def forbidden(_):
