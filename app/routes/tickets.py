@@ -21,6 +21,18 @@ Implemented here:
                                       surfaces as a friendly message;
                                       EX-2: Disposed / Lost-Missing resources
                                       link with an explicit warning.
+
+  P1.4  POST /tickets/<id>/status     — legal six-state transitions, resolvedAt,
+                                      resolution summary (UC-02).
+  P2.3  POST /tickets/<id>/escalate   — escalate to management with a mandatory
+                                      justification (UC-02 AF-3). Empty
+                                      justification is rejected server-side; the
+                                      escalation is recorded in the audit trail
+                                      (which also flags the ticket) and every
+                                      active Manager is notified.
+
+Deferred (visible stubs in the detail template, not silent gaps):
+  P2.x  comments, attachments
   P1.4  legal six-state transitions   — enforced server-side inside the
                                       properties endpoint via TRANSITIONS;
                                       resolvedAt stamped/cleared (§4.2).
@@ -416,6 +428,29 @@ def view_ticket(ticket_id):
         priorities=PRIORITIES, statuses=list(STATUS_LABELS),
         status_labels=STATUS_LABELS)
 
+    is_staff = session["role"] in STAFF
+
+    # P2.3 — the most recent escalation, if any. Shown to STAFF only: the
+    # justification is an internal note (FR-2.4) and must not reach End Users.
+    # The escalation "flag" is derived from the audit trail (no schema change).
+    escalation = None
+    if is_staff:
+        escalation = query_one(
+            "SELECT lc.newValue AS justification, l.timestamp AS at,"
+            "       CONCAT(u.firstName, ' ', u.lastName) AS actor"
+            "  FROM AuditLog l"
+            "  JOIN AuditLogChange lc ON lc.logID = l.logID"
+            "  JOIN User u ON u.userID = l.actorID"
+            " WHERE l.entityType = 'Ticket' AND l.entityID = %s"
+            "   AND lc.fieldName = 'escalation'"
+            " ORDER BY l.logID DESC LIMIT 1", (ticket_id,))
+
+    return render_template("tickets/detail.html", t=_shape(t),
+                           linked=linked, history=history,
+                           is_staff=is_staff,
+                           next_states=sorted(TRANSITIONS[t["status"]]),
+                           status_labels=STATUS_LABELS,
+                           escalation=escalation), status_code
 
 # ---------------------------------------------------------------------------
 # P2.2 — SLA tracking (FR-2.2, FR-2.5)
@@ -673,6 +708,49 @@ def save_resolution(ticket_id):
                                               summary)},
                ip=request.remote_addr)
     flash("Resolution notes saved.", "success")
+    return redirect(url_for("tickets.view_ticket", ticket_id=ticket_id))
+
+
+# ---------------------------------------------------------------------------
+# P2.3 — Escalation (FR-2.4, UC-02 AF-3)
+# ---------------------------------------------------------------------------
+
+@bp.post("/tickets/<int:ticket_id>/escalate")
+@roles_required(*STAFF)
+def escalate_ticket(ticket_id):
+    """Escalate a ticket to management with a MANDATORY justification (UC-02
+    AF-3). An empty justification is rejected server-side with HTTP 400 and
+    nothing written (the AC). On success the escalation is recorded in the
+    audit trail — which is both the audit-log requirement and the derived
+    escalation flag — and every active Manager is notified."""
+    t = _get_ticket_or_403(ticket_id)
+    justification = (request.form.get("justification") or "").strip()
+
+    # AC: the justification is required. No write on rejection.
+    if not justification:
+        flash("A justification is required to escalate a ticket.", "error")
+        return _render_detail(t, 400)
+    if len(justification) > 2000:
+        flash("Justification is too long (2000 characters maximum).", "error")
+        return _render_detail(t, 400)
+
+    # The audit change IS the escalation record: fieldName 'escalation' carries
+    # the justification, and its existence is what flags the ticket as escalated.
+    log_action(session["user_id"], "Ticket", ticket_id, "Update",
+               changes={"escalation": (None, justification)},
+               ip=request.remote_addr)
+
+    managers = query_all(
+        "SELECT userID FROM User WHERE role = 'Manager' AND status = 'Active'")
+    for m in managers:
+        if m["userID"] == session["user_id"]:
+            continue   # don't notify a manager who escalated their own ticket
+        notify(m["userID"],
+               f"Ticket #{ticket_id} escalated for review",
+               f"{session['name']} escalated '{t['title']}' ({t['priority']}). "
+               f"Justification: {justification}")
+
+    flash("Ticket escalated to management.", "success")
     return redirect(url_for("tickets.view_ticket", ticket_id=ticket_id))
 
 
