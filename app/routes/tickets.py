@@ -366,9 +366,6 @@ def view_ticket(ticket_id):
 
     # Conversation (FR-2.4): internal notes are staff-only — filtered in
     # SQL so they never reach an End User's page source.
-    # Schema (schema.sql §TicketComment): bodyText TEXT and
-    # commentType ENUM('Internal','Public') — aliased here so the template
-    # keeps working with .body / .isInternal.
     c_sql = ("SELECT c.commentID, c.bodyText AS body,"
              "       (c.commentType = 'Internal') AS isInternal, c.createdAt,"
              "       CONCAT(u.firstName, ' ', u.lastName) AS author,"
@@ -387,6 +384,13 @@ def view_ticket(ticket_id):
         "   AND a.entityID = %s"
         " ORDER BY a.timestamp DESC LIMIT 20", (ticket_id,))
 
+    # feature/kb (FR-4.2): resolution article, if one has been designated.
+    kb_article = None
+    if t.get("linkedKBArticleID"):
+        kb_article = query_one(
+            "SELECT articleID, title, status, visibility FROM KBArticle"
+            " WHERE articleID = %s", (t["linkedKBArticleID"],))
+
     # P2.2 — a submitter can reopen their own resolved ticket, but only inside
     # the policy window. The button is offered only when the action would
     # actually succeed; reopen_ticket re-checks all of this server-side.
@@ -400,6 +404,7 @@ def view_ticket(ticket_id):
         "tickets/detail.html", t=_shape(t),
         linked=linked, comments=comments, history=history,
         sla=_sla_info(t), is_staff=is_staff,
+        kb_article=kb_article,
         can_reopen=can_reopen, reopen_days=REOPEN_WINDOW_DAYS,
         next_states=sorted(TRANSITIONS[t["status"]]),
         technicians=_active_technicians() if is_staff else [],

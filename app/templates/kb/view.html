@@ -1,0 +1,186 @@
+{% extends "base.html" %}
+{% block title %}KB-{{ a.articleID }}{% endblock %}
+
+{% block page_css %}
+<style>
+    .kb-breadcrumb {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+        color: var(--text-secondary);
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+    }
+
+    .kb-breadcrumb a { color: var(--text-secondary); text-decoration: none; }
+    .kb-breadcrumb a:hover { color: var(--text-primary); }
+    .kb-breadcrumb .separator { opacity: 0.5; }
+    .kb-breadcrumb .current { color: var(--text-primary); font-weight: 500; }
+
+    .kb-view-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 320px;
+        gap: 24px;
+        align-items: start;
+    }
+
+    .card-box {
+        background: var(--panel-bg);
+        border: 1px solid var(--panel-border);
+        border-radius: 12px;
+        padding: 24px;
+        margin-bottom: 20px;
+    }
+
+    .section-heading {
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--text-secondary);
+        margin-bottom: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .kb-body {
+        color: var(--text-primary);
+        white-space: pre-wrap;
+        line-height: 1.7;
+        font-size: 15px;
+        margin: 0;
+    }
+
+    .rail-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 7px 0;
+        font-size: 13px;
+    }
+
+    .rail-row .k { color: var(--text-secondary); }
+    .rail-row .v { color: var(--text-primary); font-weight: 600; text-align: right; }
+
+    .kb-tag {
+        display: inline-flex;
+        align-items: center;
+        padding: 3px 10px;
+        border-radius: 50px;
+        font-size: 12px;
+        background: var(--card-tint);
+        border: 1px solid var(--panel-border);
+        color: var(--text-secondary);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+{# Context from kb.view_article: a, tags, linked_tickets (staff), can_edit,
+   can_submit, can_review, is_staff. #}
+                    <div class="kb-breadcrumb">
+                        <a href="{{ url_for('kb.list_articles') }}">Knowledge Base</a>
+                        <span class="separator">/</span>
+                        <span class="current">KB-{{ a.articleID }}</span>
+                    </div>
+
+                    <div class="flex-between" style="margin-bottom: 6px; gap: 16px; flex-wrap: wrap;">
+                        <h1 style="margin: 0; font-size: 24px;">{{ a.title }}</h1>
+                        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                            {% if is_staff %}
+                            <span class="{{ a.status_badge.cls }}"{% if a.status_badge.style %} style="{{ a.status_badge.style }}"{% endif %}>{{ a.status_label }}</span>
+                            <span class="{{ a.visibility_badge.cls }}"{% if a.visibility_badge.style %} style="{{ a.visibility_badge.style }}"{% endif %}>{{ a.visibility }}</span>
+                            {% endif %}
+                            {% if can_edit %}
+                            <a class="btn btn-secondary" style="text-decoration: none;"
+                                href="{{ url_for('kb.edit_article', article_id=a.articleID) }}">Edit</a>
+                            {% endif %}
+                            {% if can_submit %}
+                            <form method="post" action="{{ url_for('kb.submit_article', article_id=a.articleID) }}" style="margin: 0;">
+                                <button type="submit" class="btn btn-primary">Submit for Approval</button>
+                            </form>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="text-sm" style="color: var(--text-secondary); margin-bottom: 20px;">
+                        <strong style="color: var(--text-primary);">{{ a.authorName }}</strong>
+                        {% if a.published_label %}&middot; published {{ a.published_label }}{% endif %}
+                        &middot; created {{ a.created_label }}
+                    </div>
+
+                    {% if can_review %}
+                    {# FR-4.1: approval banner — Manager/Administrator only. #}
+                    <div class="panel" style="border-left: 4px solid var(--warning-color); margin-bottom: 20px; padding: 16px 18px;">
+                        <div class="flex-between" style="gap: 16px; flex-wrap: wrap;">
+                            <span class="text-sm" style="color: var(--text-primary);">
+                                This article is <strong>pending approval</strong>. Publishing makes it visible
+                                per its {{ a.visibility }} setting.</span>
+                            <div style="display: flex; gap: 10px;">
+                                <form method="post" action="{{ url_for('kb.approve_article', article_id=a.articleID) }}" style="margin: 0;">
+                                    <button type="submit" class="btn btn-primary">Approve &amp; Publish</button>
+                                </form>
+                                <button type="button" class="btn btn-secondary"
+                                    onclick="document.getElementById('returnBox').style.display='block'; this.style.display='none';">
+                                    Return to Draft</button>
+                            </div>
+                        </div>
+                        <form id="returnBox" method="post" style="display: none; margin-top: 14px;"
+                            action="{{ url_for('kb.return_article', article_id=a.articleID) }}">
+                            <div style="display: flex; gap: 10px;">
+                                <input type="text" name="reason" class="form-control" maxlength="255"
+                                    placeholder="Optional note to the author...">
+                                <button type="submit" class="btn btn-secondary" style="flex-shrink: 0;">Send Back</button>
+                            </div>
+                        </form>
+                    </div>
+                    {% endif %}
+
+                    <div class="kb-view-grid">
+                        <div>
+                            <div class="card-box">
+                                <p class="kb-body">{{ a.body }}</p>
+                            </div>
+
+                            {% if tags %}
+                            <div class="section-heading">Tags</div>
+                            <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px;">
+                                {% for tag in tags %}
+                                <a class="kb-tag" style="text-decoration: none;"
+                                    href="{{ url_for('kb.list_articles', q=tag) }}">#{{ tag }}</a>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <aside>
+                            <div class="card-box" style="padding: 18px;">
+                                <div class="rail-row"><span class="k">Article ID</span>
+                                    <span class="v" style="font-family: monospace;">KB-{{ a.articleID }}</span></div>
+                                <div class="rail-row"><span class="k">Author</span><span class="v">{{ a.authorName }}</span></div>
+                                {% if is_staff and a.approverName %}
+                                <div class="rail-row"><span class="k">Approved By</span><span class="v">{{ a.approverName }}</span></div>
+                                {% endif %}
+                                <div class="rail-row"><span class="k">Created</span><span class="v">{{ a.created_label }}</span></div>
+                                {% if a.published_label %}
+                                <div class="rail-row"><span class="k">Published</span><span class="v">{{ a.published_label }}</span></div>
+                                {% endif %}
+                            </div>
+
+                            {% if is_staff %}
+                            <div class="section-heading">Tickets Resolved by This Article</div>
+                            <div class="card-box" style="padding: 16px;">
+                                {% for t in linked_tickets %}
+                                <div style="display: flex; justify-content: space-between; gap: 10px; padding: 8px 0;
+                                            {% if not loop.last %}border-bottom: 1px solid var(--panel-border);{% endif %}">
+                                    <a class="text-sm" style="color: var(--accent-color); text-decoration: none; font-weight: 600;"
+                                        href="{{ url_for('tickets.view_ticket', ticket_id=t.ticketID) }}">TKT-{{ t.ticketID }}</a>
+                                    <span class="text-sm" style="color: var(--text-secondary); text-align: right;">{{ t.title }}</span>
+                                </div>
+                                {% else %}
+                                <span class="text-sm" style="color: var(--text-secondary);">
+                                    No tickets reference this article yet.</span>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </aside>
+                    </div>
+{% endblock %}

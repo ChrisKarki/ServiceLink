@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+{% block title %}{% if mode == 'new' %}New Article{% else %}Edit KB-{{ a.articleID }}{% endif %}{% endblock %}
+
+{% block page_css %}
+<style>
+    .kb-breadcrumb {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+        color: var(--text-secondary);
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+    }
+
+    .kb-breadcrumb a { color: var(--text-secondary); text-decoration: none; }
+    .kb-breadcrumb a:hover { color: var(--text-primary); }
+    .kb-breadcrumb .separator { opacity: 0.5; }
+    .kb-breadcrumb .current { color: var(--text-primary); font-weight: 500; }
+
+    .kb-form-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 3fr) minmax(260px, 1fr);
+        gap: 24px;
+        align-items: start;
+    }
+
+    .form-group { margin-bottom: 16px; }
+    .form-group:last-child { margin-bottom: 0; }
+
+    .form-label {
+        display: block;
+        margin-bottom: 6px;
+        font-weight: 600;
+        font-size: 13px;
+        color: var(--text-primary);
+    }
+
+    .form-error-msg {
+        color: var(--danger-color);
+        font-size: 13px;
+        font-weight: 600;
+        margin-top: 6px;
+    }
+
+    .form-control.input-error {
+        border-color: var(--danger-color) !important;
+        background-color: rgba(239, 68, 68, 0.05);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+{# Context from kb.new_article / kb.edit_article: mode ('new'|'edit'),
+   a (edit only), form (posted values on validation failure), errors,
+   visibilities, tags_csv (edit only).
+   The formatting toolbar from the Phase 3 mock is dropped — the body is
+   stored and rendered as plain text; a field that pretends to be rich
+   text is worse than an honest textarea. #}
+{% set action = url_for('kb.new_article') if mode == 'new' else url_for('kb.edit_article', article_id=a.articleID) %}
+{% set cancel = url_for('kb.list_articles') if mode == 'new' else url_for('kb.view_article', article_id=a.articleID) %}
+
+                    <div class="kb-breadcrumb">
+                        <a href="{{ url_for('kb.list_articles') }}">Knowledge Base</a>
+                        <span class="separator">/</span>
+                        <span class="current">{% if mode == 'new' %}New Article{% else %}Edit KB-{{ a.articleID }}{% endif %}</span>
+                    </div>
+
+                    <form method="post" action="{{ action }}">
+                        <div class="flex-between mb-4" style="gap: 16px; flex-wrap: wrap;">
+                            <h1 style="margin: 0; font-size: 24px;">
+                                {% if mode == 'new' %}New Article{% else %}Edit Article{% endif %}</h1>
+                            <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                                <a class="btn btn-secondary" href="{{ cancel }}" style="text-decoration: none;">Cancel</a>
+                                {% if mode == 'new' %}
+                                <button type="submit" name="action" value="draft" class="btn btn-secondary">Save Draft</button>
+                                <button type="submit" name="action" value="submit" class="btn btn-primary">Submit for Approval</button>
+                                {% else %}
+                                <button type="submit" class="btn btn-primary">Save Changes</button>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        {% if mode == 'edit' and a.status == 'Published' and session['role'] == 'Technician' %}
+                        <div class="panel" style="border-left: 4px solid var(--warning-color); margin-bottom: 20px; padding: 14px 18px;">
+                            <span class="text-sm" style="color: var(--text-primary);">
+                                This article is published. Saving changes will return it to
+                                <strong>Pending Approval</strong> for re-review (FR-4.1).</span>
+                        </div>
+                        {% endif %}
+
+                        <div class="kb-form-grid">
+                            <!-- LEFT: title + body -->
+                            <div class="panel" style="margin-bottom: 0;">
+                                <div class="form-group">
+                                    <label class="form-label" for="title">Title *</label>
+                                    <input type="text" id="title" name="title" maxlength="150"
+                                        class="form-control {% if errors.get('title') %}input-error{% endif %}"
+                                        placeholder="e.g. Troubleshooting Remote VPN Connectivity Drops"
+                                        value="{{ form.get('title', a.title if mode == 'edit' else '') }}">
+                                    {% if errors.get('title') %}
+                                    <div class="form-error-msg">{{ errors.get('title') }}</div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label class="form-label" for="body">Article Body *</label>
+                                    <textarea id="body" name="body" rows="20"
+                                        class="form-control {% if errors.get('body') %}input-error{% endif %}"
+                                        style="font-family: monospace; font-size: 14px; line-height: 1.6; resize: vertical;"
+                                        placeholder="1. Overview & Scope&#10;Summarise the issue this article addresses...&#10;&#10;2. Resolution Steps&#10;Step 1: ...&#10;Step 2: ...&#10;&#10;3. Escalation&#10;If the issue persists, escalate to...">{{ form.get('body', a.body if mode == 'edit' else '') }}</textarea>
+                                    {% if errors.get('body') %}
+                                    <div class="form-error-msg">{{ errors.get('body') }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- RIGHT: classification -->
+                            <div>
+                                <div class="panel">
+                                    <div class="form-group" style="margin-bottom: 0;">
+                                        <label class="form-label" for="visibility">Visibility *</label>
+                                        <select id="visibility" name="visibility"
+                                            class="form-control {% if errors.get('visibility') %}input-error{% endif %}">
+                                            {% for v in visibilities %}
+                                            <option value="{{ v }}"
+                                                {% if form.get('visibility', a.visibility if mode == 'edit' else 'Internal') == v %}selected{% endif %}>
+                                                {{ 'Public (All Users)' if v == 'Public' else 'Internal (Staff Only)' }}</option>
+                                            {% endfor %}
+                                        </select>
+                                        <span class="text-sm" style="color: var(--text-secondary); display: block; margin-top: 6px;">
+                                            Internal articles never appear to End Users, even when published.</span>
+                                        {% if errors.get('visibility') %}
+                                        <div class="form-error-msg">{{ errors.get('visibility') }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <div class="panel">
+                                    <div class="form-group" style="margin-bottom: 0;">
+                                        <label class="form-label" for="tags">Tags (comma separated)</label>
+                                        <input type="text" id="tags" name="tags" class="form-control"
+                                            placeholder="e.g. VPN, Windows11, Networking"
+                                            value="{{ form.get('tags', tags_csv if mode == 'edit' else '') }}">
+                                        <span class="text-sm" style="color: var(--text-secondary); display: block; margin-top: 6px;">
+                                            Up to 10 tags, 40 characters each. Tags are searchable.</span>
+                                    </div>
+                                </div>
+
+                                <div class="panel" style="background: var(--card-tint);">
+                                    <span class="text-sm" style="color: var(--text-secondary);">
+                                        {% if mode == 'new' %}
+                                        Drafts are private to you and the approvers. Submitting sends the
+                                        article to a Manager for review before publication (FR-4.1).
+                                        {% else %}
+                                        Every change is written to the audit log with the old and new value
+                                        of each modified field (FR-6.2).
+                                        {% endif %}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+{% endblock %}
