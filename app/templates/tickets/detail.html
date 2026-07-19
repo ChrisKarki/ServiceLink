@@ -190,10 +190,19 @@
                         <div style="display: flex; gap: 12px; align-items: center;">
                             <span class="{{ t.priority_badge.cls }}"{% if t.priority_badge.style %} style="{{ t.priority_badge.style }}"{% endif %}>{{ t.priority }}</span>
                             <span class="{{ t.status_badge.cls }}"{% if t.status_badge.style %} style="{{ t.status_badge.style }}"{% endif %}>{{ t.status_label }}</span>
+                            {% if escalation %}
+                            <!-- P2.3: derived escalation flag (staff-only), from the audit trail. -->
+                            <span class="badge"
+                                style="background: var(--warning-color); color: #fff; border: 1px solid var(--warning-color);">Escalated</span>
+                            {% endif %}
                             {% if is_staff and next_states %}
                             <!-- P1.4 status transitions (FR-2.2, UC-02). Options come from
                                  TRANSITIONS[t.status]; the server re-enforces the graph. -->
                             <button class="btn btn-secondary" onclick="openStatusModal()">Change Status</button>
+                            {% endif %}
+                            {% if is_staff %}
+                            <!-- P2.3: escalate to management with a mandatory justification. -->
+                            <button class="btn btn-secondary" onclick="openEscalateModal()">Escalate</button>
                             {% endif %}
                         </div>
                     </div>
@@ -205,6 +214,22 @@
                             <div class="card-box">
                                 <p style="color: var(--text-primary); white-space: pre-wrap; margin: 0; line-height: 1.6;">{{ t.description }}</p>
                             </div>
+
+                            {% if escalation %}
+                            {# P2.3 (staff-only): the latest escalation justification is an
+                               internal note (FR-2.4); `escalation` is None for End Users. #}
+                            <div class="card-box"
+                                style="border-left: 3px solid var(--warning-color); margin-bottom: 24px;">
+                                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                                    <span class="badge"
+                                        style="background: var(--warning-color); color: #fff; border: 1px solid var(--warning-color);">Escalated</span>
+                                    <span class="text-sm" style="color: var(--text-secondary);">
+                                        by {{ escalation.actor }} &middot; {{ escalation.at.strftime('%b %d, %Y at %H:%M') }}</span>
+                                </div>
+                                <p class="text-sm"
+                                    style="color: var(--text-primary); white-space: pre-wrap; margin: 0; line-height: 1.55;">{{ escalation.justification }}</p>
+                            </div>
+                            {% endif %}
 
                             <div class="section-heading">Comments</div>
                             <div class="card-box-tint">
@@ -380,6 +405,57 @@
                         }
                         document.addEventListener('keydown', function (e) {
                             if (e.key === 'Escape') closeStatusModal();
+                        });
+                    </script>
+                    {% endif %}
+
+                    {% if is_staff %}
+                    <!-- Escalate modal (P2.3, UC-02 AF-3). The justification is mandatory;
+                         `required` is a convenience — escalate_ticket rejects an empty
+                         justification server-side with a 400 (the AC). -->
+                    <div class="modal-overlay" id="escalateModal"
+                        onclick="if (event.target === this) closeEscalateModal()">
+                        <div class="modal-card" style="max-width: 480px;">
+                            <form method="post" action="{{ url_for('tickets.escalate_ticket', ticket_id=t.ticketID) }}">
+                                <div class="modal-head">
+                                    <h2 style="margin: 0; font-size: 18px;">Escalate to Management</h2>
+                                    <button type="button" class="icon-btn" onclick="closeEscalateModal()" title="Close">
+                                        <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M6 18L18 6M6 6l12 12"></path>
+                                        </svg>
+                                    </button>
+                                </div>
+                                <div style="padding: 4px 24px 8px 24px;">
+                                    <label class="text-sm" for="escalationJustification"
+                                        style="color: var(--text-secondary); display: block; margin-bottom: 6px;">
+                                        Justification <span style="color: var(--danger-color);">*</span></label>
+                                    <textarea name="justification" id="escalationJustification" class="form-control"
+                                        rows="4" required
+                                        placeholder="Why does this ticket need management attention?"></textarea>
+                                    <span class="text-sm" style="color: var(--text-secondary); display: block; margin-top: 8px;">
+                                        Every active manager will be notified.</span>
+                                </div>
+                                <div class="modal-foot">
+                                    <span></span>
+                                    <div style="display: flex; gap: 10px;">
+                                        <button type="button" class="btn btn-secondary" onclick="closeEscalateModal()">Cancel</button>
+                                        <button type="submit" class="btn btn-primary">Escalate</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <script>
+                        function openEscalateModal() {
+                            document.getElementById('escalateModal').classList.add('open');
+                            document.getElementById('escalationJustification').focus();
+                        }
+                        function closeEscalateModal() {
+                            document.getElementById('escalateModal').classList.remove('open');
+                        }
+                        document.addEventListener('keydown', function (e) {
+                            if (e.key === 'Escape') closeEscalateModal();
                         });
                     </script>
                     {% endif %}
