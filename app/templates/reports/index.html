@@ -2,73 +2,247 @@
 {% block title %}Reports{% endblock %}
 
 {% block content %}
-<div>
-    <h1 style="margin: 0; color: var(--text-primary); font-size: 22px;">Reports</h1>
-    <div class="text-sm" style="color: var(--text-secondary); margin-top: 4px;">
-        Ticket volume, breakdowns, and SLA context (C3.1)
+<div style="display: flex; align-items: flex-end; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+    <div>
+        <h1 style="margin: 0; color: var(--text-primary); font-size: 22px;">Reports</h1>
+        <div class="text-sm" style="color: var(--text-secondary); margin-top: 4px;">
+            Ticket, SLA, workload, and resource analytics (C3.1)
+        </div>
     </div>
+    {% if filtered %}
+    <span class="badge" style="border: 1px solid var(--accent-color); color: var(--accent-color); padding: 6px 14px;">Filters active</span>
+    {% endif %}
 </div>
 
-<div style="display: flex; gap: 16px; margin-top: 18px; flex-wrap: wrap;">
-    {% for label, value in [('Total tickets', total),
+<!-- Filter bar -->
+<form method="get" action="{{ url_for('reports.index') }}"
+      style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin: 18px 0 14px;">
+    <input type="date" name="from" value="{{ f_from }}" class="search-input" style="padding: 8px 10px;" title="Created from">
+    <span class="text-sm" style="color: var(--text-secondary);">to</span>
+    <input type="date" name="to" value="{{ f_to }}" class="search-input" style="padding: 8px 10px;" title="Created to">
+    <select name="category" class="search-input" style="width: 160px; padding: 8px 10px;">
+        <option value="">All categories</option>
+        {% for c in categories %}
+        <option value="{{ c.categoryID }}" {% if f_cat == c.categoryID %}selected{% endif %}>{{ c.name }}</option>
+        {% endfor %}
+    </select>
+    <select name="priority" class="search-input" style="width: 130px; padding: 8px 10px;">
+        <option value="">All priorities</option>
+        {% for p in priorities %}
+        <option value="{{ p }}" {% if f_priority == p %}selected{% endif %}>{{ p }}</option>
+        {% endfor %}
+    </select>
+    <select name="tech" class="search-input" style="width: 180px; padding: 8px 10px;">
+        <option value="">All technicians</option>
+        {% for t in technicians %}
+        <option value="{{ t.userID }}" {% if f_tech == t.userID %}selected{% endif %}>{{ t.name }}</option>
+        {% endfor %}
+    </select>
+    <button type="submit" class="badge badge-status-resolved" style="cursor: pointer; padding: 8px 16px; border: none;">Apply</button>
+    {% if filtered %}
+    <a href="{{ url_for('reports.index') }}" class="text-sm" style="color: var(--text-secondary);">Clear</a>
+    {% endif %}
+</form>
+
+<!-- KPI cards -->
+<div style="display: flex; gap: 16px; flex-wrap: wrap;">
+    {% for label, value in [('Tickets', total),
                             ('Open', open_count),
                             ('Resolved / Closed', resolved_count),
-                            ('Avg resolution (hrs)', avg_hours if avg_hours is not none else '—')] %}
-    <div style="flex: 1; min-width: 170px; border: 1px solid var(--panel-border); border-radius: 12px; padding: 18px 20px;">
+                            ('Avg resolution (hrs)', avg_hours if avg_hours is not none else '—'),
+                            ('SLA compliance', (sla_pct ~ '%') if sla_pct is not none else '—')] %}
+    <div style="flex: 1; min-width: 150px; border: 1px solid var(--panel-border); border-radius: 12px; padding: 16px 20px;">
         <div class="text-sm" style="color: var(--text-secondary);">{{ label }}</div>
-        <div style="color: var(--text-primary); font-size: 28px; font-weight: 600; margin-top: 6px;">{{ value }}</div>
+        <div style="color: var(--text-primary); font-size: 26px; font-weight: 600; margin-top: 6px;">{{ value }}</div>
     </div>
     {% endfor %}
 </div>
 
+<!-- Insights -->
+{% if insights %}
+<div style="margin-top: 16px; border: 1px solid var(--panel-border); border-left: 3px solid var(--accent-color); border-radius: 12px; padding: 16px 20px;">
+    <div style="color: var(--text-primary); font-weight: 600; margin-bottom: 8px;">What the data says</div>
+    {% for line in insights %}
+    <div class="text-sm" style="color: var(--text-secondary); margin-bottom: 6px;">• {{ line }}</div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<!-- Charts row 1: status / priority / category -->
+<div style="display: flex; gap: 16px; margin-top: 16px; flex-wrap: wrap;">
+    <div style="flex: 1; min-width: 260px; border: 1px solid var(--panel-border); border-radius: 12px; padding: 20px;">
+        <div style="color: var(--text-primary); font-weight: 600; margin-bottom: 12px;">Tickets by status</div>
+        <canvas id="statusChart" height="220"></canvas>
+    </div>
+    <div style="flex: 1; min-width: 260px; border: 1px solid var(--panel-border); border-radius: 12px; padding: 20px;">
+        <div style="color: var(--text-primary); font-weight: 600; margin-bottom: 12px;">Tickets by priority</div>
+        <canvas id="priorityChart" height="220"></canvas>
+    </div>
+    <div style="flex: 1; min-width: 260px; border: 1px solid var(--panel-border); border-radius: 12px; padding: 20px;">
+        <div style="color: var(--text-primary); font-weight: 600; margin-bottom: 12px;">Tickets by category</div>
+        <canvas id="categoryChart" height="220"></canvas>
+    </div>
+</div>
+
+<!-- Charts row 2: trend / technician load -->
+<div style="display: flex; gap: 16px; margin-top: 16px; flex-wrap: wrap;">
+    <div style="flex: 2; min-width: 340px; border: 1px solid var(--panel-border); border-radius: 12px; padding: 20px;">
+        <div style="color: var(--text-primary); font-weight: 600; margin-bottom: 12px;">Created vs resolved — last 12 weeks</div>
+        <canvas id="trendChart" height="130"></canvas>
+    </div>
+    <div style="flex: 1; min-width: 260px; border: 1px solid var(--panel-border); border-radius: 12px; padding: 20px;">
+        <div style="color: var(--text-primary); font-weight: 600; margin-bottom: 12px;">Open tickets per technician</div>
+        <canvas id="techChart" height="220"></canvas>
+    </div>
+</div>
+
+<!-- SLA compliance table + top requesters -->
 <div style="display: flex; gap: 16px; margin-top: 16px; flex-wrap: wrap; align-items: flex-start;">
-    {% for title, bars in [('By status', status_bars),
-                           ('By priority', priority_bars),
-                           ('By category', category_bars)] %}
+    <div style="flex: 2; min-width: 380px; border: 1px solid var(--panel-border); border-radius: 12px; overflow: hidden;">
+        <div style="color: var(--text-primary); font-weight: 600; padding: 16px 20px 0;">SLA resolution compliance</div>
+        <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+            <thead>
+                <tr style="border-bottom: 1px solid var(--panel-border);">
+                    {% for h in ['Priority', 'Tickets', 'Avg resolution (hrs)', 'Target (hrs)', 'Within target'] %}
+                    <th class="text-sm" style="text-align: left; padding: 10px 16px; color: var(--text-secondary); font-weight: 500;">{{ h }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in sla_table %}
+                <tr style="border-bottom: 1px solid var(--panel-border);">
+                    <td style="padding: 10px 16px; color: var(--text-primary);">{{ row.priority }}</td>
+                    <td class="text-sm" style="padding: 10px 16px; color: var(--text-secondary);">{{ row.tickets }}</td>
+                    <td class="text-sm" style="padding: 10px 16px; color: var(--text-secondary);">{{ row.avg_hours if row.avg_hours is not none else '—' }}</td>
+                    <td class="text-sm" style="padding: 10px 16px; color: var(--text-secondary);">{{ row.target_hours if row.target_hours is not none else '—' }}</td>
+                    <td style="padding: 10px 16px;">
+                        {% if row.pct_met is none %}
+                        <span class="text-sm" style="color: var(--text-secondary);">—</span>
+                        {% elif row.pct_met >= 90 %}
+                        <span class="badge badge-status-resolved">{{ row.pct_met }}%</span>
+                        {% elif row.pct_met >= 60 %}
+                        <span class="badge" style="border: 1px solid var(--warning-color); color: var(--warning-color);">{{ row.pct_met }}%</span>
+                        {% else %}
+                        <span class="badge" style="border: 1px solid var(--danger-color); color: var(--danger-color);">{{ row.pct_met }}%</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
     <div style="flex: 1; min-width: 280px; border: 1px solid var(--panel-border); border-radius: 12px; padding: 20px;">
-        <div style="color: var(--text-primary); font-weight: 600; margin-bottom: 14px;">{{ title }}</div>
-        {% for label, count, pct in bars %}
-        <div style="margin-bottom: 10px;">
-            <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
-                <span class="text-sm" style="color: var(--text-primary);">{{ label }}</span>
-                <span class="text-sm" style="color: var(--text-secondary);">{{ count }}</span>
-            </div>
-            <div style="height: 8px; border-radius: 4px; background: var(--panel-border); overflow: hidden;">
-                <div style="height: 100%; width: {{ pct }}%; background: var(--accent-color); border-radius: 4px;"></div>
-            </div>
+        <div style="color: var(--text-primary); font-weight: 600; margin-bottom: 4px;">Top requesters</div>
+        <div class="text-sm" style="color: var(--text-secondary); margin-bottom: 12px;">Where user demand is coming from</div>
+        {% for s in top_submitters %}
+        <div style="display: flex; justify-content: space-between; padding: 8px 0; {% if not loop.last %}border-bottom: 1px solid var(--panel-border);{% endif %}">
+            <span class="text-sm" style="color: var(--text-primary);">{{ s.name }}</span>
+            <span class="text-sm" style="color: var(--text-secondary);">{{ s.count }} ({{ s.pct }}%)</span>
         </div>
         {% else %}
-        <div class="text-sm" style="color: var(--text-secondary);">No data yet.</div>
+        <div class="text-sm" style="color: var(--text-secondary);">No submissions in this range.</div>
         {% endfor %}
     </div>
-    {% endfor %}
 </div>
 
-<div style="margin-top: 16px; border: 1px solid var(--panel-border); border-radius: 12px; overflow: hidden; max-width: 860px;">
-    <table style="width: 100%; border-collapse: collapse;">
-        <thead>
-            <tr style="border-bottom: 1px solid var(--panel-border);">
-                {% for h in ['Priority', 'Tickets', 'Response target (mins)', 'Resolution target (mins)'] %}
-                <th class="text-sm" style="text-align: left; padding: 12px 16px; color: var(--text-secondary); font-weight: 500;">{{ h }}</th>
-                {% endfor %}
-            </tr>
-        </thead>
-        <tbody>
-            {% for p in priorities %}
-            <tr style="border-bottom: 1px solid var(--panel-border);">
-                <td style="padding: 12px 16px; color: var(--text-primary);">{{ p }}</td>
-                <td class="text-sm" style="padding: 12px 16px; color: var(--text-secondary);">
-                    {% for label, count, pct in priority_bars %}{% if label == p %}{{ count }}{% endif %}{% endfor %}
-                </td>
-                <td class="text-sm" style="padding: 12px 16px; color: var(--text-secondary);">
-                    {{ sla[p].responseTargetMins if p in sla else '—' }}
-                </td>
-                <td class="text-sm" style="padding: 12px 16px; color: var(--text-secondary);">
-                    {{ sla[p].resolutionTargetMins if p in sla else '—' }}
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<!-- Charts row 3: resources -->
+<div style="display: flex; gap: 16px; margin-top: 16px; flex-wrap: wrap;">
+    <div style="flex: 1; min-width: 260px; border: 1px solid var(--panel-border); border-radius: 12px; padding: 20px;">
+        <div style="color: var(--text-primary); font-weight: 600; margin-bottom: 12px;">Resources by status <span class="text-sm" style="color: var(--text-secondary); font-weight: 400;">({{ resource_total }} total, unfiltered)</span></div>
+        <canvas id="resourceChart" height="220"></canvas>
+    </div>
+    <div style="flex: 1; min-width: 260px; border: 1px solid var(--panel-border); border-radius: 12px; padding: 20px;">
+        <div style="color: var(--text-primary); font-weight: 600; margin-bottom: 12px;">Resources by type</div>
+        <canvas id="resourceTypeChart" height="220"></canvas>
+    </div>
 </div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    var DATA = {{ chart_data | tojson }};
+    var css = getComputedStyle(document.documentElement);
+    var textColor = css.getPropertyValue('--text-secondary').trim() || '#888';
+    var gridColor = css.getPropertyValue('--panel-border').trim() || '#333';
+    var accent = css.getPropertyValue('--accent-color').trim() || '#3b82f6';
+    var warn = css.getPropertyValue('--warning-color').trim() || '#f59e0b';
+    var danger = css.getPropertyValue('--danger-color').trim() || '#ef4444';
+    // Fixed rotation so slices stay distinguishable in both themes.
+    var palette = [accent, warn, danger, '#10b981', '#8b5cf6', '#ec4899',
+                   '#14b8a6', '#f97316', '#6366f1', '#84cc16'];
+
+    Chart.defaults.color = textColor;
+    Chart.defaults.borderColor = gridColor;
+    Chart.defaults.font.family = "'IBM Plex Sans', sans-serif";
+
+    function doughnut(id, labels, counts) {
+        var el = document.getElementById(id);
+        if (!el) return;
+        new Chart(el, {
+            type: 'doughnut',
+            data: { labels: labels, datasets: [{
+                data: counts, backgroundColor: palette, borderWidth: 0 }] },
+            options: { plugins: { legend: { position: 'bottom' } },
+                       cutout: '60%' }
+        });
+    }
+
+    function bars(id, labels, counts, horizontal, color) {
+        var el = document.getElementById(id);
+        if (!el) return;
+        new Chart(el, {
+            type: 'bar',
+            data: { labels: labels, datasets: [{
+                data: counts, backgroundColor: color || accent,
+                borderRadius: 4 }] },
+            options: {
+                indexAxis: horizontal ? 'y' : 'x',
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { grid: { color: gridColor },
+                         ticks: { precision: 0 } },
+                    y: { grid: { color: gridColor },
+                         ticks: { precision: 0 } }
+                }
+            }
+        });
+    }
+
+    doughnut('statusChart', DATA.status.labels, DATA.status.counts);
+    bars('priorityChart', DATA.priority.labels, DATA.priority.counts, false,
+         [danger, warn, accent, gridColor]);
+    bars('categoryChart', DATA.category.labels, DATA.category.counts, true);
+    bars('techChart', DATA.tech.labels, DATA.tech.counts, true);
+    doughnut('resourceChart', DATA.resource.labels, DATA.resource.counts);
+    doughnut('resourceTypeChart', DATA.resource_type.labels,
+             DATA.resource_type.counts);
+
+    var trendEl = document.getElementById('trendChart');
+    if (trendEl) {
+        new Chart(trendEl, {
+            type: 'line',
+            data: {
+                labels: DATA.trend.labels,
+                datasets: [
+                    { label: 'Created', data: DATA.trend.created,
+                      borderColor: accent, backgroundColor: accent,
+                      tension: 0.3, pointRadius: 3 },
+                    { label: 'Resolved', data: DATA.trend.resolved,
+                      borderColor: '#10b981', backgroundColor: '#10b981',
+                      tension: 0.3, pointRadius: 3 }
+                ]
+            },
+            options: {
+                plugins: { legend: { position: 'bottom' } },
+                scales: {
+                    x: { grid: { color: gridColor } },
+                    y: { grid: { color: gridColor },
+                         ticks: { precision: 0 }, beginAtZero: true }
+                }
+            }
+        });
+    }
+});
+</script>
 {% endblock %}
