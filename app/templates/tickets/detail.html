@@ -254,7 +254,8 @@
 {# Freshservice-style detail: tabbed content (Details / Assets / Activity /
    Resolution) on the left, property rail on the right. Context comes from
    tickets.view_ticket: t, linked, comments, history, sla, is_staff,
-   technicians, categories, priorities, statuses, status_labels. #}
+   can_reopen, reopen_days, technicians, categories, priorities, statuses,
+   status_labels. #}
                     <div class="kb-breadcrumb">
                         <a href="{{ url_for('tickets.list_tickets') }}">Tickets</a>
                         <span class="separator">/</span>
@@ -266,6 +267,17 @@
                         <div style="display: flex; gap: 10px; align-items: center;">
                             <span class="{{ t.priority_badge.cls }}"{% if t.priority_badge.style %} style="{{ t.priority_badge.style }}"{% endif %}>{{ t.priority }}</span>
                             <span class="{{ t.status_badge.cls }}"{% if t.status_badge.style %} style="{{ t.status_badge.style }}"{% endif %}>{{ t.status_label }}</span>
+                            {% if t.slaBreached %}
+                            <!-- P2.2: stored breach flag (§4.2), set by the on-request check. -->
+                            <span class="badge"
+                                style="background: var(--danger-color); color: #fff; border: 1px solid var(--danger-color);">SLA Breached</span>
+                            {% endif %}
+                            {% if can_reopen %}
+                            <!-- P2.2: submitter self-service reopen inside the policy window. -->
+                            <form method="post" action="{{ url_for('tickets.reopen_ticket', ticket_id=t.ticketID) }}" style="margin: 0;">
+                                <button type="submit" class="btn btn-secondary">Reopen Ticket</button>
+                            </form>
+                            {% endif %}
                         </div>
                     </div>
                     <div class="text-sm" style="color: var(--text-secondary); margin-bottom: 20px;">
@@ -419,7 +431,8 @@
 
                         <!-- RIGHT: property rail -->
                         <div>
-                            <!-- SLA card (FR-2.5, backed by SLAPolicy) -->
+                            <!-- SLA card (FR-2.5, backed by SLAPolicy; breach state is the
+                                 stored flag (§4.2), set by the on-request check). -->
                             <div class="rail-card">
                                 <div class="rail-row" style="padding-top: 0;">
                                     <span class="text-sm" style="color: var(--text-secondary);">Status</span>
@@ -436,6 +449,12 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                                         {{ sla.timer }}</span>
                                 </div>
+                                {% if sla.breached %}
+                                <div class="rail-row">
+                                    <span class="text-sm" style="color: var(--danger-color); font-weight: 600;">
+                                        Resolution target missed &mdash; escalated to the technician &amp; managers.</span>
+                                </div>
+                                {% endif %}
                                 {% else %}
                                 <div class="rail-row">
                                     <span class="text-sm" style="color: var(--text-secondary);">Resolution due</span>
@@ -463,9 +482,14 @@
                                 <form method="post" action="{{ url_for('tickets.update_properties', ticket_id=t.ticketID) }}">
                                     <div class="form-group">
                                         <label class="form-label" for="prop-status">Status *</label>
+                                        {# P1.4 (FR-2.2, UC-02): only the current status and its legal
+                                           next states (TRANSITIONS) are offered; the server
+                                           re-enforces the graph on every request regardless. #}
                                         <select id="prop-status" name="status" class="form-control">
                                             {% for s in statuses %}
+                                            {% if s == t.status or s in next_states %}
                                             <option value="{{ s }}" {% if t.status == s %}selected{% endif %}>{{ status_labels[s] }}</option>
+                                            {% endif %}
                                             {% endfor %}
                                         </select>
                                     </div>
