@@ -44,9 +44,10 @@ from flask import (Blueprint, abort, flash, redirect, render_template,
 from mysql.connector.errors import IntegrityError
 
 from ..db import execute, query_all, query_one
-from ..services.audit import diff_fields, log_action
+from ..services.audit import attach_changes, diff_fields, log_action
 from ..services import notify
 from .auth import roles_required
+
 
 bp = Blueprint("admin", __name__, url_prefix="/admin")
 
@@ -417,11 +418,6 @@ AUDIT_ENTITY_TYPES = ("Ticket", "Resource", "User", "KBArticle",
 AUDIT_ACTIONS = ("Create", "Update", "Delete", "Link", "Unlink")
 AUDIT_PER_PAGE = 50
 
-# Past-tense verbs for the human-readable summary line, e.g.
-# "Chris Karki updated Resource #12 — assetState: Available -> InUse".
-ACTION_VERBS = {"Create": "created", "Update": "updated",
-                "Delete": "deleted", "Link": "linked", "Unlink": "unlinked"}
-
 ACTION_BADGES = {
     "Create": "border: 1px solid var(--accent-color); color: var(--accent-color);",
     "Update": "border: 1px solid var(--warning-color); color: var(--warning-color);",
@@ -488,21 +484,10 @@ def list_audit():
     for e in entries:
         e["ts"] = next((e[k] for k in ts_candidates
                         if k in e and e[k] is not None), None)
-        e["verb"] = ACTION_VERBS.get(e["action"], e["action"].lower())
+        e["actor"] = (f"{e['firstName']} {e['lastName']}"
+                      if e.get("firstName") else f"User #{e['actorID']}")
 
-    # --- field-level changes for the visible page, one query ----------
-    changes_by_log = {}
-    if entries:
-        ids = [e["logID"] for e in entries]
-        placeholders = ", ".join(["%s"] * len(ids))
-        change_rows = query_all(
-            "SELECT logID, fieldName, oldValue, newValue"
-            "  FROM AuditLogChange"
-            " WHERE logID IN (" + placeholders + ")"
-            " ORDER BY logID, fieldName",  # PK is (logID, fieldName); no changeID
-            tuple(ids))
-        for row in change_rows:
-            changes_by_log.setdefault(row["logID"], []).append(row)
+    attach_changes(entries)
 
     # --- actor dropdown: only users who actually have audit rows ------
     actors = query_all(
@@ -512,7 +497,7 @@ def list_audit():
 
     return render_template(
         "admin/audit.html",
-        entries=entries, changes_by_log=changes_by_log,
+        entries=entries,
         actors=actors,
         entity_types=AUDIT_ENTITY_TYPES, actions=AUDIT_ACTIONS,
         action_badges=ACTION_BADGES,

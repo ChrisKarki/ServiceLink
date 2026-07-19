@@ -45,7 +45,7 @@ from flask import (Blueprint, abort, flash, redirect, render_template,
 from mysql.connector.errors import IntegrityError
 
 from ..db import execute, query_all, query_one
-from ..services.audit import diff_fields, log_action
+from ..services.audit import diff_fields, log_action, attach_changes
 from ..services.notify import send as notify
 from .auth import login_required, roles_required
 
@@ -378,11 +378,14 @@ def view_ticket(ticket_id):
     comments = query_all(c_sql + " ORDER BY c.createdAt ASC", (ticket_id,))
 
     history = query_all(
-        "SELECT a.action, a.timestamp, CONCAT(u.firstName,' ',u.lastName) AS actor"
+        "SELECT a.logID, a.action, a.entityType, a.timestamp,"
+        "       CONCAT(u.firstName,' ',u.lastName) AS actor"
         "  FROM AuditLog a JOIN User u ON u.userID = a.actorID"
         " WHERE a.entityType IN ('Ticket', 'TicketResource', 'TicketComment')"
         "   AND a.entityID = %s"
         " ORDER BY a.timestamp DESC LIMIT 20", (ticket_id,))
+    attach_changes(history, noun="ticket")
+
 
     # feature/kb (FR-4.2): resolution article, if one has been designated.
     kb_article = None

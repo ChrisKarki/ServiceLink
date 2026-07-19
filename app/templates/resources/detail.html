@@ -20,9 +20,19 @@
         transition: color 0.2s;
     }
 
-    .kb-breadcrumb a:hover { color: var(--text-primary); }
-    .kb-breadcrumb .separator { color: var(--text-secondary); opacity: 0.5; }
-    .kb-breadcrumb .current { color: var(--text-primary); font-weight: 500; }
+    .kb-breadcrumb a:hover {
+        color: var(--text-primary);
+    }
+
+    .kb-breadcrumb .separator {
+        color: var(--text-secondary);
+        opacity: 0.5;
+    }
+
+    .kb-breadcrumb .current {
+        color: var(--text-primary);
+        font-weight: 500;
+    }
 
     /* Header bar */
     .resource-header-bar {
@@ -52,12 +62,19 @@
     }
 
     @media (max-width: 1200px) {
-        .detail-layout { grid-template-columns: 190px minmax(0, 1fr); }
-        .detail-rail { grid-column: 1 / -1; }
+        .detail-layout {
+            grid-template-columns: 190px minmax(0, 1fr);
+        }
+
+        .detail-rail {
+            grid-column: 1 / -1;
+        }
     }
 
     @media (max-width: 800px) {
-        .detail-layout { grid-template-columns: 1fr; }
+        .detail-layout {
+            grid-template-columns: 1fr;
+        }
     }
 
     /* Tab sidebar */
@@ -87,7 +104,10 @@
         transition: background 0.15s, color 0.15s;
     }
 
-    .detail-tab-btn:hover { color: var(--text-primary); background: var(--card-tint); }
+    .detail-tab-btn:hover {
+        color: var(--text-primary);
+        background: var(--card-tint);
+    }
 
     .detail-tab-btn.active {
         background: var(--button-secondary-bg);
@@ -110,8 +130,13 @@
         padding: 0 6px;
     }
 
-    .detail-pane { display: none; }
-    .detail-pane.active { display: block; }
+    .detail-pane {
+        display: none;
+    }
+
+    .detail-pane.active {
+        display: block;
+    }
 
     /* Cards */
     .card-box {
@@ -149,13 +174,28 @@
         font-size: 14px;
     }
 
-    .prop-row:last-child { border-bottom: none; }
-    .prop-row .prop-label { color: var(--text-secondary); }
-    .prop-row .prop-value { color: var(--text-primary); font-weight: 500; }
-    .prop-row .prop-value.mono { font-family: monospace; }
+    .prop-row:last-child {
+        border-bottom: none;
+    }
+
+    .prop-row .prop-label {
+        color: var(--text-secondary);
+    }
+
+    .prop-row .prop-value {
+        color: var(--text-primary);
+        font-weight: 500;
+    }
+
+    .prop-row .prop-value.mono {
+        font-family: monospace;
+    }
 
     /* Right rail */
-    .detail-rail { position: sticky; top: 24px; }
+    .detail-rail {
+        position: sticky;
+        top: 24px;
+    }
 
     .rail-summary-row {
         display: flex;
@@ -165,10 +205,19 @@
         font-size: 13px;
     }
 
-    .rail-summary-row .k { color: var(--text-secondary); }
-    .rail-summary-row .v { color: var(--text-primary); font-weight: 600; text-align: right; }
+    .rail-summary-row .k {
+        color: var(--text-secondary);
+    }
 
-    .rail-form-group { margin-bottom: 14px; }
+    .rail-summary-row .v {
+        color: var(--text-primary);
+        font-weight: 600;
+        text-align: right;
+    }
+
+    .rail-form-group {
+        margin-bottom: 14px;
+    }
 
     .rail-form-group label {
         display: block;
@@ -220,7 +269,9 @@
         padding: 60px 20px;
     }
 
-    .picker-overlay.open { display: flex; }
+    .picker-overlay.open {
+        display: flex;
+    }
 
     .picker-card {
         background: var(--panel-bg);
@@ -261,251 +312,277 @@
 {% endblock %}
 
 {% block content %}
-                    <!-- Breadcrumb -->
-                    <div class="kb-breadcrumb">
-                        <a href="{{ url_for('resources.list_resources') }}">Resources</a>
-                        <span class="separator">/</span>
-                        <a href="{{ url_for('resources.list_resources', type=r.type) }}">{{ r.type }}</a>
-                        <span class="separator">/</span>
-                        <span class="current">{{ r.resourceTag }}</span>
-                    </div>
+<!-- Breadcrumb -->
+<div class="kb-breadcrumb">
+    <a href="{{ url_for('resources.list_resources') }}">Resources</a>
+    <span class="separator">/</span>
+    <a href="{{ url_for('resources.list_resources', type=r.type) }}">{{ r.type }}</a>
+    <span class="separator">/</span>
+    <span class="current">{{ r.resourceTag }}</span>
+</div>
 
-                    <!-- Header -->
-                    <div class="resource-header-bar">
-                        <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap;">
-                            <h1 class="resource-title">{{ r.resourceTag }}</h1>
-                            <span class="{{ r.status_badge.cls }}"{% if r.status_badge.style %} style="{{ r.status_badge.style }}"{% endif %}>{{ r.status_label }}</span>
-                            <span class="text-sm" style="color: var(--text-secondary);">{{ r.make }} {{ r.model }}</span>
+<!-- Header -->
+<div class="resource-header-bar">
+    <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap;">
+        <h1 class="resource-title">{{ r.resourceTag }}</h1>
+        <span class="{{ r.status_badge.cls }}" {% if r.status_badge.style %} style="{{ r.status_badge.style }}" {% endif
+            %}>{{ r.status_label }}</span>
+        <span class="text-sm" style="color: var(--text-secondary);">{{ r.make }} {{ r.model }}</span>
+    </div>
+    <div style="display: flex; gap: 12px;">
+        <a class="btn btn-secondary" href="{{ url_for('resources.list_resources') }}"
+            style="text-decoration: none;">Back to list</a>
+        <a class="btn btn-primary" href="{{ url_for('resources.edit_resource', resource_id=r.resourceID) }}"
+            style="text-decoration: none;">Edit</a>
+    </div>
+</div>
+
+<div class="detail-layout">
+    <!-- LEFT: tab navigation -->
+    <nav class="detail-tabs" aria-label="Resource sections">
+        <button type="button" class="detail-tab-btn active" data-pane="pane-overview">Overview</button>
+        <button type="button" class="detail-tab-btn" data-pane="pane-tickets">
+            Linked Tickets <span class="tab-count">{{ tickets|length }}</span></button>
+        <button type="button" class="detail-tab-btn" data-pane="pane-activity">
+            Activity <span class="tab-count">{{ history|length }}</span></button>
+    </nav>
+
+    <!-- CENTER: tab panes -->
+    <div>
+        <!-- Overview -->
+        <div class="detail-pane active" id="pane-overview">
+            <div class="section-heading">General</div>
+            <div class="card-box">
+                <div class="prop-row">
+                    <span class="prop-label">Name</span>
+                    <span class="prop-value">{{ r.make }} {{ r.model }}</span>
+                </div>
+                <div class="prop-row">
+                    <span class="prop-label">Resource Type</span>
+                    <span class="prop-value">{{ r.type }}</span>
+                </div>
+                <div class="prop-row">
+                    <span class="prop-label">Resource Tag</span>
+                    <span class="prop-value mono">{{ r.resourceTag }}</span>
+                </div>
+                <div class="prop-row">
+                    <span class="prop-label">Serial Number</span>
+                    <span class="prop-value mono">{{ r.serialNumber or 'Not applicable' }}</span>
+                </div>
+                <div class="prop-row">
+                    <span class="prop-label">Location</span>
+                    <span class="prop-value">{{ r.location }}</span>
+                </div>
+                <div class="prop-row">
+                    <span class="prop-label">Assigned User</span>
+                    <span class="prop-value">{% if r.assignedName %}{{ r.assignedName }}{% else %}<span
+                            style="color: var(--text-secondary); font-style: italic; font-weight: 400;">Unassigned</span>{%
+                        endif %}</span>
+                </div>
+                <div class="prop-row">
+                    <span class="prop-label">Created At</span>
+                    <span class="prop-value">{% if r.createdAt %}{{ r.createdAt.strftime('%a, %b %d, %Y %I:%M %p') }}{%
+                        else %}—{% endif %}</span>
+                </div>
+                <div class="prop-row">
+                    <span class="prop-label">Updated At</span>
+                    <span class="prop-value">{% if r.updatedAt %}{{ r.updatedAt.strftime('%a, %b %d, %Y %I:%M %p') }}{%
+                        else %}—{% endif %}</span>
+                </div>
+            </div>
+
+            <div class="section-heading">Lifecycle</div>
+            <div class="card-box">
+                <div class="prop-row">
+                    <span class="prop-label">Purchase Date</span>
+                    <span class="prop-value">{% if r.purchaseDate %}{{ r.purchaseDate.strftime('%b %d, %Y') }}{% else
+                        %}Not recorded{% endif %}</span>
+                </div>
+                <div class="prop-row">
+                    <span class="prop-label">Warranty End Date</span>
+                    <span class="prop-value" style="display: flex; align-items: center; gap: 10px;">
+                        {{ r.warranty_label }}
+                        {% if r.warrantyEndDate %}
+                        <span class="badge"
+                            style="border: 1px solid var(--{{ 'success' if r.under_warranty else 'warning' }}-color); color: var(--{{ 'success' if r.under_warranty else 'warning' }}-color);">
+                            {{ 'Active' if r.under_warranty else 'Expired' }}</span>
+                        {% endif %}
+                    </span>
+                </div>
+                <div class="prop-row">
+                    <span class="prop-label">Lifecycle Status</span>
+                    <span class="prop-value">{{ r.status_label }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Linked tickets (FR-3.2) -->
+        <div class="detail-pane" id="pane-tickets">
+            <div class="section-heading">Linked Tickets &amp; Incidents</div>
+            <div class="card-box" style="padding: 16px; display: flex; flex-direction: column; gap: 12px;">
+                {% for t in tickets %}
+                <div
+                    style="display: flex; align-items: center; justify-content: space-between; padding: 16px; background: var(--card-tint); border: 1px solid var(--panel-border); border-radius: 10px;">
+                    <div style="display: flex; align-items: center; gap: 14px;">
+                        <div
+                            style="width: 36px; height: 36px; border-radius: 8px; background: var(--button-secondary-bg); display: flex; align-items: center; justify-content: center; color: var(--text-secondary);">
+                            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                                </path>
+                            </svg>
                         </div>
-                        <div style="display: flex; gap: 12px;">
-                            <a class="btn btn-secondary" href="{{ url_for('resources.list_resources') }}"
-                                style="text-decoration: none;">Back to list</a>
-                            <a class="btn btn-primary" href="{{ url_for('resources.edit_resource', resource_id=r.resourceID) }}"
-                                style="text-decoration: none;">Edit</a>
-                        </div>
-                    </div>
-
-                    <div class="detail-layout">
-                        <!-- LEFT: tab navigation -->
-                        <nav class="detail-tabs" aria-label="Resource sections">
-                            <button type="button" class="detail-tab-btn active" data-pane="pane-overview">Overview</button>
-                            <button type="button" class="detail-tab-btn" data-pane="pane-tickets">
-                                Linked Tickets <span class="tab-count">{{ tickets|length }}</span></button>
-                            <button type="button" class="detail-tab-btn" data-pane="pane-activity">
-                                Activity <span class="tab-count">{{ history|length }}</span></button>
-                        </nav>
-
-                        <!-- CENTER: tab panes -->
                         <div>
-                            <!-- Overview -->
-                            <div class="detail-pane active" id="pane-overview">
-                                <div class="section-heading">General</div>
-                                <div class="card-box">
-                                    <div class="prop-row">
-                                        <span class="prop-label">Name</span>
-                                        <span class="prop-value">{{ r.make }} {{ r.model }}</span>
-                                    </div>
-                                    <div class="prop-row">
-                                        <span class="prop-label">Resource Type</span>
-                                        <span class="prop-value">{{ r.type }}</span>
-                                    </div>
-                                    <div class="prop-row">
-                                        <span class="prop-label">Resource Tag</span>
-                                        <span class="prop-value mono">{{ r.resourceTag }}</span>
-                                    </div>
-                                    <div class="prop-row">
-                                        <span class="prop-label">Serial Number</span>
-                                        <span class="prop-value mono">{{ r.serialNumber or 'Not applicable' }}</span>
-                                    </div>
-                                    <div class="prop-row">
-                                        <span class="prop-label">Location</span>
-                                        <span class="prop-value">{{ r.location }}</span>
-                                    </div>
-                                    <div class="prop-row">
-                                        <span class="prop-label">Assigned User</span>
-                                        <span class="prop-value">{% if r.assignedName %}{{ r.assignedName }}{% else %}<span
-                                                style="color: var(--text-secondary); font-style: italic; font-weight: 400;">Unassigned</span>{% endif %}</span>
-                                    </div>
-                                    <div class="prop-row">
-                                        <span class="prop-label">Created At</span>
-                                        <span class="prop-value">{% if r.createdAt %}{{ r.createdAt.strftime('%a, %b %d, %Y %I:%M %p') }}{% else %}—{% endif %}</span>
-                                    </div>
-                                    <div class="prop-row">
-                                        <span class="prop-label">Updated At</span>
-                                        <span class="prop-value">{% if r.updatedAt %}{{ r.updatedAt.strftime('%a, %b %d, %Y %I:%M %p') }}{% else %}—{% endif %}</span>
-                                    </div>
-                                </div>
-
-                                <div class="section-heading">Lifecycle</div>
-                                <div class="card-box">
-                                    <div class="prop-row">
-                                        <span class="prop-label">Purchase Date</span>
-                                        <span class="prop-value">{% if r.purchaseDate %}{{ r.purchaseDate.strftime('%b %d, %Y') }}{% else %}Not recorded{% endif %}</span>
-                                    </div>
-                                    <div class="prop-row">
-                                        <span class="prop-label">Warranty End Date</span>
-                                        <span class="prop-value" style="display: flex; align-items: center; gap: 10px;">
-                                            {{ r.warranty_label }}
-                                            {% if r.warrantyEndDate %}
-                                            <span class="badge"
-                                                style="border: 1px solid var(--{{ 'success' if r.under_warranty else 'warning' }}-color); color: var(--{{ 'success' if r.under_warranty else 'warning' }}-color);">
-                                                {{ 'Active' if r.under_warranty else 'Expired' }}</span>
-                                            {% endif %}
-                                        </span>
-                                    </div>
-                                    <div class="prop-row">
-                                        <span class="prop-label">Lifecycle Status</span>
-                                        <span class="prop-value">{{ r.status_label }}</span>
-                                    </div>
-                                </div>
+                            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                                <span
+                                    class="badge {{ 'badge-priority-high' if t.priority in ('High', 'Critical') else '' }}"
+                                    {% if t.priority not in ('High', 'Critical' )
+                                    %}style="border: 1px solid var(--panel-border); color: var(--text-secondary);" {%
+                                    endif %}>{{ t.priority }}</span>
+                                <strong style="color: var(--text-primary); font-size: 15px;">TKT-{{ t.ticketID
+                                    }}</strong>
                             </div>
-
-                            <!-- Linked tickets (FR-3.2) -->
-                            <div class="detail-pane" id="pane-tickets">
-                                <div class="section-heading">Linked Tickets &amp; Incidents</div>
-                                <div class="card-box" style="padding: 16px; display: flex; flex-direction: column; gap: 12px;">
-                                    {% for t in tickets %}
-                                    <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px; background: var(--card-tint); border: 1px solid var(--panel-border); border-radius: 10px;">
-                                        <div style="display: flex; align-items: center; gap: 14px;">
-                                            <div style="width: 36px; height: 36px; border-radius: 8px; background: var(--button-secondary-bg); display: flex; align-items: center; justify-content: center; color: var(--text-secondary);">
-                                                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                                                </svg>
-                                            </div>
-                                            <div>
-                                                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
-                                                    <span class="badge {{ 'badge-priority-high' if t.priority in ('High', 'Critical') else '' }}"
-                                                        {% if t.priority not in ('High', 'Critical') %}style="border: 1px solid var(--panel-border); color: var(--text-secondary);"{% endif %}>{{ t.priority }}</span>
-                                                    <strong style="color: var(--text-primary); font-size: 15px;">TKT-{{ t.ticketID }}</strong>
-                                                </div>
-                                                <span style="color: var(--text-secondary); font-size: 14px; display: block;">{{ t.title }}</span>
-                                            </div>
-                                        </div>
-                                        <span class="text-sm" style="color: var(--text-secondary);">{{ t.status }}</span>
-                                    </div>
-                                    {% else %}
-                                    <div class="text-sm" style="padding: 16px; color: var(--text-secondary);">
-                                        No tickets have been linked to this resource. Linking arrives with H2.1.</div>
-                                    {% endfor %}
-                                </div>
-                            </div>
-
-                            <!-- Audit activity -->
-                            <div class="detail-pane" id="pane-activity">
-                                <div class="section-heading">Recent Audit Activity</div>
-                                <div class="card-box-tint">
-                                    {% for h in history %}
-                                    <div style="display: flex; justify-content: space-between; padding: 10px 0; {% if not loop.last %}border-bottom: 1px solid var(--panel-border);{% endif %}">
-                                        <span class="text-sm" style="color: var(--text-primary);">
-                                            <strong>{{ h.actor }}</strong> {{ h.action|lower }}d this resource</span>
-                                        <span class="text-sm" style="color: var(--text-secondary);">{{ h.timestamp.strftime('%b %d, %H:%M') }}</span>
-                                    </div>
-                                    {% else %}
-                                    <div class="text-sm" style="color: var(--text-secondary);">No audit activity recorded yet.</div>
-                                    {% endfor %}
-                                </div>
-                            </div>
+                            <span style="color: var(--text-secondary); font-size: 14px; display: block;">{{ t.title
+                                }}</span>
                         </div>
-
-                        <!-- RIGHT: summary + quick property editor -->
-                        <aside class="detail-rail">
-                            <div class="card-box" style="padding: 18px;">
-                                <div class="rail-summary-row">
-                                    <span class="k">Resource Type</span><span class="v">{{ r.type }}</span>
-                                </div>
-                                <div class="rail-summary-row">
-                                    <span class="k">Resource State</span><span class="v">{{ r.status_label }}</span>
-                                </div>
-                                <div class="rail-summary-row">
-                                    <span class="k">Serial Num.</span>
-                                    <span class="v" style="font-family: monospace;">{{ r.serialNumber or '—' }}</span>
-                                </div>
-                                <div class="rail-summary-row" style="border-top: 1px solid var(--panel-border); margin-top: 8px; padding-top: 12px; align-items: center;">
-                                    <span class="k">Used By</span>
-                                    {% if r.assignedName %}
-                                    <span style="display: flex; align-items: center; gap: 10px;">
-                                        <span class="avatar-initials">{{ r.assignedName.split()[0][0] }}{{ r.assignedName.split()[-1][0] }}</span>
-                                        <span class="v">{{ r.assignedName }}</span>
-                                    </span>
-                                    {% else %}
-                                    <span class="v" style="color: var(--text-secondary); font-style: italic; font-weight: 400;">Unassigned</span>
-                                    {% endif %}
-                                </div>
-                            </div>
-
-                            <div class="section-heading" style="margin-top: 4px;">Edit Properties</div>
-                            {# Bug fix: this form previously posted to view_resource (GET-only,
-                               405) — it must post to update_properties. #}
-                            <form class="card-box" style="padding: 18px; margin-bottom: 16px;"
-                                method="post" action="{{ url_for('resources.update_properties', resource_id=r.resourceID) }}">
-                                <div class="rail-form-group">
-                                    <label for="qp-status">Resource State</label>
-                                    <select class="form-control" id="qp-status" name="status" style="font-weight: 600;">
-                                        {% for s in statuses %}
-                                        <option value="{{ s }}" {% if r.status == s %}selected{% endif %}>{{ status_labels[s] }}</option>
-                                        {% endfor %}
-                                    </select>
-                                </div>
-                                <div class="rail-form-group">
-                                    <label>Used By</label>
-                                    {# Searchable picker (server-side search via
-                                       resources.search_users) — the full user list is
-                                       never rendered into the page. #}
-                                    <input type="hidden" name="assignedUserID" id="qp-assigned"
-                                        value="{{ r.assignedUserID or '' }}">
-                                    <button type="button" class="form-control user-pick-btn" id="qp-assigned-btn"
-                                        onclick="openUserPicker('qp-assigned', 'qp-assigned-btn')">
-                                        {{ r.assignedName or 'Unassigned' }}</button>
-                                </div>
-                                <div class="rail-form-group">
-                                    <label for="qp-location">Location</label>
-                                    <input type="text" class="form-control" id="qp-location" name="location"
-                                        value="{{ r.location }}" maxlength="120" required>
-                                </div>
-                                <button type="submit" class="btn btn-primary" style="width: 100%;">Update</button>
-                            </form>
-
-                            <div class="card-box-tint">
-                                <div class="text-sm" style="color: var(--text-secondary);">
-                                    Every property change is written to the audit log with the old and new
-                                    value of each modified field (FR-6.2). Disposal and loss cannot be
-                                    undone silently.
-                                </div>
-                            </div>
-                        </aside>
                     </div>
+                    <span class="text-sm" style="color: var(--text-secondary);">{{ t.status }}</span>
+                </div>
+                {% else %}
+                <div class="text-sm" style="padding: 16px; color: var(--text-secondary);">
+                    No tickets have been linked to this resource. Linking arrives with H2.1.</div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Audit activity -->
+        <div class="detail-pane" id="pane-activity">
+            <div class="section-heading">Recent Audit Activity</div>
+            <div class="card-box-tint">
+                {% for h in history %}
+                <div
+                    style="padding: 10px 0; {% if not loop.last %}border-bottom: 1px solid var(--panel-border);{% endif %}">
+                    <div style="display: flex; justify-content: space-between; gap: 12px;">
+                        <span class="text-sm" style="color: var(--text-primary);">{{ h.summary }}</span>
+                        <span class="text-sm" style="color: var(--text-secondary); white-space: nowrap;">{{
+                            h.timestamp.strftime('%b %d, %H:%M') }}</span>
+                    </div>
+                    {% if h.changes|length > 1 %}
+                    {% for c in h.changes %}
+                    <div class="text-sm" style="margin-top: 4px; padding-left: 12px; color: var(--text-secondary);">
+                        {{ c.label }}: {{ c.old }} → <span style="color: var(--text-primary);">{{ c.new }}</span>
+                    </div>
+                    {% endfor %}
+                    {% endif %}
+                </div>
+                {% else %}
+                <div class="text-sm" style="color: var(--text-secondary);">No audit activity recorded yet.</div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- RIGHT: summary + quick property editor -->
+    <aside class="detail-rail">
+        <div class="card-box" style="padding: 18px;">
+            <div class="rail-summary-row">
+                <span class="k">Resource Type</span><span class="v">{{ r.type }}</span>
+            </div>
+            <div class="rail-summary-row">
+                <span class="k">Resource State</span><span class="v">{{ r.status_label }}</span>
+            </div>
+            <div class="rail-summary-row">
+                <span class="k">Serial Num.</span>
+                <span class="v" style="font-family: monospace;">{{ r.serialNumber or '—' }}</span>
+            </div>
+            <div class="rail-summary-row"
+                style="border-top: 1px solid var(--panel-border); margin-top: 8px; padding-top: 12px; align-items: center;">
+                <span class="k">Used By</span>
+                {% if r.assignedName %}
+                <span style="display: flex; align-items: center; gap: 10px;">
+                    <span class="avatar-initials">{{ r.assignedName.split()[0][0] }}{{ r.assignedName.split()[-1][0]
+                        }}</span>
+                    <span class="v">{{ r.assignedName }}</span>
+                </span>
+                {% else %}
+                <span class="v"
+                    style="color: var(--text-secondary); font-style: italic; font-weight: 400;">Unassigned</span>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="section-heading" style="margin-top: 4px;">Edit Properties</div>
+        {# Bug fix: this form previously posted to view_resource (GET-only,
+        405) — it must post to update_properties. #}
+        <form class="card-box" style="padding: 18px; margin-bottom: 16px;" method="post"
+            action="{{ url_for('resources.update_properties', resource_id=r.resourceID) }}">
+            <div class="rail-form-group">
+                <label for="qp-status">Resource State</label>
+                <select class="form-control" id="qp-status" name="status" style="font-weight: 600;">
+                    {% for s in statuses %}
+                    <option value="{{ s }}" {% if r.status==s %}selected{% endif %}>{{ status_labels[s] }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="rail-form-group">
+                <label>Used By</label>
+                {# Searchable picker (server-side search via
+                resources.search_users) — the full user list is
+                never rendered into the page. #}
+                <input type="hidden" name="assignedUserID" id="qp-assigned" value="{{ r.assignedUserID or '' }}">
+                <button type="button" class="form-control user-pick-btn" id="qp-assigned-btn"
+                    onclick="openUserPicker('qp-assigned', 'qp-assigned-btn')">
+                    {{ r.assignedName or 'Unassigned' }}</button>
+            </div>
+            <div class="rail-form-group">
+                <label for="qp-location">Location</label>
+                <input type="text" class="form-control" id="qp-location" name="location" value="{{ r.location }}"
+                    maxlength="120" required>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: 100%;">Update</button>
+        </form>
+
+        <div class="card-box-tint">
+            <div class="text-sm" style="color: var(--text-secondary);">
+                Every property change is written to the audit log with the old and new
+                value of each modified field (FR-6.2). Disposal and loss cannot be
+                undone silently.
+            </div>
+        </div>
+    </aside>
+</div>
 
 <script>
-(function () {
-    var buttons = Array.prototype.slice.call(document.querySelectorAll('.detail-tab-btn'));
-    var panes = Array.prototype.slice.call(document.querySelectorAll('.detail-pane'));
-    buttons.forEach(function (btn) {
-        btn.addEventListener('click', function () {
-            buttons.forEach(function (b) { b.classList.remove('active'); });
-            panes.forEach(function (p) { p.classList.remove('active'); });
-            btn.classList.add('active');
-            document.getElementById(btn.dataset.pane).classList.add('active');
+    (function () {
+        var buttons = Array.prototype.slice.call(document.querySelectorAll('.detail-tab-btn'));
+        var panes = Array.prototype.slice.call(document.querySelectorAll('.detail-pane'));
+        buttons.forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                buttons.forEach(function (b) { b.classList.remove('active'); });
+                panes.forEach(function (p) { p.classList.remove('active'); });
+                btn.classList.add('active');
+                document.getElementById(btn.dataset.pane).classList.add('active');
+            });
         });
-    });
-})();
+    })();
 </script>
 
 <!-- Used By picker: server-side user search (resources.search_users) -->
 <div class="picker-overlay" id="userPicker" onclick="if (event.target === this) closeUserPicker()">
     <div class="picker-card">
-        <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 18px 20px 12px 20px;">
+        <div
+            style="display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 18px 20px 12px 20px;">
             <h2 style="margin: 0; font-size: 17px;">Select User</h2>
             <button type="button" class="icon-btn" onclick="closeUserPicker()" title="Close">
                 <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                    </path>
                 </svg>
             </button>
         </div>
         <div style="padding: 0 20px 12px 20px;">
-            <input type="text" id="userPickerSearch" class="form-control"
-                placeholder="Search name, email, or role..." autocomplete="off"
-                oninput="debouncedUserSearch()">
+            <input type="text" id="userPickerSearch" class="form-control" placeholder="Search name, email, or role..."
+                autocomplete="off" oninput="debouncedUserSearch()">
         </div>
         <div class="picker-body" id="userPickerResults">
             <div class="text-sm" style="color: var(--text-secondary); padding: 8px 2px;">Loading...</div>
@@ -514,107 +591,107 @@
 </div>
 
 <script>
-(function () {
-    const SEARCH_URL = "{{ url_for('resources.search_users') }}";
-    let targetInput = null, targetBtn = null, timer = null;
+    (function () {
+        const SEARCH_URL = "{{ url_for('resources.search_users') }}";
+        let targetInput = null, targetBtn = null, timer = null;
 
-    window.openUserPicker = function (inputId, btnId) {
-        targetInput = document.getElementById(inputId);
-        targetBtn = document.getElementById(btnId);
-        document.getElementById('userPicker').classList.add('open');
-        const s = document.getElementById('userPickerSearch');
-        s.value = '';
-        s.focus();
-        runSearch('');
-    };
+        window.openUserPicker = function (inputId, btnId) {
+            targetInput = document.getElementById(inputId);
+            targetBtn = document.getElementById(btnId);
+            document.getElementById('userPicker').classList.add('open');
+            const s = document.getElementById('userPickerSearch');
+            s.value = '';
+            s.focus();
+            runSearch('');
+        };
 
-    window.closeUserPicker = function () {
-        document.getElementById('userPicker').classList.remove('open');
-    };
+        window.closeUserPicker = function () {
+            document.getElementById('userPicker').classList.remove('open');
+        };
 
-    window.debouncedUserSearch = function () {
-        clearTimeout(timer);
-        timer = setTimeout(function () {
-            runSearch(document.getElementById('userPickerSearch').value.trim());
-        }, 250);
-    };
+        window.debouncedUserSearch = function () {
+            clearTimeout(timer);
+            timer = setTimeout(function () {
+                runSearch(document.getElementById('userPickerSearch').value.trim());
+            }, 250);
+        };
 
-    document.addEventListener('keydown', function (e) {
-        if (e.key === 'Escape') closeUserPicker();
-    });
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') closeUserPicker();
+        });
 
-    function pick(id, label) {
-        if (targetInput) targetInput.value = id;
-        if (targetBtn) targetBtn.textContent = label;   // textContent — user data
-        closeUserPicker();
-    }
+        function pick(id, label) {
+            if (targetInput) targetInput.value = id;
+            if (targetBtn) targetBtn.textContent = label;   // textContent — user data
+            closeUserPicker();
+        }
 
-    function runSearch(q) {
-        fetch(SEARCH_URL + '?q=' + encodeURIComponent(q))
-            .then(function (r) { return r.json(); })
-            .then(function (data) { render(data.results); })
-            .catch(function () {
-                const box = document.getElementById('userPickerResults');
-                box.innerHTML = '';
+        function runSearch(q) {
+            fetch(SEARCH_URL + '?q=' + encodeURIComponent(q))
+                .then(function (r) { return r.json(); })
+                .then(function (data) { render(data.results); })
+                .catch(function () {
+                    const box = document.getElementById('userPickerResults');
+                    box.innerHTML = '';
+                    const d = document.createElement('div');
+                    d.className = 'text-sm';
+                    d.style.cssText = 'color: var(--danger-color); padding: 8px 2px;';
+                    d.textContent = 'Search failed. Check your connection and try again.';
+                    box.appendChild(d);
+                });
+        }
+
+        // All row content is set via textContent — names/emails are
+        // user-entered data, never trusted as HTML.
+        function render(results) {
+            const box = document.getElementById('userPickerResults');
+            box.innerHTML = '';
+
+            const none = document.createElement('div');
+            none.className = 'picker-row';
+            const noneLabel = document.createElement('span');
+            noneLabel.className = 'text-sm';
+            noneLabel.style.cssText = 'color: var(--text-secondary); font-style: italic;';
+            noneLabel.textContent = 'Unassigned';
+            none.appendChild(noneLabel);
+            none.onclick = function () { pick('', 'Unassigned'); };
+            box.appendChild(none);
+
+            if (!results.length) {
                 const d = document.createElement('div');
                 d.className = 'text-sm';
-                d.style.cssText = 'color: var(--danger-color); padding: 8px 2px;';
-                d.textContent = 'Search failed. Check your connection and try again.';
+                d.style.cssText = 'color: var(--text-secondary); padding: 8px 2px;';
+                d.textContent = 'No active users match that search.';
                 box.appendChild(d);
+                return;
+            }
+            results.forEach(function (u) {
+                const row = document.createElement('div');
+                row.className = 'picker-row';
+
+                const av = document.createElement('span');
+                av.className = 'avatar-initials';
+                av.style.cssText = 'width: 32px; height: 32px; font-size: 12px;';
+                av.textContent = u.initials;
+
+                const info = document.createElement('div');
+                info.style.cssText = 'min-width: 0; flex: 1;';
+                const name = document.createElement('div');
+                name.style.cssText = 'color: var(--text-primary); font-weight: 600; font-size: 14px;';
+                name.textContent = u.name;
+                const sub = document.createElement('div');
+                sub.className = 'text-sm';
+                sub.style.cssText = 'color: var(--text-secondary);';
+                sub.textContent = u.role + (u.email ? ' \u00b7 ' + u.email : '');
+                info.appendChild(name);
+                info.appendChild(sub);
+
+                row.appendChild(av);
+                row.appendChild(info);
+                row.onclick = function () { pick(u.userID, u.name); };
+                box.appendChild(row);
             });
-    }
-
-    // All row content is set via textContent — names/emails are
-    // user-entered data, never trusted as HTML.
-    function render(results) {
-        const box = document.getElementById('userPickerResults');
-        box.innerHTML = '';
-
-        const none = document.createElement('div');
-        none.className = 'picker-row';
-        const noneLabel = document.createElement('span');
-        noneLabel.className = 'text-sm';
-        noneLabel.style.cssText = 'color: var(--text-secondary); font-style: italic;';
-        noneLabel.textContent = 'Unassigned';
-        none.appendChild(noneLabel);
-        none.onclick = function () { pick('', 'Unassigned'); };
-        box.appendChild(none);
-
-        if (!results.length) {
-            const d = document.createElement('div');
-            d.className = 'text-sm';
-            d.style.cssText = 'color: var(--text-secondary); padding: 8px 2px;';
-            d.textContent = 'No active users match that search.';
-            box.appendChild(d);
-            return;
         }
-        results.forEach(function (u) {
-            const row = document.createElement('div');
-            row.className = 'picker-row';
-
-            const av = document.createElement('span');
-            av.className = 'avatar-initials';
-            av.style.cssText = 'width: 32px; height: 32px; font-size: 12px;';
-            av.textContent = u.initials;
-
-            const info = document.createElement('div');
-            info.style.cssText = 'min-width: 0; flex: 1;';
-            const name = document.createElement('div');
-            name.style.cssText = 'color: var(--text-primary); font-weight: 600; font-size: 14px;';
-            name.textContent = u.name;
-            const sub = document.createElement('div');
-            sub.className = 'text-sm';
-            sub.style.cssText = 'color: var(--text-secondary);';
-            sub.textContent = u.role + (u.email ? ' \u00b7 ' + u.email : '');
-            info.appendChild(name);
-            info.appendChild(sub);
-
-            row.appendChild(av);
-            row.appendChild(info);
-            row.onclick = function () { pick(u.userID, u.name); };
-            box.appendChild(row);
-        });
-    }
-})();
+    })();
 </script>
 {% endblock %}

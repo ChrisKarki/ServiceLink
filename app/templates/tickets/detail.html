@@ -431,11 +431,19 @@ status_labels. #}
             <div class="card-box">
                 {% for h in history %}
                 <div
-                    style="display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; {% if not loop.last %}border-bottom: 1px solid var(--panel-border);{% endif %}">
-                    <span class="text-sm" style="color: var(--text-primary);">
-                        <strong>{{ h.actor }}</strong> &middot; {{ h.action }}</span>
-                    <span class="text-sm" style="color: var(--text-secondary); flex-shrink: 0;">{{
-                        h.timestamp.strftime('%b %d, %Y %I:%M %p') }}</span>
+                    style="padding: 10px 0; {% if not loop.last %}border-bottom: 1px solid var(--panel-border);{% endif %}">
+                    <div style="display: flex; justify-content: space-between; gap: 12px;">
+                        <span class="text-sm" style="color: var(--text-primary);">{{ h.summary }}</span>
+                        <span class="text-sm" style="color: var(--text-secondary); white-space: nowrap;">{{
+                            h.timestamp.strftime('%b %d, %H:%M') }}</span>
+                    </div>
+                    {% if h.changes|length > 1 %}
+                    {% for c in h.changes %}
+                    <div class="text-sm" style="margin-top: 4px; padding-left: 12px; color: var(--text-secondary);">
+                        {{ c.label }}: {{ c.old }} → <span style="color: var(--text-primary);">{{ c.new }}</span>
+                    </div>
+                    {% endfor %}
+                    {% endif %}
                 </div>
                 {% else %}
                 <div class="text-sm" style="color: var(--text-secondary);">No audit activity recorded yet.</div>
@@ -782,126 +790,125 @@ status_labels. #}
 </script>
 
 <div class="modal-overlay" id="kbModal" onclick="if (event.target === this) closeKbModal()">
-                        <div class="modal-card" style="max-width: 620px;">
-                            <div class="modal-head">
-                                <h2 style="margin: 0; font-size: 18px;">Attach Resolution Article</h2>
-                                <button type="button" class="icon-btn" onclick="closeKbModal()" title="Close">
-                                    <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M6 18L18 6M6 6l12 12"></path>
-                                    </svg>
-                                </button>
-                            </div>
-                            <div style="padding: 0 24px 14px 24px;">
-                                <input type="text" id="kbSearch" class="form-control"
-                                    placeholder="Search title, body, or tags..." autocomplete="off"
-                                    oninput="debouncedKbSearch()">
-                            </div>
-                            <div class="modal-body" id="kbResults">
-                                <div class="text-sm" style="color: var(--text-secondary); padding: 12px 2px;">Loading...</div>
-                            </div>
-                        </div>
-                    </div>
+    <div class="modal-card" style="max-width: 620px;">
+        <div class="modal-head">
+            <h2 style="margin: 0; font-size: 18px;">Attach Resolution Article</h2>
+            <button type="button" class="icon-btn" onclick="closeKbModal()" title="Close">
+                <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                    </path>
+                </svg>
+            </button>
+        </div>
+        <div style="padding: 0 24px 14px 24px;">
+            <input type="text" id="kbSearch" class="form-control" placeholder="Search title, body, or tags..."
+                autocomplete="off" oninput="debouncedKbSearch()">
+        </div>
+        <div class="modal-body" id="kbResults">
+            <div class="text-sm" style="color: var(--text-secondary); padding: 12px 2px;">Loading...</div>
+        </div>
+    </div>
+</div>
 
-                    <form method="post" id="kbLinkForm" style="display: none;"
-                        action="{{ url_for('kb.link_ticket_article', ticket_id=t.ticketID) }}">
-                        <input type="hidden" name="article_id" id="kbLinkArticleId" value="">
-                    </form>
+<form method="post" id="kbLinkForm" style="display: none;"
+    action="{{ url_for('kb.link_ticket_article', ticket_id=t.ticketID) }}">
+    <input type="hidden" name="article_id" id="kbLinkArticleId" value="">
+</form>
 
-                    <script>
-                        (function () {
-                            const KB_SEARCH_URL = "{{ url_for('kb.search_articles') }}";
-                            let kbTimer = null;
+<script>
+    (function () {
+        const KB_SEARCH_URL = "{{ url_for('kb.search_articles') }}";
+        let kbTimer = null;
 
-                            window.openKbModal = function () {
-                                document.getElementById('kbModal').classList.add('open');
-                                const s = document.getElementById('kbSearch');
-                                s.value = '';
-                                s.focus();
-                                kbRun('');
-                            };
+        window.openKbModal = function () {
+            document.getElementById('kbModal').classList.add('open');
+            const s = document.getElementById('kbSearch');
+            s.value = '';
+            s.focus();
+            kbRun('');
+        };
 
-                            window.closeKbModal = function () {
-                                document.getElementById('kbModal').classList.remove('open');
-                            };
+        window.closeKbModal = function () {
+            document.getElementById('kbModal').classList.remove('open');
+        };
 
-                            window.debouncedKbSearch = function () {
-                                clearTimeout(kbTimer);
-                                kbTimer = setTimeout(function () {
-                                    kbRun(document.getElementById('kbSearch').value.trim());
-                                }, 250);
-                            };
+        window.debouncedKbSearch = function () {
+            clearTimeout(kbTimer);
+            kbTimer = setTimeout(function () {
+                kbRun(document.getElementById('kbSearch').value.trim());
+            }, 250);
+        };
 
-                            document.addEventListener('keydown', function (e) {
-                                if (e.key === 'Escape') closeKbModal();
-                            });
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') closeKbModal();
+        });
 
-                            function kbRun(q) {
-                                fetch(KB_SEARCH_URL + '?q=' + encodeURIComponent(q))
-                                    .then(function (r) { return r.json(); })
-                                    .then(function (data) { kbRender(data.results); })
-                                    .catch(function () {
-                                        const box = document.getElementById('kbResults');
-                                        box.innerHTML = '';
-                                        const d = document.createElement('div');
-                                        d.className = 'text-sm';
-                                        d.style.cssText = 'color: var(--danger-color); padding: 12px 2px;';
-                                        d.textContent = 'Search failed. Check your connection and try again.';
-                                        box.appendChild(d);
-                                    });
-                            }
+        function kbRun(q) {
+            fetch(KB_SEARCH_URL + '?q=' + encodeURIComponent(q))
+                .then(function (r) { return r.json(); })
+                .then(function (data) { kbRender(data.results); })
+                .catch(function () {
+                    const box = document.getElementById('kbResults');
+                    box.innerHTML = '';
+                    const d = document.createElement('div');
+                    d.className = 'text-sm';
+                    d.style.cssText = 'color: var(--danger-color); padding: 12px 2px;';
+                    d.textContent = 'Search failed. Check your connection and try again.';
+                    box.appendChild(d);
+                });
+        }
 
-                            // All row content is set via textContent — titles are
-                            // user-entered data, never trusted as HTML. Only
-                            // Published articles are selectable (the server
-                            // rejects anything else regardless).
-                            function kbRender(results) {
-                                const box = document.getElementById('kbResults');
-                                box.innerHTML = '';
-                                const published = results.filter(function (a) {
-                                    return a.status === 'Published';
-                                });
-                                if (!published.length) {
-                                    const d = document.createElement('div');
-                                    d.className = 'text-sm';
-                                    d.style.cssText = 'color: var(--text-secondary); padding: 12px 2px;';
-                                    d.textContent = 'No published articles match that search.';
-                                    box.appendChild(d);
-                                    return;
-                                }
-                                published.forEach(function (a) {
-                                    const row = document.createElement('div');
-                                    row.className = 'res-row';
+        // All row content is set via textContent — titles are
+        // user-entered data, never trusted as HTML. Only
+        // Published articles are selectable (the server
+        // rejects anything else regardless).
+        function kbRender(results) {
+            const box = document.getElementById('kbResults');
+            box.innerHTML = '';
+            const published = results.filter(function (a) {
+                return a.status === 'Published';
+            });
+            if (!published.length) {
+                const d = document.createElement('div');
+                d.className = 'text-sm';
+                d.style.cssText = 'color: var(--text-secondary); padding: 12px 2px;';
+                d.textContent = 'No published articles match that search.';
+                box.appendChild(d);
+                return;
+            }
+            published.forEach(function (a) {
+                const row = document.createElement('div');
+                row.className = 'res-row';
 
-                                    const info = document.createElement('div');
-                                    info.style.cssText = 'min-width: 0; flex: 1;';
-                                    const top = document.createElement('div');
-                                    const id = document.createElement('strong');
-                                    id.style.cssText = 'color: var(--text-primary); font-family: monospace;';
-                                    id.textContent = 'KB-' + a.articleID;
-                                    top.appendChild(id);
-                                    const title = document.createElement('span');
-                                    title.style.cssText = 'color: var(--text-primary); margin-left: 8px; font-weight: 600;';
-                                    title.textContent = a.title;
-                                    top.appendChild(title);
-                                    const sub = document.createElement('span');
-                                    sub.className = 'text-sm';
-                                    sub.style.cssText = 'color: var(--text-secondary); display: block; margin-top: 2px;';
-                                    sub.textContent = a.category + ' \u00b7 ' + a.visibility +
-                                        ' \u00b7 ' + a.author;
-                                    info.appendChild(top);
-                                    info.appendChild(sub);
+                const info = document.createElement('div');
+                info.style.cssText = 'min-width: 0; flex: 1;';
+                const top = document.createElement('div');
+                const id = document.createElement('strong');
+                id.style.cssText = 'color: var(--text-primary); font-family: monospace;';
+                id.textContent = 'KB-' + a.articleID;
+                top.appendChild(id);
+                const title = document.createElement('span');
+                title.style.cssText = 'color: var(--text-primary); margin-left: 8px; font-weight: 600;';
+                title.textContent = a.title;
+                top.appendChild(title);
+                const sub = document.createElement('span');
+                sub.className = 'text-sm';
+                sub.style.cssText = 'color: var(--text-secondary); display: block; margin-top: 2px;';
+                sub.textContent = a.category + ' \u00b7 ' + a.visibility +
+                    ' \u00b7 ' + a.author;
+                info.appendChild(top);
+                info.appendChild(sub);
 
-                                    row.appendChild(info);
-                                    row.onclick = function () {
-                                        document.getElementById('kbLinkArticleId').value = a.articleID;
-                                        document.getElementById('kbLinkForm').submit();
-                                    };
-                                    box.appendChild(row);
-                                });
-                            }
-                        })();
-                    </script>
+                row.appendChild(info);
+                row.onclick = function () {
+                    document.getElementById('kbLinkArticleId').value = a.articleID;
+                    document.getElementById('kbLinkForm').submit();
+                };
+                box.appendChild(row);
+            });
+        }
+    })();
+</script>
 
 {% endif %}
 {% endblock %}

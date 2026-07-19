@@ -65,27 +65,18 @@
                     {{ e.entityType }}{% if e.entityID %} #{{ e.entityID }}{% endif %}
                 </td>
                 <td style="padding: 12px 16px;">
-                    {% set changes = changes_by_log.get(e.logID) %}
-                    <div class="text-sm" style="color: var(--text-primary); margin-bottom: {% if changes %}6px{% else %}0{% endif %};">
-                        {% if e.firstName %}{{ e.firstName }} {{ e.lastName }}{% else %}User #{{ e.actorID }}{% endif %}
-                        {{ e.verb }} {{ e.entityType }}{% if e.entityID %} #{{ e.entityID }}{% endif %}{% if changes %}:{% endif %}
-                    </div>
-                    {% if changes %}
-                    <div style="display: flex; flex-direction: column; gap: 4px;">
-                        {% for c in changes %}
-                        <div class="text-sm">
-                            <span style="color: var(--text-primary); font-weight: 500;">{{ c.fieldName }}:</span>
-                            <span style="color: var(--text-secondary);">{{ c.oldValue if c.oldValue is not none else '∅' }}</span>
-                            <span style="color: var(--text-secondary);">→</span>
-                            <span style="color: var(--text-primary);">{{ c.newValue if c.newValue is not none else '∅' }}</span>
+                    <div class="text-sm" style="color: var(--text-primary);">{{ e.summary }}</div>
+                    {% if e.changes|length > 1 %}
+                    <div style="display: flex; flex-direction: column; gap: 4px; margin-top: 6px;">
+                        {% for c in e.changes %}
+                        <div class="text-sm" style="color: var(--text-secondary);">
+                            {{ c.label }}: {{ c.old }} → <span style="color: var(--text-primary);">{{ c.new }}</span>
                         </div>
                         {% endfor %}
                     </div>
                     {% endif %}
                 </td>
-                <td class="text-sm" style="padding: 12px 16px; color: var(--text-secondary); white-space: nowrap;">
-                    {{ e.ipAddress or '—' }}
-                </td>
+
             </tr>
             {% else %}
             <tr>

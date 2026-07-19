@@ -35,7 +35,7 @@ from flask import (Blueprint, Response, abort, flash, redirect,
 from mysql.connector.errors import IntegrityError
 
 from ..db import execute, query_all, query_one
-from ..services.audit import diff_fields, log_action
+from ..services.audit import diff_fields, log_action, attach_changes
 from .auth import roles_required
 
 bp = Blueprint("resources", __name__, url_prefix="/resources")
@@ -359,11 +359,13 @@ def view_resource(resource_id):
         " WHERE tr.resourceID = %s ORDER BY tr.linkedAt DESC", (resource_id,))
 
     history = query_all(
-        "SELECT a.action, a.timestamp, CONCAT(u.firstName,' ',u.lastName) AS actor"
+        "SELECT a.logID, a.action, a.entityType, a.timestamp,"
+        "       CONCAT(u.firstName,' ',u.lastName) AS actor"
         "  FROM AuditLog a JOIN User u ON u.userID = a.actorID"
         " WHERE a.entityType = 'Resource' AND a.entityID = %s"
         " ORDER BY a.timestamp DESC LIMIT 15", (resource_id,))
-
+    attach_changes(history, noun="resource")
+    
     return render_template("resources/detail.html", r=_shape(row),
                            tickets=tickets, history=history,
                            users=_assignable_users(),
