@@ -436,6 +436,14 @@ def edit_resource(resource_id):
     if before is None:
         abort(404)
 
+    def _name_for(uid):
+        """Picker button label for a user ID (None-safe)."""
+        if not uid:
+            return None
+        row = query_one("SELECT CONCAT(firstName, ' ', lastName) AS name"
+                        "  FROM User WHERE userID = %s", (uid,))
+        return row["name"] if row else None
+
     if request.method == "POST":
         form = _read_form(request.form)
         errors = _validate(form)
@@ -444,6 +452,7 @@ def edit_resource(resource_id):
                 flash(e, "error")
             form["resourceID"] = resource_id
             return render_template("resources/form.html", resource=form,
+                                   assigned_name=_name_for(form["assignedUserID"]),
                                    users=_assignable_users(), mode="edit",
                                    types=TYPES, statuses=STATUSES,
                                    status_labels=STATUS_LABELS), 400
@@ -461,6 +470,7 @@ def edit_resource(resource_id):
                 flash("Could not save the resource. Check the values and retry.", "error")
             form["resourceID"] = resource_id
             return render_template("resources/form.html", resource=form,
+                                   assigned_name=_name_for(form["assignedUserID"]),
                                    users=_assignable_users(), mode="edit",
                                    types=TYPES, statuses=STATUSES,
                                    status_labels=STATUS_LABELS), 400
@@ -468,12 +478,13 @@ def edit_resource(resource_id):
         changes = diff_fields(before, form, EDITABLE)
         if changes:
             log_action(session["user_id"], "Resource", resource_id, "Update",
-                       changes=changes)
+                       changes=changes, ip=request.remote_addr)
         flash("Resource updated." if changes else "No changes to save.",
               "success" if changes else "info")
         return redirect(url_for("resources.view_resource", resource_id=resource_id))
 
     return render_template("resources/form.html", resource=before,
+                           assigned_name=_name_for(before["assignedUserID"]),
                            users=_assignable_users(), mode="edit",
                            types=TYPES, statuses=STATUSES,
                            status_labels=STATUS_LABELS)
@@ -570,3 +581,34 @@ def _shape(r):
     r["warranty_label"] = (
         warranty.strftime("%b %d, %Y") if warranty else "Not tracked")
     return r
+
+
+@bp.get("/users/search")
+@roles_required(*STAFF)
+def search_users():
+    """JSON search behind the Used By / Assigned User picker.
+
+    Returns at most 20 active users matching q across name, email, and
+    role. Server-side search means the full user table never reaches the
+    browser (same pattern as tickets.search_linkable). Empty q returns
+    the first 20 by first name so the picker isn't blank on open.
+    """
+    q = (request.args.get("q") or "").strip()
+
+    sql = ("SELECT userID, CONCAT(firstName, ' ', lastName) AS name,"
+           "       UPPER(CONCAT(LEFT(firstName,1), LEFT(lastName,1))) AS initials,"
+           "       role, email"
+           "  FROM User WHERE status = 'Active'")
+    params = []
+    if q:
+        sql += ("   AND (CONCAT(firstName, ' ', lastName) LIKE %s"
+                "        OR email LIKE %s OR role LIKE %s)")
+        params.extend([f"%{q}%"] * 3)
+
+    rows = query_all(sql + " ORDER BY firstName, lastName LIMIT 20",
+                     tuple(params))
+    return {"results": [
+        {"userID": u["userID"], "name": u["name"], "initials": u["initials"],
+         "role": u["role"], "email": u["email"]}
+        for u in rows
+    ]}

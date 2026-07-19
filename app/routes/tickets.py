@@ -732,8 +732,12 @@ def link_resource(ticket_id):
         if resource is None:
             continue  # deleted between search and submit — skip silently
         try:
-            execute("INSERT INTO TicketResource (ticketID, resourceID, linkedAt)"
-                    " VALUES (%s, %s, NOW())", (ticket_id, resource_id))
+            # Schema (deployed): TicketResource.linkedByUserID is NOT NULL —
+            # the linker is the session user (who also appears in AuditLog).
+            execute("INSERT INTO TicketResource"
+                    " (ticketID, resourceID, linkedByUserID, linkedAt)"
+                    " VALUES (%s, %s, %s, NOW())",
+                    (ticket_id, resource_id, session["user_id"]))
         except IntegrityError:
             # AF-2: composite PK (ticketID, resourceID) already exists.
             # The DB is the source of truth — a pre-check would race.
@@ -758,7 +762,6 @@ def link_resource(ticket_id):
     if dup_tags:
         flash(f"Already linked: {', '.join(dup_tags)}.", "info")
     return redirect(url_for("tickets.view_ticket", ticket_id=ticket_id))
-
 
 @bp.post("/tickets/<int:ticket_id>/resources/unlink")
 @roles_required(*STAFF)
