@@ -76,6 +76,7 @@ def get_connection():
     using query_one / query_all / execute."""
     return _get_pool().get_connection()
 
+
 def log_audit(actor_id, entity_type, entity_id, action, ip_address, changes=None):
     """Insert a record into AuditLog and optional field diffs into AuditLogChange."""
     log_id = execute(
