@@ -599,6 +599,20 @@ def update_properties(ticket_id):
         notify(assignee, f"Ticket #{ticket_id} assigned to you",
                f"'{before['title']}' was assigned to you by "
                f"{session['name']}.")
+
+    # FR-2.5 registry row "Ticket status change -> submitter". Previously
+    # documented but never wired: update_properties notified the new
+    # assignee only, so a submitter never heard that their ticket moved to
+    # In Progress or Resolved (TC-02 main flow). Skipped when the person
+    # making the change IS the submitter -- no self-notifications, matching
+    # the convention in add_comment.
+    if "status" in changes and before["submittedByUserID"] != session["user_id"]:
+        notify(before["submittedByUserID"],
+               f"Ticket #{ticket_id} is now "
+               f"{STATUS_LABELS[status]}",
+               f"'{before['title']}' moved from "
+               f"{STATUS_LABELS[before['status']]} to "
+               f"{STATUS_LABELS[status]} (updated by {session['name']}).")
     flash("Ticket updated.", "success")
     return redirect(url_for("tickets.view_ticket", ticket_id=ticket_id))
 
