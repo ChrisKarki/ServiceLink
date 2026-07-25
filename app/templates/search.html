@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% block title %}Search{% endblock %}
+
+{% block content %}
+<div style="max-width: 900px;">
+
+  <form method="get" action="{{ url_for('search.index') }}"
+        style="position: relative; display: flex; align-items: center; margin-bottom: 18px;">
+    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+         style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
+                color: var(--text-secondary); pointer-events: none;">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+    </svg>
+    <input type="text" name="q" class="search-input" value="{{ q }}" autofocus
+           placeholder="Search tickets, resources, articles&hellip;"
+           style="padding: 14px 16px 14px 46px; width: 100%; font-size: 16px;">
+    {% if scope != 'all' %}<input type="hidden" name="type" value="{{ scope }}">{% endif %}
+  </form>
+
+  <div style="display: flex; gap: 8px; flex-wrap: wrap; padding-bottom: 14px;
+              border-bottom: 1px solid var(--panel-border); margin-bottom: 20px;">
+    {% set chip_base = 'padding: 6px 14px; border-radius: 999px; font-size: 13px;
+                        text-decoration: none; display: inline-block;' %}
+    <a href="{{ url_for('search.index', q=q) }}"
+       style="{{ chip_base }}
+              {% if scope == 'all' %}background: var(--accent-color); color: #fff;
+              {% else %}border: 1px solid var(--panel-border); color: var(--text-secondary);{% endif %}">
+      All{% if q and not too_short %} ({{ total }}){% endif %}
+    </a>
+    {% for s in sections %}
+    <a href="{{ url_for('search.index', q=q, type=s) }}"
+       style="{{ chip_base }}
+              {% if scope == s %}background: var(--accent-color); color: #fff;
+              {% else %}border: 1px solid var(--panel-border); color: var(--text-secondary);{% endif %}">
+      {{ search_section_labels[s] }}{% if q and not too_short %} ({{ counts[s] }}){% endif %}
+    </a>
+    {% endfor %}
+  </div>
+
+  {% if not q %}
+    <p style="color: var(--text-secondary);">
+      Type a search term above to look across tickets, resources, articles and users.
+    </p>
+
+  {% elif too_short %}
+    <p style="color: var(--text-secondary);">
+      Enter at least 2 characters to search.
+    </p>
+
+  {% elif total == 0 %}
+    <div style="text-align: center; padding: 48px 20px;">
+      <div style="color: var(--text-primary); font-weight: 500; margin-bottom: 6px;">
+        No results for &ldquo;{{ q }}&rdquo;
+      </div>
+      <div class="text-sm" style="color: var(--text-secondary);">
+        Try a shorter term, check the spelling, or search by ID number
+        (for example <code>1042</code> for a ticket).
+      </div>
+    </div>
+
+  {% else %}
+    {% for s in sections %}
+      {% if (scope == 'all' or scope == s) and results[s] %}
+      <section style="margin-bottom: 30px;">
+        <div style="display: flex; align-items: baseline; justify-content: space-between;
+                    margin-bottom: 10px;">
+          <h3 style="margin: 0; font-size: 14px; letter-spacing: .04em;
+                     text-transform: uppercase; color: var(--text-secondary);">
+            {{ search_section_labels[s] }}
+          </h3>
+          {% if scope == 'all' and counts[s] > results[s]|length %}
+          <a href="{{ url_for('search.index', q=q, type=s) }}"
+             class="text-sm" style="color: var(--accent-color); text-decoration: none;">
+            View all {{ counts[s] }}
+          </a>
+          {% endif %}
+        </div>
+
+        <div style="border: 1px solid var(--panel-border); border-radius: 8px; overflow: hidden;">
+          {% for item in results[s] %}
+          <div style="padding: 14px 16px;
+                      {% if not loop.last %}border-bottom: 1px solid var(--panel-border);{% endif %}">
+            <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+              <span class="text-sm" style="color: var(--text-secondary);
+                    font-family: 'IBM Plex Mono', monospace;">{{ item.ref }}</span>
+              {% if item.url %}
+              <a href="{{ item.url }}" style="color: var(--text-primary); font-weight: 500;
+                 text-decoration: none;">{{ item.title }}</a>
+              {% else %}
+              <span style="color: var(--text-primary); font-weight: 500;">{{ item.title }}</span>
+              {% endif %}
+              {% for b in item.badges %}
+              <span class="{{ b.cls }}" style="{{ b.style }}">{{ b.text }}</span>
+              {% endfor %}
+            </div>
+            {% if item.meta %}
+            <div class="text-sm" style="color: var(--text-secondary); margin-top: 5px;">
+              {{ item.meta }}
+            </div>
+            {% endif %}
+          </div>
+          {% endfor %}
+        </div>
+      </section>
+      {% endif %}
+    {% endfor %}
+  {% endif %}
+
+  {% if degraded %}
+  <div class="text-sm" style="color: var(--warning-color); margin-top: 20px;">
+    Some sections could not be searched:
+    {% for s in degraded %}{{ search_section_labels[s] }}{% if not loop.last %}, {% endif %}{% endfor %}.
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}
