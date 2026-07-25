@@ -285,6 +285,49 @@ def _parse_tags(raw):
     return tags[:MAX_TAGS]
 
 
+def _duplicate_title(title, exclude_id=None):
+    """TC-04 EX-1 / FR-4.1: article titles must be unique.
+
+    The deployed KBArticle table has no Category column, so the title alone
+    is the natural key. Archived articles are excluded, so retiring an
+    article frees its title for reuse. MySQL's default collation is
+    case-insensitive, so "Reset VPN" and "reset vpn" collide as intended.
+    """
+    sql = ("SELECT articleID FROM KBArticle"
+           " WHERE title = %s AND status <> 'Archived'")
+    params = [title]
+    if exclude_id is not None:
+        sql += " AND articleID <> %s"
+        params.append(exclude_id)
+    return query_one(sql, tuple(params))
+
+
+def _notify_linked_readers(article_id, title):
+    """Notify submitters of tickets linked to a published, publicly visible
+    article when that article changes.
+
+    Internal articles are skipped entirely: an End User must never learn the
+    contents -- or the existence -- of an Internal article, which is the same
+    rule _scope_clause enforces on every SELECT. Self-notification is skipped
+    so an author who also submitted the linked ticket is not emailed about
+    their own edit.
+    """
+    a = query_one("SELECT status, visibility FROM KBArticle"
+                  " WHERE articleID = %s", (article_id,))
+    if a is None or a["status"] != "Published" or a["visibility"] != "Public":
+        return
+    for r in query_all(
+            "SELECT DISTINCT t.submittedByUserID AS uid FROM Ticket t"
+            "  JOIN User u ON u.userID = t.submittedByUserID"
+            " WHERE t.linkedKBArticleID = %s AND u.status = 'Active'",
+            (article_id,)):
+        if r["uid"] == session["user_id"]:
+            continue
+        notify(r["uid"], f"KB-{article_id} has been updated",
+               f"'{title}' -- a knowledge base article linked to one of "
+               f"your tickets -- has been updated.")
+
+
 def _validate(f):
     errors = {}
     if not f["title"]:
@@ -323,6 +366,13 @@ def new_article():
     if request.method == "POST":
         f = _read_form(request.form)
         errors = _validate(f)
+        # TC-04 EX-1: reject a duplicate title before the INSERT.
+        dup = _duplicate_title(f["title"]) if not errors else None
+        if dup:
+            errors["title"] = (
+                f"An article with this title already exists "
+                f"(KB-{dup['articleID']}). Choose a different title, or "
+                f"edit the existing article instead of duplicating it.")
         if errors:
             flash("Please correct the highlighted validation errors.", "error")
             return render_template("kb/form.html", mode="new", form=request.form,
@@ -367,6 +417,14 @@ def edit_article(article_id):
     if request.method == "POST":
         f = _read_form(request.form)
         errors = _validate(f)
+        # TC-04 EX-1: renaming an article onto an existing title is the same
+        # collision as creating one. Excludes this article from the check.
+        dup = (_duplicate_title(f["title"], exclude_id=article_id)
+               if not errors else None)
+        if dup:
+            errors["title"] = (
+                f"An article with this title already exists "
+                f"(KB-{dup['articleID']}). Choose a different title.")
         if errors:
             flash("Please correct the highlighted validation errors.", "error")
             return render_template("kb/form.html", mode="edit", a=_shape(before),
@@ -405,6 +463,10 @@ def edit_article(article_id):
             flash("Changes saved — the article returns to Pending Approval "
                   "for re-review before it is published again.", "warning")
         else:
+            # An approver edit that leaves the article Published is a live
+            # content change -- tell everyone reading it from a ticket.
+            if status == "Published":
+                _notify_linked_readers(article_id, f["title"])
             flash("Article updated.", "success")
         return redirect(url_for("kb.view_article", article_id=article_id))
 
@@ -459,6 +521,7 @@ def approve_article(article_id):
            f"KB-{article_id} approved and published",
            f"'{a['title']}' was approved by {session['name']} and is now "
            f"live ({a['visibility']} visibility).")
+    _notify_linked_readers(article_id, a["title"])
     flash(f"KB-{article_id} is now published.", "success")
     return redirect(url_for("kb.view_article", article_id=article_id))
 
