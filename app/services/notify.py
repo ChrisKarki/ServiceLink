@@ -5,12 +5,21 @@ to logs/notifications.log (and the Flask console) in an email-shaped format so
 the demo can show WHAT would have been sent and to WHOM. Real SMTP is opt-in
 (see _deliver) and off unless configured — the stub satisfies the demo.
 
+Every notification fans out to three channels:
+    1. logs/notifications.log  — always, the demo and audit record
+    2. Notification table      — always, backs the topbar bell (in-app)
+    3. SMTP                    — only when NOTIFY_SMTP_HOST is configured
+
 THE CONTRACT (do not change without a team decision):
 
-    send(user_id, subject, body) -> bool
+    send(user_id, subject, body, link=None) -> bool
 
-Callers code against send() only. Wiring a real SMTP relay changes ONLY
-_deliver() below — zero call sites move.
+`link` is additive and optional, so all existing call sites are unchanged.
+It is the relative path the bell entry opens, e.g. "/tickets/42". When
+omitted, _infer_link() derives one from the subject where it safely can.
+
+Callers code against send() only. Changing the relay touches ONLY
+_deliver(); adding a channel touches ONLY send().
 
 FR-2.5 REGISTRY — every event that must call send(), its recipients, and the
 single call site that fires it. P3.1 verifies this list against the code:
@@ -37,8 +46,9 @@ NOTIFY_SMTP_PASSWORD / NOTIFY_FROM / NOTIFY_SMTP_TLS). Unset = log-only stub.
 
 import logging
 import os
+import re
 
-from ..db import query_one
+from ..db import execute, query_one
 
 _logger = None
 
@@ -62,7 +72,7 @@ def _get_logger():
     return _logger
 
 
-def send(user_id, subject, body):
+def send(user_id, subject, body, link=None):
     """Notify a user. Returns True if 'delivered', False if user unknown.
 
     Never raises on a missing user — a notification failure must not
@@ -77,8 +87,43 @@ def send(user_id, subject, body):
         )
         return False
 
+    _store(user_id, subject, body,
+           link if link is not None else _infer_link(subject))
     _deliver(user["email"], subject, body)
     return True
+
+
+def _store(user_id, subject, body, link):
+    """Write the in-app copy that backs the topbar bell.
+
+    Swallows its own failures for the same reason _deliver does: if the
+    Notification table is missing or the insert fails, the ticket update
+    that triggered this must still stand. The log line remains the record.
+    """
+    try:
+        execute("INSERT INTO Notification (userID, subject, body, link)"
+                " VALUES (%s, %s, %s, %s)",
+                (user_id, subject[:255], body, link or None))
+    except Exception as exc:  # noqa: BLE001 — see the send() contract
+        _get_logger().warning(
+            "in-app notification not stored for userID=%s: %s", user_id, exc)
+
+
+# Subjects across the codebase consistently name their entity as "#42" or
+# "KB-7", so the bell is useful immediately without editing all thirteen
+# existing call sites. An explicit link= always wins; this is the fallback.
+_ARTICLE_RE = re.compile(r"\bKB-(\d+)")
+_TICKET_RE = re.compile(r"#(\d+)")
+
+
+def _infer_link(subject):
+    m = _ARTICLE_RE.search(subject or "")
+    if m:
+        return f"/kb/{m.group(1)}"
+    m = _TICKET_RE.search(subject or "")
+    if m:
+        return f"/tickets/{m.group(1)}"
+    return None
 
 
 def _deliver(email, subject, body):
