@@ -52,11 +52,13 @@ All mutations go through services.audit.log_action — no local audit INSERTs
 
 from datetime import datetime, timedelta
 
-from flask import (Blueprint, abort, flash, redirect, render_template,
+from flask import (Blueprint, abort, current_app, flash, redirect,
+                   render_template, send_from_directory,
                    request, session, url_for)
 from mysql.connector.errors import IntegrityError
 
 from ..db import execute, query_all, query_one
+from ..services import attachments
 from ..services.audit import diff_fields, log_action, attach_changes
 from ..services.notify import send as notify
 from .auth import login_required, roles_required
@@ -161,12 +163,30 @@ def create_ticket():
         elif priority not in PRIORITIES:
             errors["priority"] = "Invalid priority selection."
 
+        # Attachments are validated BEFORE the ticket row is written, so a
+        # rejected file re-renders the form with everything the user typed
+        # still present rather than creating a ticket and then complaining
+        # (TC-01 AF-2 + EX-1).
+        pending = [f for f in request.files.getlist("attachments")
+                   if f and f.filename]
+        for f in pending:
+            problem = attachments.validate(f)
+            if problem:
+                errors.setdefault("attachments", []).append(problem)
+        if len(pending) > attachments.MAX_PER_TICKET:
+            errors.setdefault("attachments", []).append(
+                f"A ticket may hold at most {attachments.MAX_PER_TICKET} "
+                f"files.")
+
         # EX-1: validation errors re-render the form with entered data intact.
         if errors:
             flash("Please correct the highlighted validation errors.", "error")
             return render_template("tickets/new.html", categories=categories,
                                    priorities=PRIORITIES, form=request.form,
-                                   errors=errors), 400
+                                   errors=errors,
+                                   max_upload_label=attachments.MAX_MB_LABEL,
+                                   allowed_extensions=attachments.EXTENSION_LABEL,
+                                   accept_attr=",".join(attachments.ALLOWED_EXTENSIONS)), 400
 
         # UC-01 main flow: ticket is born in status New, audit-logged.
         ticket_id = execute(
@@ -177,6 +197,12 @@ def create_ticket():
 
         log_action(session["user_id"], "Ticket", ticket_id, "Create",
                    ip=request.remote_addr)
+
+        # Files need the ticket to exist first (FK). Already validated above,
+        # so nothing here should fail.
+        saved, upload_errors = _save_uploads(ticket_id, pending)
+        for problem in upload_errors:
+            flash(problem, "error")
 
         # P1.2 — hand the new ticket to the rotation.
         assigned = _auto_assign(ticket_id, int(category_id), title, priority)
@@ -190,7 +216,10 @@ def create_ticket():
         return redirect(url_for("tickets.view_ticket", ticket_id=ticket_id))
 
     return render_template("tickets/new.html", categories=categories,
-                           priorities=PRIORITIES, form={}, errors={})
+                           priorities=PRIORITIES, form={}, errors={},
+                           max_upload_label=attachments.MAX_MB_LABEL,
+                           allowed_extensions=attachments.EXTENSION_LABEL,
+                           accept_attr=",".join(attachments.ALLOWED_EXTENSIONS))
 
 
 # ---------------------------------------------------------------------------
@@ -418,6 +447,10 @@ def view_ticket(ticket_id):
     return render_template(
         "tickets/detail.html", t=_shape(t),
         linked=linked, comments=comments, history=history,
+        attachments=_attachments_for(ticket_id),
+        max_upload_label=attachments.MAX_MB_LABEL,
+        allowed_extensions=attachments.EXTENSION_LABEL,
+        accept_attr=",".join(attachments.ALLOWED_EXTENSIONS),
         sla=_sla_info(t), is_staff=is_staff,
         kb_article=kb_article,
         can_reopen=can_reopen, reopen_days=REOPEN_WINDOW_DAYS,
@@ -917,3 +950,153 @@ def _age(dt):
         return f"{hours} hour{'s' if hours != 1 else ''} ago"
     days = hours // 24
     return f"{days} day{'s' if days != 1 else ''} ago"
+
+
+
+# ---------------------------------------------------------------------------
+# Attachments (FR-2.1) — see services/attachments.py for the policy rationale
+# ---------------------------------------------------------------------------
+
+def _attachments_for(ticket_id):
+    rows = query_all(
+        "SELECT a.attachmentID, a.originalName, a.storedName, a.mimeType,"
+        "       a.sizeBytes, a.uploadedAt, a.uploadedByID,"
+        "       CONCAT(u.firstName, ' ', u.lastName) AS uploadedBy"
+        "  FROM TicketAttachment a JOIN User u ON u.userID = a.uploadedByID"
+        " WHERE a.ticketID = %s ORDER BY a.uploadedAt DESC", (ticket_id,))
+    for r in rows:
+        r["sizeLabel"] = attachments.human_size(r["sizeBytes"])
+        r["kind"] = attachments.icon_for(r["mimeType"], r["originalName"])
+    return rows
+
+
+def _save_uploads(ticket_id, files):
+    """Validate and persist a batch of uploads. Returns (saved, errors).
+
+    Each file is judged on its own: one rejected screenshot must not discard
+    the three that were fine, and the user is told exactly which failed and
+    why (TC-01 AF-2).
+    """
+    saved, errors = [], []
+    files = [f for f in (files or []) if f and f.filename]
+    if not files:
+        return saved, errors
+
+    existing = query_one("SELECT COUNT(*) AS n FROM TicketAttachment"
+                         " WHERE ticketID = %s", (ticket_id,))["n"]
+    directory = attachments.upload_dir(current_app)
+
+    for f in files:
+        if existing + len(saved) >= attachments.MAX_PER_TICKET:
+            errors.append(
+                f"'{f.filename}' was not attached: a ticket may hold at "
+                f"most {attachments.MAX_PER_TICKET} files.")
+            continue
+
+        problem = attachments.validate(f)
+        if problem:
+            errors.append(problem)
+            continue
+
+        stored, size = attachments.store(f, directory)
+        attachment_id = execute(
+            "INSERT INTO TicketAttachment (ticketID, originalName, storedName,"
+            "        mimeType, sizeBytes, uploadedByID)"
+            " VALUES (%s, %s, %s, %s, %s, %s)",
+            (ticket_id, f.filename[:255], stored, (f.mimetype or "")[:100],
+             size, session["user_id"]))
+        log_action(session["user_id"], "TicketAttachment", attachment_id,
+                   "Create",
+                   changes={"file": (None, f"{f.filename} "
+                                           f"({attachments.human_size(size)})"),
+                            "ticket": (None, f"#{ticket_id}")},
+                   ip=request.remote_addr)
+        saved.append(f.filename)
+
+    return saved, errors
+
+
+def _flash_upload_result(saved, errors):
+    if saved:
+        flash(f"Attached {len(saved)} file"
+              f"{'' if len(saved) == 1 else 's'}.", "success")
+    for problem in errors:
+        flash(problem, "error")
+
+
+@bp.post("/tickets/<int:ticket_id>/attachments")
+@login_required
+def upload_attachment(ticket_id):
+    """Add files to an existing ticket.
+
+    _get_ticket_or_403 applies the FR-5.1 scope, so an End User cannot
+    attach to a ticket they cannot see. Closed tickets are frozen — the
+    record of a finished ticket should not keep changing.
+    """
+    t = _get_ticket_or_403(ticket_id)
+    if t["status"] == "Closed":
+        flash("This ticket is closed; attachments can no longer be added.",
+              "error")
+        return redirect(url_for("tickets.view_ticket", ticket_id=ticket_id))
+
+    saved, errors = _save_uploads(ticket_id, request.files.getlist("attachments"))
+    if not saved and not errors:
+        flash("No file was selected.", "error")
+    _flash_upload_result(saved, errors)
+    return redirect(url_for("tickets.view_ticket", ticket_id=ticket_id))
+
+
+@bp.get("/tickets/<int:ticket_id>/attachments/<int:attachment_id>")
+@login_required
+def download_attachment(ticket_id, attachment_id):
+    """Serve a file through the application, never straight off the disk.
+
+    _get_ticket_or_403 runs FIRST: access to an attachment is exactly access
+    to its ticket (FR-5.1). The attachment row is then re-checked against
+    this ticket, so a valid id from someone else's ticket is a 404, not a
+    leak.
+    """
+    _get_ticket_or_403(ticket_id)
+    a = query_one(
+        "SELECT originalName, storedName, mimeType FROM TicketAttachment"
+        " WHERE attachmentID = %s AND ticketID = %s",
+        (attachment_id, ticket_id))
+    if a is None:
+        abort(404)
+
+    # Anything not on the inline allowlist is forced to download, so an
+    # uploaded file can never execute or render in this origin.
+    return send_from_directory(
+        attachments.upload_dir(current_app), a["storedName"],
+        mimetype=a["mimeType"],
+        as_attachment=not attachments.is_inline(a["mimeType"]),
+        download_name=a["originalName"])
+
+
+@bp.post("/tickets/<int:ticket_id>/attachments/<int:attachment_id>/delete")
+@login_required
+def delete_attachment(ticket_id, attachment_id):
+    """Remove an attachment. The uploader may remove their own; staff may
+    remove any. The row goes first — an orphaned file on disk is harmless,
+    an unreachable row is not."""
+    _get_ticket_or_403(ticket_id)
+    a = query_one(
+        "SELECT attachmentID, originalName, storedName, uploadedByID"
+        "  FROM TicketAttachment"
+        " WHERE attachmentID = %s AND ticketID = %s",
+        (attachment_id, ticket_id))
+    if a is None:
+        abort(404)
+    if (session["role"] not in STAFF
+            and a["uploadedByID"] != session["user_id"]):
+        abort(403)
+
+    execute("DELETE FROM TicketAttachment WHERE attachmentID = %s",
+            (attachment_id,))
+    attachments.remove(a["storedName"], attachments.upload_dir(current_app))
+    log_action(session["user_id"], "TicketAttachment", attachment_id, "Delete",
+               changes={"file": (a["originalName"], None)},
+               ip=request.remote_addr)
+    flash(f"Removed {a['originalName']}.", "success")
+    return redirect(url_for("tickets.view_ticket", ticket_id=ticket_id))
+

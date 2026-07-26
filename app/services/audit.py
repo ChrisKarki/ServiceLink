@@ -36,7 +36,7 @@ from ..db import get_connection, query_all
 # letting MariaDB truncate an out-of-domain value into garbage.
 ENTITY_TYPES = ("Ticket", "Resource", "User", "KBArticle",
                 "TicketComment", "TicketResource", "Category", "SLAPolicy",
-                "SystemSetting")
+                "SystemSetting", "TicketAttachment")
 ACTIONS = {"Create", "Update", "Delete", "Link", "Unlink"}
 
 

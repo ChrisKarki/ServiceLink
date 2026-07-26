@@ -318,6 +318,8 @@ status_labels, next_states, escalation (P2.3: None for End Users). #}
                 <span class="badge"
                     style="border: 1px solid var(--panel-border); color: var(--text-secondary); margin-left: 4px;">{{
                     linked|length }}</span></button>
+            <button type="button" class="tab-btn" data-tab="tab-files" onclick="showTab(this)">Attachments
+                {% if attachments %}<span class="badge" style="margin-left:6px; border:1px solid var(--panel-border); color:var(--text-secondary);">{{ attachments|length }}</span>{% endif %}</button>
             <button type="button" class="tab-btn" data-tab="tab-activity" onclick="showTab(this)">Activity</button>
             <button type="button" class="tab-btn" data-tab="tab-resolution" onclick="showTab(this)">Resolution</button>
         </div>
@@ -447,6 +449,59 @@ status_labels, next_states, escalation (P2.3: None for End Users). #}
                 <div class="text-sm" style="padding: 8px; color: var(--text-secondary);">No resources linked to this
                     ticket.</div>
                 {% endfor %}
+            </div>
+        </div>
+
+        <!-- TAB: Attachments (FR-2.1). Files are served by an authenticated
+             route, never from static/ — access follows ticket access. -->
+        <div class="tab-pane" id="tab-files">
+            <div class="flex-between" style="margin-bottom: 12px;">
+                <div class="section-heading" style="margin-bottom: 0;">Attachments</div>
+                <span class="text-sm" style="color: var(--text-secondary);">
+                    Max {{ max_upload_label }} per file &middot; {{ allowed_extensions }}
+                </span>
+            </div>
+
+            <div class="card-box" style="padding: 16px;">
+                {% for a in attachments %}
+                <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px; background: var(--card-tint); border: 1px solid var(--panel-border); border-radius: 10px; margin-bottom: 10px;">
+                    <div style="min-width: 0;">
+                        <a href="{{ url_for('tickets.download_attachment', ticket_id=t.ticketID, attachment_id=a.attachmentID) }}"
+                           style="color: var(--text-primary); font-weight: 600; text-decoration: none; word-break: break-all;">{{ a.originalName }}</a>
+                        <span class="badge" style="margin-left: 6px; border: 1px solid var(--panel-border); color: var(--text-secondary);">{{ a.kind }}</span>
+                        <span class="text-sm" style="color: var(--text-secondary); display: block; margin-top: 2px;">
+                            {{ a.sizeLabel }} &middot; {{ a.uploadedBy }} &middot;
+                            {{ a.uploadedAt.strftime('%b %d, %Y %H:%M') if a.uploadedAt else '' }}
+                        </span>
+                    </div>
+                    {% if is_staff or a.uploadedByID == session['user_id'] %}
+                    <form method="post" action="{{ url_for('tickets.delete_attachment', ticket_id=t.ticketID, attachment_id=a.attachmentID) }}"
+                          onsubmit="return confirm('Remove ' + {{ a.originalName | tojson }} + '? This cannot be undone.');">
+                        <button type="submit" class="btn btn-ghost btn-sm" style="color: var(--danger-color);">Remove</button>
+                    </form>
+                    {% endif %}
+                </div>
+                {% else %}
+                <div class="text-sm" style="padding: 8px; color: var(--text-secondary);">No files attached to this ticket.</div>
+                {% endfor %}
+
+                {% if t.status != 'Closed' %}
+                <form method="post" enctype="multipart/form-data"
+                      action="{{ url_for('tickets.upload_attachment', ticket_id=t.ticketID) }}"
+                      style="margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--panel-border);">
+                    <input type="file" name="attachments" id="ticket-files" multiple
+                           accept="{{ accept_attr }}"
+                           class="form-control" style="padding: 10px;"
+                           onchange="validateFiles(this)">
+                    <div class="text-sm" id="file-warning"
+                         style="color: var(--danger-color); margin-top: 6px; display: none;"></div>
+                    <button type="submit" class="btn btn-secondary" style="margin-top: 10px;">Upload</button>
+                </form>
+                {% else %}
+                <div class="text-sm" style="margin-top: 12px; color: var(--text-secondary);">
+                    This ticket is closed; attachments can no longer be added.
+                </div>
+                {% endif %}
             </div>
         </div>
 
@@ -653,6 +708,28 @@ status_labels, next_states, escalation (P2.3: None for End Users). #}
 </div>
 
 <script>
+    // Client-side pre-check only — a friendlier failure than uploading 40 MB
+    // and being rejected. services/attachments.py re-validates everything
+    // server-side; this can be bypassed and is not relied on.
+    var MAX_UPLOAD_BYTES = {{ (max_upload_label.split(' ')[0] | int) * 1024 * 1024 }};
+    function validateFiles(input) {
+        var warn = document.getElementById('file-warning');
+        var problems = [];
+        for (var i = 0; i < input.files.length; i++) {
+            var f = input.files[i];
+            if (f.size > MAX_UPLOAD_BYTES) {
+                problems.push(f.name + ' exceeds {{ max_upload_label }}');
+            }
+        }
+        if (problems.length) {
+            warn.textContent = problems.join('; ');
+            warn.style.display = 'block';
+        } else {
+            warn.textContent = '';
+            warn.style.display = 'none';
+        }
+    }
+
     function showTab(btn) {
         document.querySelectorAll('.tab-btn').forEach(function (b) { b.classList.remove('active'); });
         document.querySelectorAll('.tab-pane').forEach(function (p) { p.classList.remove('active'); });
