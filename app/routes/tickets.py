@@ -397,6 +397,25 @@ def _get_ticket_or_403(ticket_id):
 def view_ticket(ticket_id):
     t = _get_ticket_or_403(ticket_id)
     _check_and_escalate_breach(t)   # on-request SLA check (§4.2)
+    return _render_detail(t)
+
+
+def _render_detail(t, status_code=200):
+    """Single render path for the ticket detail page.
+
+    view_ticket lands here on a normal GET, and escalate_ticket lands here
+    when a justification is rejected, so a 400 re-renders exactly the page
+    the user was already looking at instead of a divergent one.
+
+    Previously this function was CALLED but never DEFINED: escalate_ticket
+    referenced it on both validation-failure paths, and view_ticket carried
+    a second, unreachable render block after its return. The consequences
+    were that an empty justification raised NameError (500) instead of the
+    400 the acceptance criterion requires, and that `escalation` was never
+    passed to the template — so a successful escalation never displayed its
+    justification. Both are fixed by having one definition.
+    """
+    ticket_id = t["ticketID"]
     is_staff = session["role"] in STAFF
 
     linked = query_all(
@@ -422,11 +441,11 @@ def view_ticket(ticket_id):
         "SELECT a.logID, a.action, a.entityType, a.timestamp,"
         "       CONCAT(u.firstName,' ',u.lastName) AS actor"
         "  FROM AuditLog a JOIN User u ON u.userID = a.actorID"
-        " WHERE a.entityType IN ('Ticket', 'TicketResource', 'TicketComment')"
+        " WHERE a.entityType IN ('Ticket', 'TicketResource',"
+        "                        'TicketComment', 'TicketAttachment')"
         "   AND a.entityID = %s"
         " ORDER BY a.timestamp DESC LIMIT 20", (ticket_id,))
     attach_changes(history, noun="ticket")
-
 
     # feature/kb (FR-4.2): resolution article, if one has been designated.
     kb_article = None
@@ -435,9 +454,26 @@ def view_ticket(ticket_id):
             "SELECT articleID, title, status, visibility FROM KBArticle"
             " WHERE articleID = %s", (t["linkedKBArticleID"],))
 
-    # P2.2 — a submitter can reopen their own resolved ticket, but only inside
-    # the policy window. The button is offered only when the action would
-    # actually succeed; reopen_ticket re-checks all of this server-side.
+    # P2.3 — the most recent escalation, if any. STAFF only: the
+    # justification is an internal note (FR-2.4) and must not reach End
+    # Users. The escalation "flag" is derived from the audit trail rather
+    # than a column, so no schema change was needed.
+    escalation = None
+    if is_staff:
+        escalation = query_one(
+            "SELECT lc.newValue AS justification, l.timestamp AS at,"
+            "       CONCAT(u.firstName, ' ', u.lastName) AS actor"
+            "  FROM AuditLog l"
+            "  JOIN AuditLogChange lc ON lc.logID = l.logID"
+            "  JOIN User u ON u.userID = l.actorID"
+            " WHERE l.entityType = 'Ticket' AND l.entityID = %s"
+            "   AND lc.fieldName = 'escalation'"
+            " ORDER BY l.logID DESC LIMIT 1", (ticket_id,))
+
+    # P2.2 — a submitter can reopen their own resolved ticket, but only
+    # inside the policy window. The button is offered only when the action
+    # would actually succeed; reopen_ticket re-checks all of this
+    # server-side.
     can_reopen = (
         t["status"] == "Resolved"
         and t["resolvedAt"] is not None
@@ -452,38 +488,15 @@ def view_ticket(ticket_id):
         allowed_extensions=attachments.EXTENSION_LABEL,
         accept_attr=",".join(attachments.ALLOWED_EXTENSIONS),
         sla=_sla_info(t), is_staff=is_staff,
-        kb_article=kb_article,
+        kb_article=kb_article, escalation=escalation,
         can_reopen=can_reopen, reopen_days=REOPEN_WINDOW_DAYS,
         next_states=sorted(TRANSITIONS[t["status"]]),
         technicians=_active_technicians() if is_staff else [],
         categories=query_all("SELECT categoryID, name FROM Category"
                              " WHERE isActive = TRUE ORDER BY name"),
         priorities=PRIORITIES, statuses=list(STATUS_LABELS),
-        status_labels=STATUS_LABELS)
+        status_labels=STATUS_LABELS), status_code
 
-    is_staff = session["role"] in STAFF
-
-    # P2.3 — the most recent escalation, if any. Shown to STAFF only: the
-    # justification is an internal note (FR-2.4) and must not reach End Users.
-    # The escalation "flag" is derived from the audit trail (no schema change).
-    escalation = None
-    if is_staff:
-        escalation = query_one(
-            "SELECT lc.newValue AS justification, l.timestamp AS at,"
-            "       CONCAT(u.firstName, ' ', u.lastName) AS actor"
-            "  FROM AuditLog l"
-            "  JOIN AuditLogChange lc ON lc.logID = l.logID"
-            "  JOIN User u ON u.userID = l.actorID"
-            " WHERE l.entityType = 'Ticket' AND l.entityID = %s"
-            "   AND lc.fieldName = 'escalation'"
-            " ORDER BY l.logID DESC LIMIT 1", (ticket_id,))
-
-    return render_template("tickets/detail.html", t=_shape(t),
-                           linked=linked, history=history,
-                           is_staff=is_staff,
-                           next_states=sorted(TRANSITIONS[t["status"]]),
-                           status_labels=STATUS_LABELS,
-                           escalation=escalation), status_code
 
 # ---------------------------------------------------------------------------
 # P2.2 — SLA tracking (FR-2.2, FR-2.5)
