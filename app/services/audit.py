@@ -34,9 +34,9 @@ from ..db import get_connection, query_all
 
 # Mirror the ENUM domains in schema.sql — fail loudly on drift instead of
 # letting MariaDB truncate an out-of-domain value into garbage.
-ENTITY_TYPES = {"Ticket", "Resource", "User", "KBArticle",
-                "TicketComment", "TicketResource",
-                "Category", "SLAPolicy"}
+ENTITY_TYPES = ("Ticket", "Resource", "User", "KBArticle",
+                "TicketComment", "TicketResource", "Category", "SLAPolicy",
+                "SystemSetting")
 ACTIONS = {"Create", "Update", "Delete", "Link", "Unlink"}
 
 

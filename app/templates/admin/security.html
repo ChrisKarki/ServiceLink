@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% block title %}Administration · Security{% endblock %}
+
+{% block content %}
+{% include "admin/_subnav.html" with context %}
+
+<div style="display: flex; gap: 20px; margin-top: 18px; align-items: flex-start; flex-wrap: wrap;">
+
+    <div style="flex: 1; min-width: 320px; border: 1px solid var(--panel-border); border-radius: 12px; padding: 20px;">
+        <div style="color: var(--text-primary); font-weight: 600; margin-bottom: 6px;">
+            Two-factor authentication
+        </div>
+        <div class="text-sm" style="color: var(--text-secondary); margin-bottom: 16px;">
+            When mandatory, every account is required to enrol an authenticator
+            app the next time it signs in (FR-1.1).
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 18px;">
+            <span class="badge {% if mfa_required %}badge-status-resolved{% endif %}"
+                  {% if not mfa_required %}style="border: 1px solid var(--warning-color); color: var(--warning-color);"{% endif %}>
+                {{ 'Mandatory' if mfa_required else 'Optional' }}
+            </span>
+            <span class="text-sm" style="color: var(--text-secondary);">
+                {{ enrolled_count }} of {{ total_count }} active accounts enrolled
+            </span>
+        </div>
+
+        <form method="post" action="{{ url_for('admin.toggle_mfa') }}"
+              {% if mfa_required %}onsubmit="return confirm('Make two-factor authentication optional? Accounts already enrolled will still be challenged, but new accounts will not be forced to enrol.');"{% endif %}>
+            <input type="hidden" name="mfa_required" value="{{ '0' if mfa_required else '1' }}">
+            {% if mfa_required %}
+            <button type="submit" class="badge" style="cursor: pointer; padding: 8px 18px; background: none; border: 1px solid var(--warning-color); color: var(--warning-color);">
+                Make optional
+            </button>
+            {% else %}
+            <button type="submit" class="badge badge-status-resolved" style="cursor: pointer; padding: 8px 18px; border: none;">
+                Make mandatory
+            </button>
+            {% endif %}
+        </form>
+
+        <div class="text-sm" style="color: var(--text-secondary); margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--panel-border);">
+            Turning this off never removes an existing second factor. Accounts
+            already enrolled keep being challenged; only new enrolments stop
+            being forced. To weaken a specific account, reset it explicitly
+            in the table.
+        </div>
+    </div>
+
+    <div style="flex: 1; min-width: 320px; border: 1px solid var(--panel-border); border-radius: 12px; padding: 20px;">
+        <div style="color: var(--text-primary); font-weight: 600; margin-bottom: 6px;">
+            Password and reset policy
+        </div>
+        <div class="text-sm" style="color: var(--text-secondary); line-height: 1.7;">
+            Minimum password length: {{ min_password_len }} characters, mixing
+            letters with a number or symbol.<br>
+            Reset codes expire after {{ otp_ttl }} minutes, are single-use, and
+            lock after 5 incorrect attempts.<br>
+            Reset codes are stored hashed, never in plaintext.<br>
+            Completing a password reset also clears the account's authenticator
+            enrolment.<br>
+            Sessions expire 8 hours after sign-in regardless of activity.
+        </div>
+    </div>
+</div>
+
+<div style="margin-top: 20px; border: 1px solid var(--panel-border); border-radius: 12px; overflow: hidden;">
+    <table style="width: 100%; border-collapse: collapse;">
+        <thead>
+            <tr style="border-bottom: 1px solid var(--panel-border);">
+                {% for h in ['User', 'Role', 'Status', 'Authenticator', 'Enrolled', 'Actions'] %}
+                <th class="text-sm" style="text-align: left; padding: 12px 16px; color: var(--text-secondary); font-weight: 500;">{{ h }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for u in users %}
+            <tr style="border-bottom: 1px solid var(--panel-border);">
+                <td style="padding: 12px 16px;">
+                    <div style="color: var(--text-primary); font-weight: 500;">{{ u.firstName }} {{ u.lastName }}</div>
+                    <div class="text-sm" style="color: var(--text-secondary);">{{ u.email }}</div>
+                </td>
+                <td class="text-sm" style="padding: 12px 16px; color: var(--text-primary);">{{ u.role }}</td>
+                <td class="text-sm" style="padding: 12px 16px; color: var(--text-secondary);">{{ u.status }}</td>
+                <td style="padding: 12px 16px;">
+                    {% if u.enrolled %}
+                    <span class="badge badge-status-resolved">Enrolled</span>
+                    {% else %}
+                    <span class="badge" style="border: 1px solid var(--warning-color); color: var(--warning-color);">Not enrolled</span>
+                    {% endif %}
+                </td>
+                <td class="text-sm" style="padding: 12px 16px; color: var(--text-secondary); white-space: nowrap;">
+                    {{ u.totpEnrolledAt.strftime('%b %d, %Y') if u.totpEnrolledAt else '—' }}
+                </td>
+                <td style="padding: 12px 16px;">
+                    {% if u.enrolled %}
+                    <form method="post" action="{{ url_for('admin.reset_user_mfa', user_id=u.userID) }}" style="margin: 0;"
+                          onsubmit="return confirm('Reset two-factor authentication for ' + {{ (u.firstName ~ ' ' ~ u.lastName) | tojson }} + '? They will set up a new authenticator at next sign-in.');">
+                        <button type="submit" class="badge" style="cursor: pointer; padding: 6px 14px; background: none; border: 1px solid var(--danger-color); color: var(--danger-color);">
+                            Reset authenticator
+                        </button>
+                    </form>
+                    {% else %}
+                    <span class="text-sm" style="color: var(--text-secondary);">Enrols at next sign-in</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="6" style="padding: 32px; text-align: center; color: var(--text-secondary);">
+                    No active accounts.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

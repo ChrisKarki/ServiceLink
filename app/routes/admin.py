@@ -45,7 +45,7 @@ from mysql.connector.errors import IntegrityError
 
 from ..db import execute, query_all, query_one
 from ..services.audit import attach_changes, diff_fields, log_action
-from ..services import notify
+from ..services import notify, security
 from .auth import roles_required
 
 
@@ -70,7 +70,8 @@ STATUS_BADGES = {
 
 _USER_SELECT = (
     "SELECT userID, email, firstName, lastName, role, status,"
-    "       mfaEnabled, createdAt, lastLoginAt"
+    "       mfaEnabled, totpSecret, totpEnrolledAt,"
+    "       createdAt, lastLoginAt"
     "  FROM User")
 
 
@@ -504,3 +505,92 @@ def list_audit():
         f_entity=f_entity, f_action=f_action, f_actor=f_actor,
         f_entity_id=f_entity_id,
         page=page, pages=pages, total=total, per_page=AUDIT_PER_PAGE)
+
+
+# ---------------------------------------------------------------------------
+# Security settings (FR-1.1) — system-wide MFA switch + per-user MFA reset
+# ---------------------------------------------------------------------------
+
+@bp.get("/security")
+@roles_required("Administrator")
+def security_settings():
+    """MFA posture at a glance: the system switch plus who is actually
+    enrolled. An Administrator turning MFA off should be able to see how
+    many accounts still hold a second factor before deciding."""
+    rows = query_all(
+        "SELECT u.userID, u.firstName, u.lastName, u.email, u.role,"
+        "       u.status, u.totpEnrolledAt,"
+        "       (u.totpSecret IS NOT NULL) AS enrolled"
+        "  FROM User u WHERE u.status <> 'Suspended'"
+        " ORDER BY u.role, u.firstName, u.lastName")
+    return render_template(
+        "admin/security.html",
+        mfa_required=security.mfa_required(),
+        users=rows,
+        enrolled_count=sum(1 for r in rows if r["enrolled"]),
+        total_count=len(rows),
+        otp_ttl=security.OTP_TTL_MINUTES,
+        min_password_len=security.MIN_PASSWORD_LEN)
+
+
+@bp.post("/security/mfa")
+@roles_required("Administrator")
+def toggle_mfa():
+    """Flip the system-wide MFA requirement.
+
+    Turning it OFF does not clear anyone's existing enrolment — accounts
+    that already hold a second factor keep being challenged. It only stops
+    NEW enrolments being forced at sign-in. Weakening an account is an
+    explicit per-user reset, never a side effect of a global toggle.
+    """
+    want = request.form.get("mfa_required") == "1"
+    before = security.mfa_required()
+    if want == before:
+        flash("No change.", "info")
+        return redirect(url_for("admin.security_settings"))
+
+    security.set_setting("mfa_required", "1" if want else "0",
+                         actor_id=session["user_id"])
+    log_action(session["user_id"], "SystemSetting", 0, "Update",
+               changes={"mfa_required": ("on" if before else "off",
+                                         "on" if want else "off")},
+               ip=request.remote_addr)
+    flash("Two-factor authentication is now mandatory for all accounts."
+          if want else
+          "Two-factor authentication is no longer mandatory. Accounts "
+          "already enrolled will still be challenged.", "success")
+    return redirect(url_for("admin.security_settings"))
+
+
+@bp.post("/users/<int:user_id>/reset-mfa")
+@roles_required("Administrator")
+def reset_user_mfa(user_id):
+    """Clear a user's authenticator enrolment — the lost-phone path.
+
+    Same one-line operation the password-reset flow performs, so there is
+    one definition of "reset MFA" in the codebase.
+    """
+    user = _get_user(user_id)
+    if not user["totpSecret"]:
+        flash(f"{user['firstName']} {user['lastName']} has no authenticator "
+              "enrolled.", "info")
+        return redirect(url_for("admin.security_settings"))
+
+    security.reset_totp(user_id)
+    log_action(session["user_id"], "User", user_id, "Update",
+               changes={"totpSecret": ("enrolled", "reset by administrator")},
+               ip=request.remote_addr)
+    try:
+        notify.send(user_id,
+                    "Two-factor authentication reset on your account",
+                    f"An administrator ({session['name']}) reset two-factor "
+                    "authentication on your ServiceLink account. You will be "
+                    "asked to set up your authenticator app again the next "
+                    "time you sign in.\n\nIf you did not request this, "
+                    "contact your administrator immediately.")
+    except Exception:
+        pass
+    flash(f"Authenticator reset for {user['firstName']} {user['lastName']}. "
+          "They will re-enrol at next sign-in.", "success")
+    return redirect(url_for("admin.security_settings"))
+
