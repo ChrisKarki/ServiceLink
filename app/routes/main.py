@@ -297,7 +297,17 @@ _FEED_VERBS = {"Create": "created", "Update": "updated", "Delete": "deleted",
                "Link": "linked", "Unlink": "unlinked"}
 _FEED_NOUNS = {"Ticket": "ticket", "Resource": "resource", "User": "user",
                "KBArticle": "article", "TicketComment": "comment",
-               "TicketResource": "resource link on ticket"}
+               "TicketResource": "resource link on ticket",
+               "Category": "category", "SLAPolicy": "SLA policy",
+               "SystemSetting": "security setting"}
+
+
+def _feed_target(r):
+    """Human label for an audit row. Singleton entities (SLA policy, system
+    settings) are logged with entityID 0 and read badly as "#0", so the id is
+    dropped for those."""
+    noun = _FEED_NOUNS.get(r["entityType"], r["entityType"])
+    return noun if not r["entityID"] else f"{noun} #{r['entityID']}"
 
 
 def _activity_feed():
@@ -310,8 +320,11 @@ def _activity_feed():
         {
             "name": f"{r['firstName']} {r['lastName']}",
             "initials": (r["firstName"][:1] + r["lastName"][:1]).upper(),
-            "verb": _FEED_VERBS[r["action"]],
-            "target": f"{_FEED_NOUNS[r['entityType']]} #{r['entityID']}",
+            "verb": _FEED_VERBS.get(r["action"], r["action"].lower()),
+            # .get() rather than [] : admin.py writes Category, SLAPolicy and
+            # SystemSetting rows, and an unmapped entityType used to raise
+            # KeyError here and 500 the whole dashboard.
+            "target": _feed_target(r),
             "accent": r["action"] == "Create",
             "when": _age(r["timestamp"]),
         }

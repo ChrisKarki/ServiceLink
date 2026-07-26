@@ -9,6 +9,7 @@
         {% for endpoint, label in [('admin.list_users', 'Users'),
                                    ('admin.list_categories', 'Categories'),
                                    ('admin.list_sla', 'SLA Targets'),
+                                   ('admin.security_settings', 'Security'),
                                    ('admin.list_audit', 'Audit Log')] %}
         <a href="{{ url_for(endpoint) }}"
            style="text-decoration: none; padding: 8px 16px; border-radius: 8px; font-size: 14px;

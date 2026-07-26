@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Set up 2FA · ServiceLink</title>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@100;200;300;400;500;600;700&family=IBM+Plex+Sans:wght@100;200;300;400;500;600;700&family=Montserrat:wght@100;200;300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
+</head>
+
+<body class="auth-page">
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <button class="icon-btn theme-toggle theme-corner" onclick="toggleTheme()" title="Toggle dark / light mode">
+        <span class="icon-moon"><svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg></span>
+        <span class="icon-sun"><svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg></span>
+    </button>
+
+    <div class="panel login-card">
+        <div class="brand" style="justify-content: center;">
+            <img src="{{ url_for('static', filename='assets/logo.svg') }}" alt="Logo" style="height: 48px; width: auto;">
+            ServiceLink
+        </div>
+
+        <div style="text-align: center; margin-bottom: 18px;">
+            <div style="color: var(--text-primary); font-weight: 600; font-size: 17px;">
+                Set up two-factor authentication
+            </div>
+            <div class="text-sm" style="color: var(--text-secondary); margin-top: 6px;">
+                Your administrator requires an authenticator app on every account.
+            </div>
+        </div>
+
+        <ol class="text-sm" style="color: var(--text-secondary); padding-left: 20px; margin: 0 0 16px;">
+            <li style="margin-bottom: 6px;">Install Google Authenticator, Microsoft Authenticator, Authy, or 1Password.</li>
+            <li style="margin-bottom: 6px;">Scan the code below.</li>
+            <li>Enter the 6-digit code it shows to finish.</li>
+        </ol>
+
+        <div style="text-align: center; background: #ffffff; border-radius: 10px;
+                    padding: 14px; margin-bottom: 14px;">
+            <img src="{{ qr }}" alt="Authenticator enrolment QR code"
+                 style="width: 190px; height: 190px; display: block; margin: 0 auto;">
+        </div>
+
+        <details style="margin-bottom: 20px;">
+            <summary class="text-sm" style="color: var(--text-secondary); cursor: pointer;">
+                Can&rsquo;t scan? Enter this key manually
+            </summary>
+            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px;
+                        color: var(--text-primary); word-break: break-all;
+                        background: var(--card-tint); border: 1px solid var(--panel-border);
+                        border-radius: 6px; padding: 10px; margin-top: 8px;">{{ secret }}</div>
+            <div class="text-sm" style="color: var(--text-secondary); margin-top: 6px;">
+                Account: {{ email }} &middot; Type: time-based (TOTP)
+            </div>
+        </details>
+
+        <form method="post" action="{{ url_for('auth.mfa_setup') }}">
+            <div class="form-group" style="margin-bottom: 20px;">
+                <label class="form-label" for="enrol-code">Code from your app</label>
+                <input type="text" class="form-control" id="enrol-code" name="code"
+                    inputmode="numeric" pattern="[0-9 ]*" maxlength="7" required autofocus
+                    autocomplete="one-time-code" placeholder="000000" style="padding-left: 16px; letter-spacing: 6px; text-align: center; font-family: 'IBM Plex Mono', monospace; font-size: 20px;">
+            </div>
+            <button type="submit" class="btn btn-primary"
+                style="width: 100%; padding: 14px; font-size: 16px; font-weight: 600;">
+                Activate and sign in</button>
+        </form>
+
+        <div class="text-sm" style="color: var(--text-secondary); margin-top: 16px; text-align: center;">
+            Keep the manual key somewhere safe. If you lose your authenticator,
+            resetting your password also resets two-factor authentication.
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            {% for category, message in messages %}
+            showToast({{ message | tojson }}, {{ category | tojson }});
+            {% endfor %}
+        });
+    </script>
+    {% endif %}
+    {% endwith %}
+</body>
+
+</html>
