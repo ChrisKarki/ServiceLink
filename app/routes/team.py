@@ -21,8 +21,8 @@ Workload aggregation keeps the schema-drift defence from reports.py:
 SELECT * over Ticket, resolve the assignee key in Python.
 """
 
-from flask import (Blueprint, abort, flash, redirect, render_template,
-                   request, session, url_for)
+from flask import (Blueprint, abort, flash, jsonify, redirect,
+                   render_template, request, session, url_for)
 from mysql.connector.errors import IntegrityError
 
 from ..db import execute, query_all, query_one
@@ -42,6 +42,14 @@ def _assignee(ticket):
         if k in ticket and ticket[k] is not None:
             return ticket[k]
     return None
+
+
+def _wants_json():
+    """The redesigned team page auto-saves via fetch(); those requests
+    carry X-Requested-With so the same endpoints can answer JSON while
+    plain form POSTs (Katie's TC paths, no-JS fallback) keep the
+    flash-and-redirect behaviour."""
+    return request.headers.get("X-Requested-With") == "fetch"
 
 
 # ---------------------------------------------------------------------------
@@ -157,20 +165,31 @@ def rename_group(group_id):
     before = _get_group(group_id)
     name = (request.form.get("name") or "").strip()
     if not name or len(name) > 80:
+        if _wants_json():
+            return jsonify(ok=False, error="Group name is required "
+                           "(max 80 characters)."), 400
         flash("Group name is required (max 80 characters).", "error")
         return redirect(url_for("team.index"))
     if name == before["name"]:
+        if _wants_json():
+            return jsonify(ok=True, unchanged=True, name=name)
         flash("No changes to save.", "info")
         return redirect(url_for("team.index"))
     try:
         execute("UPDATE TechGroup SET name = %s WHERE groupID = %s",
                 (name, group_id))
     except IntegrityError:
+        if _wants_json():
+            return jsonify(ok=False,
+                           error=f"A group named '{name}' already "
+                           "exists."), 409
         flash(f"A group named '{name}' already exists.", "error")
         return redirect(url_for("team.index"))
     log_action(session["user_id"], "TechGroup", group_id, "Update",
                changes={"name": (before["name"], name)},
                ip=request.remote_addr)
+    if _wants_json():
+        return jsonify(ok=True, name=name)
     flash("Group renamed.", "success")
     return redirect(url_for("team.index"))
 
@@ -209,6 +228,9 @@ def set_member_groups(user_id):
     if user is None:
         abort(404)
     if user["role"] not in STAFF_ROLES:
+        if _wants_json():
+            return jsonify(ok=False, error="Only Technicians, Managers, "
+                           "and Administrators can belong to groups."), 400
         flash("Only Technicians, Managers, and Administrators can belong "
               "to groups.", "error")
         return redirect(url_for("team.index"))
@@ -222,7 +244,15 @@ def set_member_groups(user_id):
     current = {r["groupID"] for r in query_all(
         "SELECT groupID FROM TechGroupMember WHERE userID = %s",
         (user_id,))}
+
+    def _payload():
+        return jsonify(ok=True,
+                       groupIDs=sorted(wanted),
+                       names=sorted(valid[g] for g in wanted))
+
     if wanted == current:
+        if _wants_json():
+            return _payload()
         flash("No changes to save.", "info")
         return redirect(url_for("team.index"))
 
@@ -239,6 +269,8 @@ def set_member_groups(user_id):
     log_action(session["user_id"], "User", user_id, "Update",
                changes={"groups": (_names(current), _names(wanted))},
                ip=request.remote_addr)
+    if _wants_json():
+        return _payload()
     flash(f"Groups updated for {user['firstName']} {user['lastName']}.",
           "success")
     return redirect(url_for("team.index"))
@@ -266,7 +298,15 @@ def set_category_groups(category_id):
     current = {r["groupID"] for r in query_all(
         "SELECT groupID FROM CategoryGroup WHERE categoryID = %s",
         (category_id,))}
+
+    def _payload():
+        return jsonify(ok=True,
+                       groupIDs=sorted(wanted),
+                       names=sorted(valid[g] for g in wanted))
+
     if wanted == current:
+        if _wants_json():
+            return _payload()
         flash("No changes to save.", "info")
         return redirect(url_for("team.index"))
 
@@ -284,6 +324,8 @@ def set_category_groups(category_id):
     log_action(session["user_id"], "Category", category_id, "Update",
                changes={"groups": (_names(current), _names(wanted))},
                ip=request.remote_addr)
+    if _wants_json():
+        return _payload()
     flash(f"Routing updated for category '{category['name']}'. New tickets "
           "in it round-robin across the selected groups.", "success")
     return redirect(url_for("team.index"))
