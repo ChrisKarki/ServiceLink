@@ -668,13 +668,24 @@ status_labels, next_states, escalation (P2.3: None for End Users). #}
                     </select>
                 </div>
                 <div class="form-group">
+                    <label class="form-label" for="prop-group">Group</label>
+                    {# Choosing a group narrows the Agent list to its members;
+                       "No group" offers every active staff member. The server
+                       re-validates membership either way (update_properties). #}
+                    <select id="prop-group" name="assignedGroupID" class="form-control"
+                            onchange="filterAgents()">
+                        <option value="">No group</option>
+                        {% for g in groups %}
+                        <option value="{{ g.groupID }}" {% if t.assignedGroupID==g.groupID %}selected{% endif %}>{{
+                            g.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
                     <label class="form-label" for="prop-agent">Agent</label>
                     <select id="prop-agent" name="assignedToUserID" class="form-control">
-                        <option value="">Unassigned</option>
-                        {% for tech in technicians %}
-                        <option value="{{ tech.userID }}" {% if t.assignedToUserID==tech.userID %}selected{% endif %}>{{
-                            tech.name }}</option>
-                        {% endfor %}
+                        {# Options are populated by filterAgents() from the
+                           group/staff data below. #}
                     </select>
                 </div>
                 <div class="form-group">
@@ -696,6 +707,9 @@ status_labels, next_states, escalation (P2.3: None for End Users). #}
             <div class="rail-row"><span class="text-sm" style="color: var(--text-secondary);">Category</span><span
                     class="text-sm" style="color: var(--text-primary); font-weight: 500;">{{ t.categoryName }}</span>
             </div>
+            <div class="rail-row"><span class="text-sm" style="color: var(--text-secondary);">Group</span><span
+                    class="text-sm" style="color: var(--text-primary); font-weight: 500;">{{ t.groupName or '—'
+                    }}</span></div>
             <div class="rail-row"><span class="text-sm" style="color: var(--text-secondary);">Agent</span><span
                     class="text-sm" style="color: var(--text-primary); font-weight: 500;">{% if t.unassigned
                     %}Unassigned{% else %}{{ t.assigneeName }}{% endif %}</span></div>
@@ -729,6 +743,39 @@ status_labels, next_states, escalation (P2.3: None for End Users). #}
             warn.style.display = 'none';
         }
     }
+
+    {% if is_staff %}
+    // Group -> Agent picker (properties panel). GROUP_MEMBERS keys are
+    // stringified groupIDs; ALL_STAFF backs the "No group" option.
+    var GROUP_MEMBERS = {{ group_members | tojson }};
+    var ALL_STAFF = {{ staff | tojson }};
+    var CURRENT_AGENT = {{ t.assignedToUserID | tojson }};
+
+    function filterAgents() {
+        var groupSel = document.getElementById('prop-group');
+        var agentSel = document.getElementById('prop-agent');
+        if (!groupSel || !agentSel) return;
+        var list = groupSel.value ? (GROUP_MEMBERS[groupSel.value] || []) : ALL_STAFF;
+        agentSel.textContent = '';
+        var blank = document.createElement('option');
+        blank.value = '';
+        blank.textContent = 'Unassigned';
+        agentSel.appendChild(blank);
+        var found = false;
+        list.forEach(function (m) {
+            var opt = document.createElement('option');
+            opt.value = m.userID;
+            opt.textContent = m.name;
+            if (CURRENT_AGENT !== null && m.userID === CURRENT_AGENT) {
+                opt.selected = true;
+                found = true;
+            }
+            agentSel.appendChild(opt);
+        });
+        if (!found) agentSel.value = '';
+    }
+    filterAgents();
+    {% endif %}
 
     function showTab(btn) {
         document.querySelectorAll('.tab-btn').forEach(function (b) { b.classList.remove('active'); });

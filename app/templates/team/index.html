@@ -2,11 +2,102 @@
 {% block title %}Team{% endblock %}
 
 {% block content %}
+<style>
+    /* ---- team page (C3.2) redesign: chips, pills, popover editor ---- */
+    .tm-card { border: 1px solid var(--panel-border); border-radius: 12px; padding: 16px; }
+    .tm-chip {
+        display: inline-flex; align-items: center; gap: 6px;
+        padding: 5px 12px; border-radius: 999px; cursor: pointer;
+        border: 1px solid var(--panel-border); background: none;
+        color: var(--text-secondary); font-size: 13px; line-height: 1;
+        transition: border-color .12s, color .12s, background .12s;
+        user-select: none;
+    }
+    .tm-chip:hover { border-color: var(--accent-color); color: var(--text-primary); }
+    .tm-chip.on {
+        border-color: var(--accent-color); color: var(--accent-color);
+        background: color-mix(in srgb, var(--accent-color) 12%, transparent);
+    }
+    .tm-chip.on::before { content: "\2713"; font-size: 11px; }
+    .tm-chip.inactive-group { opacity: .55; }
+    .tm-chip:disabled { cursor: wait; opacity: .6; }
+    .tm-pill {
+        display: inline-block; padding: 3px 10px; border-radius: 999px;
+        border: 1px solid var(--panel-border); color: var(--text-primary);
+        font-size: 12px; margin: 2px 4px 2px 0; white-space: nowrap;
+    }
+    .tm-saved {
+        font-size: 12px; color: var(--accent-color); margin-left: 8px;
+        opacity: 0; transition: opacity .2s; white-space: nowrap;
+    }
+    .tm-saved.show { opacity: 1; }
+    .tm-saved.err { color: var(--danger-color); }
+    .tm-edit-btn {
+        cursor: pointer; background: none; border: 1px solid var(--panel-border);
+        color: var(--text-secondary); border-radius: 8px; padding: 4px 10px;
+        font-size: 12px; transition: border-color .12s, color .12s;
+    }
+    .tm-edit-btn:hover { border-color: var(--accent-color); color: var(--accent-color); }
+    .tm-rename {
+        background: none; border: 1px solid transparent; border-radius: 8px;
+        color: var(--text-primary); padding: 6px 8px; width: 170px;
+        font-size: 14px; transition: border-color .12s, background .12s;
+    }
+    .tm-rename:hover { border-color: var(--panel-border); }
+    .tm-rename:focus {
+        outline: none; border-color: var(--accent-color);
+        background: color-mix(in srgb, var(--accent-color) 6%, transparent);
+    }
+    /* ---- modal ---- */
+    .tm-overlay {
+        position: fixed; inset: 0; display: none; z-index: 300;
+        background: rgba(0, 0, 0, .55); backdrop-filter: blur(2px);
+        align-items: center; justify-content: center;
+    }
+    .tm-overlay.open { display: flex; }
+    .tm-modal {
+        width: min(420px, calc(100vw - 32px));
+        background: var(--panel-bg, var(--card-bg, #14161b));
+        border: 1px solid var(--panel-border); border-radius: 14px;
+        box-shadow: 0 18px 50px rgba(0, 0, 0, .5);
+        animation: tm-pop .16s ease-out;
+    }
+    @keyframes tm-pop {
+        from { transform: translateY(10px) scale(.98); opacity: 0; }
+        to   { transform: none; opacity: 1; }
+    }
+    .tm-modal-head {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 14px 18px; border-bottom: 1px solid var(--panel-border);
+    }
+    .tm-modal-title { color: var(--text-primary); font-weight: 600; font-size: 15px; }
+    .tm-modal-sub { color: var(--text-secondary); font-size: 12px; margin-top: 2px; }
+    .tm-modal-body { padding: 12px 18px 6px; max-height: 50vh; overflow-y: auto; }
+    .tm-modal-foot {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 12px 18px; border-top: 1px solid var(--panel-border);
+    }
+    .tm-opt {
+        display: flex; align-items: center; gap: 10px; padding: 9px 10px;
+        border-radius: 8px; cursor: pointer; color: var(--text-primary);
+        font-size: 14px; transition: background .12s;
+    }
+    .tm-opt:hover { background: color-mix(in srgb, var(--accent-color) 8%, transparent); }
+    .tm-opt input { accent-color: var(--accent-color); width: 16px; height: 16px; cursor: pointer; }
+    .tm-opt .muted { color: var(--text-secondary); font-size: 12px; }
+    .tm-close {
+        cursor: pointer; background: none; border: 1px solid var(--panel-border);
+        color: var(--text-primary); border-radius: 8px; padding: 7px 16px; font-size: 13px;
+    }
+    .tm-close:hover { border-color: var(--accent-color); }
+</style>
+
 <div style="display: flex; align-items: flex-end; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
     <div>
         <h1 style="margin: 0; color: var(--text-primary); font-size: 22px;">Team</h1>
         <div class="text-sm" style="color: var(--text-secondary); margin-top: 4px;">
-            Technician and manager workload (C3.2). Account changes live in Administration.
+            Groups, category routing, and workload (C3.2). Account changes live in Administration.
+            Changes here save automatically.
         </div>
     </div>
     {% if unassigned_open %}
@@ -16,23 +107,140 @@
     {% endif %}
 </div>
 
+<!-- ===================== Groups ===================== -->
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 18px; align-items: start;">
+    <div class="tm-card">
+        <h2 style="margin: 0 0 12px; font-size: 16px; color: var(--text-primary);">Groups</h2>
+        <form method="post" action="{{ url_for('team.create_group') }}"
+              style="display: flex; gap: 8px; margin-bottom: 14px;">
+            <input type="text" name="name" maxlength="80" required class="search-input"
+                   placeholder="New group (e.g. Tier 1, Network, Cybersecurity)"
+                   style="flex: 1; padding: 8px 12px;">
+            <button type="submit" class="btn btn-primary" style="padding: 8px 16px;">Create</button>
+        </form>
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="border-bottom: 1px solid var(--panel-border);">
+                    {% for h in ['Group', 'Members', 'Status', ''] %}
+                    <th class="text-sm" style="text-align: left; padding: 8px 10px; color: var(--text-secondary); font-weight: 500;">{{ h }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for g in groups %}
+                <tr style="border-bottom: 1px solid var(--panel-border);">
+                    <td style="padding: 8px 10px; white-space: nowrap;">
+                        <input type="text" value="{{ g.name }}" maxlength="80" required
+                               class="tm-rename" data-rename
+                               data-endpoint="{{ url_for('team.rename_group', group_id=g.groupID) }}"
+                               data-original="{{ g.name }}"
+                               title="Click to rename — saves on Enter or when you click away">
+                        <span class="tm-saved" data-indicator></span>
+                    </td>
+                    <td class="text-sm" style="padding: 8px 10px; color: var(--text-primary);">{{ g.memberCount }}</td>
+                    <td style="padding: 8px 10px;">
+                        {% if g.isActive %}
+                        <span class="badge badge-status-resolved">Active</span>
+                        {% else %}
+                        <span class="badge" style="border: 1px solid var(--danger-color); color: var(--danger-color);">Inactive</span>
+                        {% endif %}
+                    </td>
+                    <td style="padding: 8px 10px;">
+                        <form method="post" action="{{ url_for('team.toggle_group', group_id=g.groupID) }}" style="margin: 0;">
+                            <button type="submit" class="badge"
+                                    style="cursor: pointer; padding: 6px 12px; background: none; border: 1px solid {{ 'var(--danger-color); color: var(--danger-color)' if g.isActive else 'var(--accent-color); color: var(--accent-color)' }};">
+                                {{ 'Deactivate' if g.isActive else 'Activate' }}</button>
+                        </form>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="4" style="padding: 20px; text-align: center; color: var(--text-secondary);">
+                        No groups yet. Create one above, add members in the roster,
+                        then map it onto categories.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- ===================== Category routing ===================== -->
+    <div class="tm-card">
+        <h2 style="margin: 0 0 6px; font-size: 16px; color: var(--text-primary);">Category routing</h2>
+        <div class="text-sm" style="color: var(--text-secondary); margin-bottom: 12px;">
+            New tickets round-robin across a category's groups, then across
+            that group's active technicians. A category with no groups keeps
+            the plain all-technician rotation. Click a group to toggle it —
+            saves instantly.
+        </div>
+        <table style="width: 100%; border-collapse: collapse;">
+            <tbody>
+                {% for c in categories %}
+                <tr style="border-bottom: 1px solid var(--panel-border);">
+                    <td style="padding: 10px; color: var(--text-primary); white-space: nowrap; vertical-align: top; width: 1%;">
+                        {{ c.name }}
+                        {% if not c.isActive %}
+                        <span class="text-sm" style="color: var(--text-secondary);">(inactive)</span>
+                        {% endif %}
+                        <span class="tm-saved" data-indicator></span>
+                    </td>
+                    <td style="padding: 8px 10px;" data-chipset
+                        data-endpoint="{{ url_for('team.set_category_groups', category_id=c.categoryID) }}">
+                        {% for g in groups %}
+                        <button type="button"
+                                class="tm-chip {{ 'on' if g.groupID in c.groupIDs }} {{ 'inactive-group' if not g.isActive }}"
+                                data-gid="{{ g.groupID }}"
+                                {% if not g.isActive %}title="Inactive group — kept for existing routing but skipped by auto-assignment"{% endif %}>
+                            {{ g.name }}</button>
+                        {% else %}
+                        <span class="text-sm" style="color: var(--text-secondary);">No groups yet.</span>
+                        {% endfor %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- ===================== Roster + workload ===================== -->
 <div style="margin-top: 18px; border: 1px solid var(--panel-border); border-radius: 12px; overflow: hidden;">
     <table style="width: 100%; border-collapse: collapse;">
         <thead>
             <tr style="border-bottom: 1px solid var(--panel-border);">
-                {% for h in ['Member', 'Role', 'Status', 'Open load', 'In progress', 'Resolved / Closed', 'Last login'] %}
+                {% for h in ['Member', 'Role', 'Groups', 'Status', 'Open load', 'In progress', 'Resolved / Closed', 'Last login'] %}
                 <th class="text-sm" style="text-align: left; padding: 12px 16px; color: var(--text-secondary); font-weight: 500;">{{ h }}</th>
                 {% endfor %}
             </tr>
         </thead>
         <tbody>
             {% for m in members %}
-            <tr style="border-bottom: 1px solid var(--panel-border);">
+            <tr style="border-bottom: 1px solid var(--panel-border);"
+                data-member-row
+                data-endpoint="{{ url_for('team.set_member_groups', user_id=m.userID) }}"
+                data-name="{{ m.firstName }} {{ m.lastName }}"
+                data-gids="{{ m.groupIDs | join(',') }}">
                 <td style="padding: 12px 16px;">
                     <div style="color: var(--text-primary); font-weight: 500;">{{ m.firstName }} {{ m.lastName }}</div>
                     <div class="text-sm" style="color: var(--text-secondary);">{{ m.email }}</div>
                 </td>
                 <td class="text-sm" style="padding: 12px 16px; color: var(--text-primary);">{{ m.role }}</td>
+                <td style="padding: 12px 16px; min-width: 200px;">
+                    <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                        <span data-pills>
+                            {% for gid in m.groupIDs %}
+                            {% for g in groups if g.groupID == gid %}
+                            <span class="tm-pill">{{ g.name }}</span>
+                            {% endfor %}
+                            {% else %}
+                            <span class="text-sm" style="color: var(--text-secondary);">&mdash;</span>
+                            {% endfor %}
+                        </span>
+                        <button type="button" class="tm-edit-btn" data-edit-groups>Edit</button>
+                        <span class="tm-saved" data-indicator></span>
+                    </div>
+                </td>
                 <td style="padding: 12px 16px;">
                     {% if m.status == 'Active' %}
                     <span class="badge badge-status-resolved">Active</span>
@@ -56,12 +264,231 @@
             </tr>
             {% else %}
             <tr>
-                <td colspan="7" style="padding: 32px; text-align: center; color: var(--text-secondary);">
-                    No technicians or managers yet.
+                <td colspan="8" style="padding: 32px; text-align: center; color: var(--text-secondary);">
+                    No staff accounts yet.
                 </td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
 </div>
+
+<!-- ===================== Member groups modal ===================== -->
+<div class="tm-overlay" id="tm-overlay">
+    <div class="tm-modal" role="dialog" aria-modal="true" aria-labelledby="tm-modal-title">
+        <div class="tm-modal-head">
+            <div>
+                <div class="tm-modal-title" id="tm-modal-title">Edit groups</div>
+                <div class="tm-modal-sub">Changes save automatically.</div>
+            </div>
+            <span class="tm-saved" id="tm-modal-saved"></span>
+        </div>
+        <div class="tm-modal-body" id="tm-modal-body">
+            {% for g in groups %}
+            <label class="tm-opt">
+                <input type="checkbox" value="{{ g.groupID }}" data-gname="{{ g.name }}">
+                <span>{{ g.name }}</span>
+                {% if not g.isActive %}<span class="muted">(inactive)</span>{% endif %}
+            </label>
+            {% else %}
+            <div class="text-sm" style="color: var(--text-secondary); padding: 8px 0 14px;">
+                No groups exist yet — create one in the Groups panel first.
+            </div>
+            {% endfor %}
+        </div>
+        <div class="tm-modal-foot">
+            <span class="text-sm" style="color: var(--text-secondary);">Members receive auto-assigned tickets via their groups.</span>
+            <button type="button" class="tm-close" id="tm-modal-close">Done</button>
+        </div>
+    </div>
+</div>
+
+<script>
+(function () {
+    "use strict";
+
+    function flashIndicator(el, ok, msg) {
+        if (!el) return;
+        el.textContent = msg || (ok ? "Saved \u2713" : "Failed");
+        el.classList.toggle("err", !ok);
+        el.classList.add("show");
+        clearTimeout(el._t);
+        el._t = setTimeout(function () { el.classList.remove("show"); }, ok ? 1600 : 4000);
+    }
+
+    function post(endpoint, form) {
+        return fetch(endpoint, {
+            method: "POST",
+            body: form,
+            headers: { "X-Requested-With": "fetch" },
+            credentials: "same-origin"
+        }).then(function (r) {
+            return r.json().then(function (data) {
+                if (!r.ok || !data.ok) {
+                    throw new Error(data.error || ("HTTP " + r.status));
+                }
+                return data;
+            });
+        });
+    }
+
+    /* ---- Category routing: toggle chips, auto-save the full set ---- */
+    document.querySelectorAll("[data-chipset]").forEach(function (cell) {
+        var indicator = cell.parentElement.querySelector("[data-indicator]");
+        cell.addEventListener("click", function (ev) {
+            var chip = ev.target.closest(".tm-chip");
+            if (!chip) return;
+            chip.classList.toggle("on");
+            var chips = cell.querySelectorAll(".tm-chip");
+            chips.forEach(function (c) { c.disabled = true; });
+            var form = new FormData();
+            cell.querySelectorAll(".tm-chip.on").forEach(function (c) {
+                form.append("group_ids", c.dataset.gid);
+            });
+            post(cell.dataset.endpoint, form)
+                .then(function (data) {
+                    var onSet = {};
+                    data.groupIDs.forEach(function (id) { onSet[id] = true; });
+                    chips.forEach(function (c) {
+                        c.classList.toggle("on", !!onSet[c.dataset.gid]);
+                    });
+                    flashIndicator(indicator, true);
+                })
+                .catch(function (e) {
+                    chip.classList.toggle("on"); // revert optimistic toggle
+                    flashIndicator(indicator, false, e.message);
+                })
+                .finally(function () {
+                    chips.forEach(function (c) { c.disabled = false; });
+                });
+        });
+    });
+
+    /* ---- Group rename: auto-save on Enter / blur ---- */
+    document.querySelectorAll("[data-rename]").forEach(function (input) {
+        var indicator = input.parentElement.querySelector("[data-indicator]");
+        function save() {
+            var name = input.value.trim();
+            if (!name || name === input.dataset.original) {
+                input.value = input.dataset.original;
+                return;
+            }
+            input.disabled = true;
+            var form = new FormData();
+            form.append("name", name);
+            post(input.dataset.endpoint, form)
+                .then(function (data) {
+                    input.dataset.original = data.name;
+                    input.value = data.name;
+                    flashIndicator(indicator, true,
+                        data.unchanged ? "No change" : "Saved \u2713");
+                })
+                .catch(function (e) {
+                    input.value = input.dataset.original;
+                    flashIndicator(indicator, false, e.message);
+                })
+                .finally(function () { input.disabled = false; });
+        }
+        input.addEventListener("blur", save);
+        input.addEventListener("keydown", function (ev) {
+            if (ev.key === "Enter") { ev.preventDefault(); input.blur(); }
+            if (ev.key === "Escape") {
+                input.value = input.dataset.original;
+                input.blur();
+            }
+        });
+    });
+
+    /* ---- Member groups: modal with auto-saving checkboxes ---- */
+    var overlay = document.getElementById("tm-overlay");
+    var modalTitle = document.getElementById("tm-modal-title");
+    var modalSaved = document.getElementById("tm-modal-saved");
+    var modalBody = document.getElementById("tm-modal-body");
+    var activeRow = null;
+
+    function currentIDs(row) {
+        return row.dataset.gids ? row.dataset.gids.split(",").filter(Boolean) : [];
+    }
+
+    function renderPills(row, names) {
+        var span = row.querySelector("[data-pills]");
+        span.textContent = "";
+        if (!names.length) {
+            var dash = document.createElement("span");
+            dash.className = "text-sm";
+            dash.style.color = "var(--text-secondary)";
+            dash.textContent = "\u2014";
+            span.appendChild(dash);
+            return;
+        }
+        names.forEach(function (n) {
+            var pill = document.createElement("span");
+            pill.className = "tm-pill";
+            pill.textContent = n;
+            span.appendChild(pill);
+        });
+    }
+
+    function openModal(row) {
+        activeRow = row;
+        modalTitle.textContent = "Groups \u2014 " + row.dataset.name;
+        modalSaved.classList.remove("show");
+        var ids = currentIDs(row);
+        modalBody.querySelectorAll("input[type=checkbox]").forEach(function (cb) {
+            cb.checked = ids.indexOf(cb.value) !== -1;
+            cb.disabled = false;
+        });
+        overlay.classList.add("open");
+    }
+
+    function closeModal() {
+        overlay.classList.remove("open");
+        activeRow = null;
+    }
+
+    document.querySelectorAll("[data-member-row]").forEach(function (row) {
+        row.querySelector("[data-edit-groups]").addEventListener("click", function () {
+            openModal(row);
+        });
+    });
+
+    modalBody.addEventListener("change", function (ev) {
+        var cb = ev.target;
+        if (cb.type !== "checkbox" || !activeRow) return;
+        var row = activeRow;
+        var boxes = modalBody.querySelectorAll("input[type=checkbox]");
+        boxes.forEach(function (b) { b.disabled = true; });
+        var form = new FormData();
+        boxes.forEach(function (b) {
+            if (b.checked) form.append("group_ids", b.value);
+        });
+        var rowIndicator = row.querySelector("[data-indicator]");
+        post(row.dataset.endpoint, form)
+            .then(function (data) {
+                row.dataset.gids = data.groupIDs.join(",");
+                renderPills(row, data.names);
+                var onSet = {};
+                data.groupIDs.forEach(function (id) { onSet[id] = true; });
+                boxes.forEach(function (b) { b.checked = !!onSet[b.value]; });
+                flashIndicator(modalSaved, true);
+                flashIndicator(rowIndicator, true);
+            })
+            .catch(function (e) {
+                cb.checked = !cb.checked; // revert
+                flashIndicator(modalSaved, false, e.message);
+            })
+            .finally(function () {
+                boxes.forEach(function (b) { b.disabled = false; });
+            });
+    });
+
+    document.getElementById("tm-modal-close").addEventListener("click", closeModal);
+    overlay.addEventListener("click", function (ev) {
+        if (ev.target === overlay) closeModal();
+    });
+    document.addEventListener("keydown", function (ev) {
+        if (ev.key === "Escape" && overlay.classList.contains("open")) closeModal();
+    });
+})();
+</script>
 {% endblock %}

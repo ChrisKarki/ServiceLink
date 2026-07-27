@@ -36,7 +36,7 @@ from ..db import get_connection, query_all
 # letting MariaDB truncate an out-of-domain value into garbage.
 ENTITY_TYPES = ("Ticket", "Resource", "User", "KBArticle",
                 "TicketComment", "TicketResource", "Category", "SLAPolicy",
-                "SystemSetting", "TicketAttachment")
+                "SystemSetting", "TicketAttachment", "TechGroup")
 ACTIONS = {"Create", "Update", "Delete", "Link", "Unlink"}
 
 
@@ -171,7 +171,9 @@ FIELD_LABELS = {
     "assignedToUserID": "Assigned to", "assignedUserID": "Assigned to",
     "submittedByUserID": "Submitted by", "authorUserID": "Author",
     "categoryID": "Category", "linkedKBArticleID": "Resolution article",
-    "resourceID": "Resource", "status": "Status", "priority": "Priority",
+    "resourceID": "Resource", "assignedGroupID": "Group",
+    "groupID": "Group", "members": "Members", "groups": "Groups",
+    "status": "Status", "priority": "Priority",
     "location": "Location", "title": "Title", "name": "Name", "role": "Role",
     "isActive": "Active", "resourceTag": "Resource tag", "type": "Type",
     "make": "Make", "model": "Model", "serialNumber": "Serial number",
@@ -189,7 +191,7 @@ _VERBS = {"Create": "created", "Update": "updated", "Delete": "deleted",
 
 _NOUNS = {"Ticket": "ticket", "Resource": "resource", "User": "account",
           "Category": "category", "SLAPolicy": "SLA policy",
-          "KBArticle": "article"}
+          "KBArticle": "article", "TechGroup": "group"}
 
 
 def _pretty_field(name):
@@ -246,7 +248,8 @@ def attach_changes(history, noun=None):
             by_log.setdefault(r["logID"], []).append(r)
 
     # -- collect referenced IDs, one pass ------------------------------
-    want = {"user": set(), "cat": set(), "kb": set(), "res": set()}
+    want = {"user": set(), "cat": set(), "kb": set(), "res": set(),
+            "grp": set()}
     for rows in by_log.values():
         for r in rows:
             f = r["fieldName"].split(".")[-1]
@@ -261,6 +264,8 @@ def attach_changes(history, noun=None):
                     want["kb"].add(int(v))
                 elif f == "resourceID":
                     want["res"].add(int(v))
+                elif f in ("assignedGroupID", "groupID"):
+                    want["grp"].add(int(v))
 
     labels = {
         "user": _load_labels(want["user"],
@@ -275,6 +280,9 @@ def attach_changes(history, noun=None):
         "res": _load_labels(want["res"],
             "SELECT resourceID AS id, resourceTag AS label"
             "  FROM Resource WHERE resourceID IN ({ph})"),
+        "grp": _load_labels(want["grp"],
+            "SELECT groupID AS id, name AS label"
+            "  FROM TechGroup WHERE groupID IN ({ph})"),
     }
 
     def _display(field, v):
@@ -291,6 +299,8 @@ def attach_changes(history, noun=None):
                 return labels["kb"].get(i, f"article #{i}")
             if f == "resourceID":
                 return labels["res"].get(i, f"resource #{i}")
+            if f in ("assignedGroupID", "groupID"):
+                return labels["grp"].get(i, f"group #{i}")
         return _pretty_value(v)
 
     for h in history:

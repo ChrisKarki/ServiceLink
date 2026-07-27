@@ -118,11 +118,13 @@ PRIORITY_BADGES = {
 _TICKET_SELECT = (
     "SELECT t.*, c.name AS categoryName,"
     "       CONCAT(s.firstName, ' ', s.lastName) AS submitterName,"
-    "       CONCAT(a.firstName, ' ', a.lastName) AS assigneeName"
+    "       CONCAT(a.firstName, ' ', a.lastName) AS assigneeName,"
+    "       g.name AS groupName"
     "  FROM Ticket t"
     "  JOIN Category c ON c.categoryID = t.categoryID"
     "  JOIN User s     ON s.userID = t.submittedByUserID"
-    "  LEFT JOIN User a ON a.userID = t.assignedToUserID")
+    "  LEFT JOIN User a ON a.userID = t.assignedToUserID"
+    "  LEFT JOIN TechGroup g ON g.groupID = t.assignedGroupID")
 
 
 @bp.get("/health")
@@ -242,16 +244,48 @@ def _auto_assign(ticket_id, category_id, title, priority):
 
     Returns the assignee's display name, or None on AF-1.
     """
-    tech = query_one(
+    # Group-level rotation first (FR-2.3 + groups): among ACTIVE groups
+    # mapped to this category that hold at least one active Technician,
+    # pick the group whose most recent assignment in this category is
+    # oldest. Same never-assigned-sorts-first rule as the technician
+    # rotation, so no rotation pointer is stored at either level.
+    group = query_one(
+        "SELECT g.groupID, g.name,"
+        "       (SELECT MAX(t.createdAt) FROM Ticket t"
+        "         WHERE t.assignedGroupID = g.groupID"
+        "           AND t.categoryID = %s) AS lastAssigned"
+        "  FROM CategoryGroup cg"
+        "  JOIN TechGroup g ON g.groupID = cg.groupID AND g.isActive = TRUE"
+        " WHERE cg.categoryID = %s"
+        "   AND EXISTS (SELECT 1 FROM TechGroupMember m"
+        "                 JOIN User u ON u.userID = m.userID"
+        "                WHERE m.groupID = g.groupID"
+        "                  AND u.role = 'Technician'"
+        "                  AND u.status = 'Active')"
+        " ORDER BY COALESCE(lastAssigned, '1970-01-01') ASC, g.groupID ASC"
+        " LIMIT 1",
+        (category_id, category_id))
+    group_id = group["groupID"] if group else None
+
+    # Technician rotation: inside the chosen group when one exists;
+    # otherwise the original any-active-Technician rotation (categories
+    # with no group mapping keep the pre-group behaviour).
+    tech_sql = (
         "SELECT u.userID, CONCAT(u.firstName, ' ', u.lastName) AS name,"
         "       (SELECT MAX(t.createdAt) FROM Ticket t"
         "         WHERE t.assignedToUserID = u.userID"
         "           AND t.categoryID = %s) AS lastAssigned"
-        "  FROM User u"
-        " WHERE u.role = 'Technician' AND u.status = 'Active'"
-        " ORDER BY COALESCE(lastAssigned, '1970-01-01') ASC, u.userID ASC"
-        " LIMIT 1",
-        (category_id,))
+        "  FROM User u")
+    params = [category_id]
+    if group_id:
+        tech_sql += (" JOIN TechGroupMember m ON m.userID = u.userID"
+                     "  AND m.groupID = %s")
+        params.append(group_id)
+    tech_sql += (" WHERE u.role = 'Technician' AND u.status = 'Active'"
+                 " ORDER BY COALESCE(lastAssigned, '1970-01-01') ASC,"
+                 "          u.userID ASC"
+                 " LIMIT 1")
+    tech = query_one(tech_sql, tuple(params))
 
     if tech is None:
         # AF-1: unassigned queue (status stays New), Managers notified.
@@ -263,20 +297,23 @@ def _auto_assign(ticket_id, category_id, title, priority):
                    "technician is available. It is waiting in the unassigned queue.")
         return None
 
-    execute("UPDATE Ticket SET assignedToUserID = %s, status = 'Assigned'"
-            " WHERE ticketID = %s", (tech["userID"], ticket_id))
+    execute("UPDATE Ticket SET assignedToUserID = %s,"
+            "  assignedGroupID = %s, status = 'Assigned'"
+            " WHERE ticketID = %s", (tech["userID"], group_id, ticket_id))
 
     # System-triggered change; the submitter is recorded as the actor because
     # AuditLog.actorID is NOT NULL and the submission is what triggered it.
     log_action(session["user_id"], "Ticket", ticket_id, "Update",
                changes={"status": ("New", "Assigned"),
-                        "assignedToUserID": (None, tech["userID"])},
+                        "assignedToUserID": (None, tech["userID"]),
+                        "assignedGroupID": (None, group_id)},
                ip=request.remote_addr)
 
     notify(tech["userID"],
            f"Ticket #{ticket_id} assigned to you",
            f"'{title}' ({priority}) has been auto-assigned to you via "
-           "category rotation.")
+           + (f"the {group['name']} rotation." if group
+              else "category rotation."))
     return tech["name"]
 
 
@@ -300,9 +337,37 @@ _CHIP_CLAUSES = {
 }
 
 
+def _auto_close_expired():
+    """Resolved tickets close permanently once the reopen window lapses
+    (FR-2.2): Resolved + REOPEN_WINDOW_DAYS -> Closed. Run lazily on the
+    list and detail views rather than by a scheduler — at demo scale a
+    sweep on page load is exact enough, and it needs no systemd timer.
+    The viewer is the recorded actor, matching the P1.2/P2.2 convention
+    for system-detected changes."""
+    rows = query_all(
+        "SELECT ticketID, title, submittedByUserID, resolvedAt FROM Ticket"
+        " WHERE status = 'Resolved' AND resolvedAt IS NOT NULL"
+        "   AND resolvedAt < NOW() - INTERVAL %s DAY",
+        (REOPEN_WINDOW_DAYS,))
+    for r in rows:
+        execute("UPDATE Ticket SET status = 'Closed'"
+                " WHERE ticketID = %s AND status = 'Resolved'",
+                (r["ticketID"],))
+        log_action(session["user_id"], "Ticket", r["ticketID"], "Update",
+                   changes={"status": ("Resolved", "Closed")},
+                   ip=request.remote_addr)
+        notify(r["submittedByUserID"],
+               f"Ticket #{r['ticketID']} closed",
+               f"'{r['title']}' was resolved on "
+               f"{r['resolvedAt']:%b %d, %Y} and has been closed "
+               f"automatically after the {REOPEN_WINDOW_DAYS}-day reopen "
+               "window. If the issue returns, please submit a new ticket.")
+
+
 @bp.get("/tickets")
 @login_required
 def list_tickets():
+    _auto_close_expired()
     role, uid = session["role"], session["user_id"]
     view = request.args.get("view", "open")
     view = view if view in _CHIP_CLAUSES else "open"
@@ -395,6 +460,7 @@ def _get_ticket_or_403(ticket_id):
 @bp.get("/tickets/<int:ticket_id>")
 @login_required
 def view_ticket(ticket_id):
+    _auto_close_expired()
     t = _get_ticket_or_403(ticket_id)
     _check_and_escalate_breach(t)   # on-request SLA check (§4.2)
     return _render_detail(t)
@@ -492,6 +558,9 @@ def _render_detail(t, status_code=200):
         can_reopen=can_reopen, reopen_days=REOPEN_WINDOW_DAYS,
         next_states=sorted(TRANSITIONS[t["status"]]),
         technicians=_active_technicians() if is_staff else [],
+        groups=_active_groups() if is_staff else [],
+        group_members=_group_members() if is_staff else {},
+        staff=_active_staff() if is_staff else [],
         categories=query_all("SELECT categoryID, name FROM Category"
                              " WHERE isActive = TRUE ORDER BY name"),
         priorities=PRIORITIES, statuses=list(STATUS_LABELS),
@@ -575,11 +644,47 @@ def _active_technicians():
         " WHERE role = 'Technician' AND status = 'Active' ORDER BY firstName")
 
 
+def _active_staff():
+    """Manual assignment pool: any active Technician, Manager, or
+    Administrator (the auto-rotation stays Technician-only)."""
+    return query_all(
+        "SELECT userID, CONCAT(firstName, ' ', lastName, ' (', role, ')')"
+        "       AS name"
+        "  FROM User"
+        " WHERE role IN ('Technician', 'Manager', 'Administrator')"
+        "   AND status = 'Active' ORDER BY firstName")
+
+
+def _active_groups():
+    return query_all("SELECT groupID, name FROM TechGroup"
+                     " WHERE isActive = TRUE ORDER BY name")
+
+
+def _group_members():
+    """{str(groupID): [{userID, name}, ...]} for the detail-page agent
+    picker. String keys because the dict is emitted with |tojson and read
+    back by JavaScript, where object keys are strings."""
+    rows = query_all(
+        "SELECT m.groupID, u.userID,"
+        "       CONCAT(u.firstName, ' ', u.lastName, ' (', u.role, ')')"
+        "       AS name"
+        "  FROM TechGroupMember m JOIN User u ON u.userID = m.userID"
+        " WHERE u.status = 'Active'"
+        "   AND u.role IN ('Technician', 'Manager', 'Administrator')"
+        " ORDER BY u.firstName")
+    out = {}
+    for r in rows:
+        out.setdefault(str(r["groupID"]), []).append(
+            {"userID": r["userID"], "name": r["name"]})
+    return out
+
+
 # ---------------------------------------------------------------------------
 # Properties panel (status / priority / assignee / category) — staff only
 # ---------------------------------------------------------------------------
 
-_PROP_FIELDS = ["status", "priority", "assignedToUserID", "categoryID"]
+_PROP_FIELDS = ["status", "priority", "assignedToUserID",
+                "assignedGroupID", "categoryID"]
 
 
 @bp.post("/tickets/<int:ticket_id>/properties")
@@ -597,10 +702,30 @@ def update_properties(ticket_id):
         flash("Invalid property values.", "error")
         return redirect(url_for("tickets.view_ticket", ticket_id=ticket_id))
     assignee = int(assignee_raw) if assignee_raw.isdigit() else None
-    if assignee and query_one("SELECT 1 AS x FROM User WHERE userID = %s"
-                              "   AND role = 'Technician' AND status = 'Active'",
-                              (assignee,)) is None:
-        flash("Assignee must be an active technician.", "error")
+    group_raw = request.form.get("assignedGroupID", "")
+    group_id = int(group_raw) if group_raw.isdigit() else None
+
+    # Manual assignment accepts any active staff member — Technician,
+    # Manager, or Administrator (the auto-rotation stays Technician-only).
+    if assignee and query_one(
+            "SELECT 1 AS x FROM User WHERE userID = %s"
+            "   AND role IN ('Technician', 'Manager', 'Administrator')"
+            "   AND status = 'Active'", (assignee,)) is None:
+        flash("Assignee must be an active Technician, Manager, or "
+              "Administrator.", "error")
+        return redirect(url_for("tickets.view_ticket", ticket_id=ticket_id))
+    if group_id and query_one(
+            "SELECT 1 AS x FROM TechGroup WHERE groupID = %s",
+            (group_id,)) is None:
+        flash("Unknown group.", "error")
+        return redirect(url_for("tickets.view_ticket", ticket_id=ticket_id))
+    # A chosen group constrains the agent list: the agent must belong to
+    # it. Assigning outside every group is done with Group = "No group".
+    if group_id and assignee and query_one(
+            "SELECT 1 AS x FROM TechGroupMember"
+            " WHERE groupID = %s AND userID = %s",
+            (group_id, assignee)) is None:
+        flash("That agent is not a member of the selected group.", "error")
         return redirect(url_for("tickets.view_ticket", ticket_id=ticket_id))
 
     # P1.4 (UC-02) — the server is the single source of truth for the legal
@@ -618,7 +743,8 @@ def update_properties(ticket_id):
         return redirect(url_for("tickets.view_ticket", ticket_id=ticket_id))
 
     after = {"status": status, "priority": priority,
-             "assignedToUserID": assignee, "categoryID": int(category_raw)}
+             "assignedToUserID": assignee, "assignedGroupID": group_id,
+             "categoryID": int(category_raw)}
     changes = diff_fields(before, after, _PROP_FIELDS)
     if not changes:
         flash("No changes to save.", "info")
@@ -634,9 +760,10 @@ def update_properties(ticket_id):
         resolved_at = None
 
     execute("UPDATE Ticket SET status=%s, priority=%s, assignedToUserID=%s,"
-            "  categoryID=%s, resolvedAt=%s WHERE ticketID=%s",
-            (status, priority, assignee, int(category_raw), resolved_at,
-             ticket_id))
+            "  assignedGroupID=%s, categoryID=%s, resolvedAt=%s"
+            " WHERE ticketID=%s",
+            (status, priority, assignee, group_id, int(category_raw),
+             resolved_at, ticket_id))
 
     log_action(session["user_id"], "Ticket", ticket_id, "Update",
                changes=changes, ip=request.remote_addr)
@@ -656,6 +783,19 @@ def update_properties(ticket_id):
         notify(before["submittedByUserID"],
                f"Ticket #{ticket_id} is now "
                f"{STATUS_LABELS[status]}",
+               f"'{before['title']}' moved from "
+               f"{STATUS_LABELS[before['status']]} to "
+               f"{STATUS_LABELS[status]} (updated by {session['name']}).")
+
+    # FR-2.5: the assigned agent also hears about status changes they did
+    # not make themselves (a Manager resolving, an Administrator reopening).
+    # Skipped when the assignment itself just changed — the "assigned to
+    # you" notification above already carries the news.
+    if ("status" in changes and assignee
+            and assignee != session["user_id"]
+            and "assignedToUserID" not in changes):
+        notify(assignee,
+               f"Ticket #{ticket_id} is now {STATUS_LABELS[status]}",
                f"'{before['title']}' moved from "
                f"{STATUS_LABELS[before['status']]} to "
                f"{STATUS_LABELS[status]} (updated by {session['name']}).")
@@ -690,7 +830,9 @@ def add_comment(ticket_id):
                changes={"commentID": (None, comment_id)},
                ip=request.remote_addr)
 
-    # Notify the other side of the conversation (never for internal notes).
+    # Public replies notify the other side of the conversation; internal
+    # notes notify the assigned agent (staff-to-staff channel, FR-2.4) —
+    # the submitter never hears about internal notes.
     if not is_internal:
         if session["role"] in STAFF and t["submittedByUserID"] != session["user_id"]:
             notify(t["submittedByUserID"], f"New reply on ticket #{ticket_id}",
@@ -698,6 +840,12 @@ def add_comment(ticket_id):
         elif session["role"] == "EndUser" and t["assignedToUserID"]:
             notify(t["assignedToUserID"], f"New reply on ticket #{ticket_id}",
                    f"{session['name']} replied to '{t['title']}'.")
+    elif (t["assignedToUserID"]
+          and t["assignedToUserID"] != session["user_id"]):
+        notify(t["assignedToUserID"],
+               f"New internal note on ticket #{ticket_id}",
+               f"{session['name']} added an internal note to "
+               f"'{t['title']}'.")
 
     flash("Internal note added." if is_internal else "Reply added.", "success")
     return redirect(url_for("tickets.view_ticket", ticket_id=ticket_id))
@@ -800,8 +948,30 @@ def escalate_ticket(ticket_id):
                changes={"escalation": (None, justification)},
                ip=request.remote_addr)
 
-    managers = query_all(
-        "SELECT userID FROM User WHERE role = 'Manager' AND status = 'Active'")
+    # Scope the escalation to the queue that owns the ticket: Managers who
+    # are members of the ticket's group, else Managers in any group mapped
+    # to its category, else (no groups configured) every active Manager.
+    managers = []
+    if t.get("assignedGroupID"):
+        managers = query_all(
+            "SELECT DISTINCT u.userID"
+            "  FROM TechGroupMember m JOIN User u ON u.userID = m.userID"
+            " WHERE m.groupID = %s"
+            "   AND u.role = 'Manager' AND u.status = 'Active'",
+            (t["assignedGroupID"],))
+    if not managers:
+        managers = query_all(
+            "SELECT DISTINCT u.userID"
+            "  FROM CategoryGroup cg"
+            "  JOIN TechGroupMember m ON m.groupID = cg.groupID"
+            "  JOIN User u ON u.userID = m.userID"
+            " WHERE cg.categoryID = %s"
+            "   AND u.role = 'Manager' AND u.status = 'Active'",
+            (t["categoryID"],))
+    if not managers:
+        managers = query_all(
+            "SELECT userID FROM User"
+            " WHERE role = 'Manager' AND status = 'Active'")
     for m in managers:
         if m["userID"] == session["user_id"]:
             continue   # don't notify a manager who escalated their own ticket
@@ -964,12 +1134,12 @@ def _age(dt):
     days = hours // 24
     return f"{days} day{'s' if days != 1 else ''} ago"
 
-
-
-# ---------------------------------------------------------------------------
-# Attachments (FR-2.1) — see services/attachments.py for the policy rationale
-# ---------------------------------------------------------------------------
-
+
+
+# ---------------------------------------------------------------------------
+# Attachments (FR-2.1) — see services/attachments.py for the policy rationale
+# ---------------------------------------------------------------------------
+
 def _attachments_for(ticket_id):
     rows = query_all(
         "SELECT a.attachmentID, a.originalName, a.storedName, a.mimeType,"
@@ -1029,87 +1199,87 @@ def _save_uploads(ticket_id, files):
     return saved, errors
 
 
-def _flash_upload_result(saved, errors):
-    if saved:
-        flash(f"Attached {len(saved)} file"
-              f"{'' if len(saved) == 1 else 's'}.", "success")
-    for problem in errors:
-        flash(problem, "error")
-
-
-@bp.post("/tickets/<int:ticket_id>/attachments")
-@login_required
-def upload_attachment(ticket_id):
-    """Add files to an existing ticket.
-
-    _get_ticket_or_403 applies the FR-5.1 scope, so an End User cannot
-    attach to a ticket they cannot see. Closed tickets are frozen — the
-    record of a finished ticket should not keep changing.
-    """
-    t = _get_ticket_or_403(ticket_id)
-    if t["status"] == "Closed":
-        flash("This ticket is closed; attachments can no longer be added.",
-              "error")
-        return redirect(url_for("tickets.view_ticket", ticket_id=ticket_id))
-
-    saved, errors = _save_uploads(ticket_id, request.files.getlist("attachments"))
-    if not saved and not errors:
-        flash("No file was selected.", "error")
-    _flash_upload_result(saved, errors)
-    return redirect(url_for("tickets.view_ticket", ticket_id=ticket_id))
-
-
-@bp.get("/tickets/<int:ticket_id>/attachments/<int:attachment_id>")
-@login_required
-def download_attachment(ticket_id, attachment_id):
-    """Serve a file through the application, never straight off the disk.
-
-    _get_ticket_or_403 runs FIRST: access to an attachment is exactly access
-    to its ticket (FR-5.1). The attachment row is then re-checked against
-    this ticket, so a valid id from someone else's ticket is a 404, not a
-    leak.
-    """
-    _get_ticket_or_403(ticket_id)
-    a = query_one(
-        "SELECT originalName, storedName, mimeType FROM TicketAttachment"
-        " WHERE attachmentID = %s AND ticketID = %s",
-        (attachment_id, ticket_id))
-    if a is None:
-        abort(404)
-
-    # Anything not on the inline allowlist is forced to download, so an
-    # uploaded file can never execute or render in this origin.
-    return send_from_directory(
-        attachments.upload_dir(current_app), a["storedName"],
-        mimetype=a["mimeType"],
-        as_attachment=not attachments.is_inline(a["mimeType"]),
-        download_name=a["originalName"])
-
-
-@bp.post("/tickets/<int:ticket_id>/attachments/<int:attachment_id>/delete")
-@login_required
-def delete_attachment(ticket_id, attachment_id):
-    """Remove an attachment. The uploader may remove their own; staff may
-    remove any. The row goes first — an orphaned file on disk is harmless,
-    an unreachable row is not."""
-    _get_ticket_or_403(ticket_id)
-    a = query_one(
-        "SELECT attachmentID, originalName, storedName, uploadedByID"
-        "  FROM TicketAttachment"
-        " WHERE attachmentID = %s AND ticketID = %s",
-        (attachment_id, ticket_id))
-    if a is None:
-        abort(404)
-    if (session["role"] not in STAFF
-            and a["uploadedByID"] != session["user_id"]):
-        abort(403)
-
-    execute("DELETE FROM TicketAttachment WHERE attachmentID = %s",
-            (attachment_id,))
-    attachments.remove(a["storedName"], attachments.upload_dir(current_app))
-    log_action(session["user_id"], "TicketAttachment", attachment_id, "Delete",
-               changes={"file": (a["originalName"], None)},
-               ip=request.remote_addr)
-    flash(f"Removed {a['originalName']}.", "success")
-    return redirect(url_for("tickets.view_ticket", ticket_id=ticket_id))
+def _flash_upload_result(saved, errors):
+    if saved:
+        flash(f"Attached {len(saved)} file"
+              f"{'' if len(saved) == 1 else 's'}.", "success")
+    for problem in errors:
+        flash(problem, "error")
+
+
+@bp.post("/tickets/<int:ticket_id>/attachments")
+@login_required
+def upload_attachment(ticket_id):
+    """Add files to an existing ticket.
+
+    _get_ticket_or_403 applies the FR-5.1 scope, so an End User cannot
+    attach to a ticket they cannot see. Closed tickets are frozen — the
+    record of a finished ticket should not keep changing.
+    """
+    t = _get_ticket_or_403(ticket_id)
+    if t["status"] == "Closed":
+        flash("This ticket is closed; attachments can no longer be added.",
+              "error")
+        return redirect(url_for("tickets.view_ticket", ticket_id=ticket_id))
+
+    saved, errors = _save_uploads(ticket_id, request.files.getlist("attachments"))
+    if not saved and not errors:
+        flash("No file was selected.", "error")
+    _flash_upload_result(saved, errors)
+    return redirect(url_for("tickets.view_ticket", ticket_id=ticket_id))
+
+
+@bp.get("/tickets/<int:ticket_id>/attachments/<int:attachment_id>")
+@login_required
+def download_attachment(ticket_id, attachment_id):
+    """Serve a file through the application, never straight off the disk.
+
+    _get_ticket_or_403 runs FIRST: access to an attachment is exactly access
+    to its ticket (FR-5.1). The attachment row is then re-checked against
+    this ticket, so a valid id from someone else's ticket is a 404, not a
+    leak.
+    """
+    _get_ticket_or_403(ticket_id)
+    a = query_one(
+        "SELECT originalName, storedName, mimeType FROM TicketAttachment"
+        " WHERE attachmentID = %s AND ticketID = %s",
+        (attachment_id, ticket_id))
+    if a is None:
+        abort(404)
+
+    # Anything not on the inline allowlist is forced to download, so an
+    # uploaded file can never execute or render in this origin.
+    return send_from_directory(
+        attachments.upload_dir(current_app), a["storedName"],
+        mimetype=a["mimeType"],
+        as_attachment=not attachments.is_inline(a["mimeType"]),
+        download_name=a["originalName"])
+
+
+@bp.post("/tickets/<int:ticket_id>/attachments/<int:attachment_id>/delete")
+@login_required
+def delete_attachment(ticket_id, attachment_id):
+    """Remove an attachment. The uploader may remove their own; staff may
+    remove any. The row goes first — an orphaned file on disk is harmless,
+    an unreachable row is not."""
+    _get_ticket_or_403(ticket_id)
+    a = query_one(
+        "SELECT attachmentID, originalName, storedName, uploadedByID"
+        "  FROM TicketAttachment"
+        " WHERE attachmentID = %s AND ticketID = %s",
+        (attachment_id, ticket_id))
+    if a is None:
+        abort(404)
+    if (session["role"] not in STAFF
+            and a["uploadedByID"] != session["user_id"]):
+        abort(403)
+
+    execute("DELETE FROM TicketAttachment WHERE attachmentID = %s",
+            (attachment_id,))
+    attachments.remove(a["storedName"], attachments.upload_dir(current_app))
+    log_action(session["user_id"], "TicketAttachment", attachment_id, "Delete",
+               changes={"file": (a["originalName"], None)},
+               ip=request.remote_addr)
+    flash(f"Removed {a['originalName']}.", "success")
+    return redirect(url_for("tickets.view_ticket", ticket_id=ticket_id))
 

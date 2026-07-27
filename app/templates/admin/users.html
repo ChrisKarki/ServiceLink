@@ -60,8 +60,15 @@
                     <span style="color: var(--text-primary);">{{ u.role }}</span>
                     {% else %}
                     <form method="post" action="{{ url_for('admin.change_role', user_id=u.userID) }}" style="margin: 0;">
+                        {# The confirm lives in confirmRoleChange() below. The
+                           previous inline handler embedded |tojson output —
+                           double-quoted — inside a double-quoted onchange
+                           attribute, which truncated the attribute and made
+                           the handler a no-op: the form never submitted. #}
                         <select name="role" class="search-input" style="width: 140px; padding: 6px 8px;"
-                                onchange="if (confirm('Change ' + {{ (u.firstName ~ ' ' ~ u.lastName) | tojson }} + '\'s role to ' + this.value + '?')) { this.form.submit(); } else { this.selectedIndex = {{ roles.index(u.role) }}; }">
+                                data-name="{{ u.firstName }} {{ u.lastName }}"
+                                data-current="{{ u.role }}"
+                                onchange="confirmRoleChange(this)">
                             {% for r in roles %}
                             <option value="{{ r }}" {% if u.role == r %}selected{% endif %}>{{ r }}</option>
                             {% endfor %}
@@ -110,4 +117,13 @@
         </tbody>
     </table>
 </div>
+<script>
+    function confirmRoleChange(sel) {
+        if (confirm("Change " + sel.dataset.name + "'s role to " + sel.value + "?")) {
+            sel.form.submit();
+        } else {
+            sel.value = sel.dataset.current;
+        }
+    }
+</script>
 {% endblock %}
