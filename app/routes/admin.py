@@ -415,7 +415,8 @@ def update_sla(priority):
 
 AUDIT_ENTITY_TYPES = ("Ticket", "Resource", "User", "KBArticle",
                       "TicketComment", "TicketResource",
-                      "Category", "SLAPolicy")
+                      "Category", "SLAPolicy", "SystemSetting",
+                      "TicketAttachment", "TechGroup")
 AUDIT_ACTIONS = ("Create", "Update", "Delete", "Link", "Unlink")
 AUDIT_PER_PAGE = 50
 

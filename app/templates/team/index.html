@@ -6,7 +6,7 @@
     <div>
         <h1 style="margin: 0; color: var(--text-primary); font-size: 22px;">Team</h1>
         <div class="text-sm" style="color: var(--text-secondary); margin-top: 4px;">
-            Technician and manager workload (C3.2). Account changes live in Administration.
+            Groups, category routing, and workload (C3.2). Account changes live in Administration.
         </div>
     </div>
     {% if unassigned_open %}
@@ -16,11 +16,121 @@
     {% endif %}
 </div>
 
+<!-- ===================== Groups ===================== -->
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 18px; align-items: start;">
+    <div style="border: 1px solid var(--panel-border); border-radius: 12px; padding: 16px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+            <h2 style="margin: 0; font-size: 16px; color: var(--text-primary);">Groups</h2>
+        </div>
+        <form method="post" action="{{ url_for('team.create_group') }}"
+              style="display: flex; gap: 8px; margin-bottom: 14px;">
+            <input type="text" name="name" maxlength="80" required class="search-input"
+                   placeholder="New group (e.g. Tier 1, Network, Cybersecurity)"
+                   style="flex: 1; padding: 8px 12px;">
+            <button type="submit" class="btn btn-primary" style="padding: 8px 16px;">Create</button>
+        </form>
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="border-bottom: 1px solid var(--panel-border);">
+                    {% for h in ['Group', 'Members', 'Status', ''] %}
+                    <th class="text-sm" style="text-align: left; padding: 8px 10px; color: var(--text-secondary); font-weight: 500;">{{ h }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for g in groups %}
+                <tr style="border-bottom: 1px solid var(--panel-border);">
+                    <td style="padding: 8px 10px;">
+                        <form method="post" action="{{ url_for('team.rename_group', group_id=g.groupID) }}"
+                              style="margin: 0; display: flex; gap: 6px;">
+                            <input type="text" name="name" value="{{ g.name }}" maxlength="80" required
+                                   class="search-input" style="width: 160px; padding: 6px 8px;">
+                            <button type="submit" class="badge" title="Rename"
+                                    style="cursor: pointer; padding: 6px 10px; background: none; border: 1px solid var(--panel-border); color: var(--text-secondary);">Save</button>
+                        </form>
+                    </td>
+                    <td class="text-sm" style="padding: 8px 10px; color: var(--text-primary);">{{ g.memberCount }}</td>
+                    <td style="padding: 8px 10px;">
+                        {% if g.isActive %}
+                        <span class="badge badge-status-resolved">Active</span>
+                        {% else %}
+                        <span class="badge" style="border: 1px solid var(--danger-color); color: var(--danger-color);">Inactive</span>
+                        {% endif %}
+                    </td>
+                    <td style="padding: 8px 10px;">
+                        <form method="post" action="{{ url_for('team.toggle_group', group_id=g.groupID) }}" style="margin: 0;">
+                            <button type="submit" class="badge"
+                                    style="cursor: pointer; padding: 6px 12px; background: none; border: 1px solid {{ 'var(--danger-color); color: var(--danger-color)' if g.isActive else 'var(--accent-color); color: var(--accent-color)' }};">
+                                {{ 'Deactivate' if g.isActive else 'Activate' }}</button>
+                        </form>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="4" style="padding: 20px; text-align: center; color: var(--text-secondary);">
+                        No groups yet. Create one above, add members in the roster,
+                        then map it onto categories.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- ===================== Category routing ===================== -->
+    <div style="border: 1px solid var(--panel-border); border-radius: 12px; padding: 16px;">
+        <h2 style="margin: 0 0 6px; font-size: 16px; color: var(--text-primary);">Category routing</h2>
+        <div class="text-sm" style="color: var(--text-secondary); margin-bottom: 12px;">
+            New tickets round-robin across a category's groups, then across
+            that group's active technicians. A category with no groups keeps
+            the plain all-technician rotation.
+        </div>
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="border-bottom: 1px solid var(--panel-border);">
+                    {% for h in ['Category', 'Groups', ''] %}
+                    <th class="text-sm" style="text-align: left; padding: 8px 10px; color: var(--text-secondary); font-weight: 500;">{{ h }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for c in categories %}
+                <tr style="border-bottom: 1px solid var(--panel-border);">
+                    <td style="padding: 8px 10px; color: var(--text-primary);">
+                        {{ c.name }}
+                        {% if not c.isActive %}
+                        <span class="text-sm" style="color: var(--text-secondary);">(inactive)</span>
+                        {% endif %}
+                    </td>
+                    <td style="padding: 8px 10px;" colspan="2">
+                        <form method="post" action="{{ url_for('team.set_category_groups', category_id=c.categoryID) }}"
+                              style="margin: 0; display: flex; gap: 6px; align-items: flex-start;">
+                            <select name="group_ids" multiple size="{{ [groups|length, 3]|min if groups else 1 }}"
+                                    class="search-input" style="flex: 1; padding: 6px 8px;">
+                                {% for g in groups %}
+                                <option value="{{ g.groupID }}" {% if g.groupID in c.groupIDs %}selected{% endif %}>{{ g.name }}</option>
+                                {% endfor %}
+                            </select>
+                            <button type="submit" class="badge"
+                                    style="cursor: pointer; padding: 6px 12px; background: none; border: 1px solid var(--accent-color); color: var(--accent-color);">Save</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div class="text-sm" style="color: var(--text-secondary); margin-top: 10px;">
+            Hold Ctrl (Cmd on Mac) to select multiple groups.
+        </div>
+    </div>
+</div>
+
+<!-- ===================== Roster + workload ===================== -->
 <div style="margin-top: 18px; border: 1px solid var(--panel-border); border-radius: 12px; overflow: hidden;">
     <table style="width: 100%; border-collapse: collapse;">
         <thead>
             <tr style="border-bottom: 1px solid var(--panel-border);">
-                {% for h in ['Member', 'Role', 'Status', 'Open load', 'In progress', 'Resolved / Closed', 'Last login'] %}
+                {% for h in ['Member', 'Role', 'Groups', 'Status', 'Open load', 'In progress', 'Resolved / Closed', 'Last login'] %}
                 <th class="text-sm" style="text-align: left; padding: 12px 16px; color: var(--text-secondary); font-weight: 500;">{{ h }}</th>
                 {% endfor %}
             </tr>
@@ -33,6 +143,19 @@
                     <div class="text-sm" style="color: var(--text-secondary);">{{ m.email }}</div>
                 </td>
                 <td class="text-sm" style="padding: 12px 16px; color: var(--text-primary);">{{ m.role }}</td>
+                <td style="padding: 12px 16px; min-width: 180px;">
+                    <form method="post" action="{{ url_for('team.set_member_groups', user_id=m.userID) }}"
+                          style="margin: 0; display: flex; gap: 6px; align-items: flex-start;">
+                        <select name="group_ids" multiple size="{{ [groups|length, 3]|min if groups else 1 }}"
+                                class="search-input" style="flex: 1; padding: 6px 8px;">
+                            {% for g in groups %}
+                            <option value="{{ g.groupID }}" {% if g.groupID in m.groupIDs %}selected{% endif %}>{{ g.name }}</option>
+                            {% endfor %}
+                        </select>
+                        <button type="submit" class="badge"
+                                style="cursor: pointer; padding: 6px 12px; background: none; border: 1px solid var(--accent-color); color: var(--accent-color);">Save</button>
+                    </form>
+                </td>
                 <td style="padding: 12px 16px;">
                     {% if m.status == 'Active' %}
                     <span class="badge badge-status-resolved">Active</span>
@@ -56,8 +179,8 @@
             </tr>
             {% else %}
             <tr>
-                <td colspan="7" style="padding: 32px; text-align: center; color: var(--text-secondary);">
-                    No technicians or managers yet.
+                <td colspan="8" style="padding: 32px; text-align: center; color: var(--text-secondary);">
+                    No staff accounts yet.
                 </td>
             </tr>
             {% endfor %}
