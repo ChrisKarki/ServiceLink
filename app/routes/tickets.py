@@ -190,39 +190,185 @@ def create_ticket():
                                    allowed_extensions=attachments.EXTENSION_LABEL,
                                    accept_attr=",".join(attachments.ALLOWED_EXTENSIONS)), 400
 
-        # UC-01 main flow: ticket is born in status New, audit-logged.
-        ticket_id = execute(
-            "INSERT INTO Ticket (title, description, categoryID, priority,"
-            "  status, submittedByUserID, createdAt)"
-            " VALUES (%s, %s, %s, %s, 'New', %s, NOW())",
-            (title, description, int(category_id), priority, session["user_id"]))
+        # EX-3 test affordance: debug-only trigger so the server-error path is
+        # reproducible without breaking the database. Same gating convention as
+        # MFA_EXEMPT_EMAILS — inert unless FLASK_DEBUG=1.
+        if current_app.debug and title.startswith("!!FORCE500"):
+            raise RuntimeError("Simulated server-side failure (TC-01 EX-3).")
 
-        log_action(session["user_id"], "Ticket", ticket_id, "Create",
-                   ip=request.remote_addr)
+        try:
+            # UC-01 main flow: ticket is born in status New, audit-logged.
+            ticket_id = execute(
+                "INSERT INTO Ticket (title, description, categoryID, priority,"
+                "  status, submittedByUserID, createdAt)"
+                " VALUES (%s, %s, %s, %s, 'New', %s, NOW())",
+                (title, description, int(category_id), priority,
+                 session["user_id"]))
 
-        # Files need the ticket to exist first (FK). Already validated above,
-        # so nothing here should fail.
-        saved, upload_errors = _save_uploads(ticket_id, pending)
-        for problem in upload_errors:
-            flash(problem, "error")
+            log_action(session["user_id"], "Ticket", ticket_id, "Create",
+                       ip=request.remote_addr)
 
-        # P1.2 — hand the new ticket to the rotation.
-        assigned = _auto_assign(ticket_id, int(category_id), title, priority)
+            # Files need the ticket to exist first (FK). Already validated
+            # above, so nothing here should fail.
+            saved, upload_errors = _save_uploads(ticket_id, pending)
+            for problem in upload_errors:
+                flash(problem, "error")
+
+            # P1.2 — hand the new ticket to the rotation.
+            assigned = _auto_assign(ticket_id, int(category_id), title,
+                                    priority)
+        except Exception:
+            # EX-3: any server-side failure during creation returns the user to
+            # their form with every field intact rather than a bare 500 page.
+            current_app.logger.exception(
+                "Ticket creation failed for user %s", session.get("user_id"))
+            flash("Something went wrong on our end and the ticket was not "
+                  "created. Your details have been kept — please try again.",
+                  "error")
+            return render_template(
+                "tickets/new.html", categories=categories,
+                priorities=PRIORITIES, form=request.form, errors={},
+                max_upload_label=attachments.MAX_MB_LABEL,
+                allowed_extensions=attachments.EXTENSION_LABEL,
+                accept_attr=",".join(attachments.ALLOWED_EXTENSIONS)), 500
+
+        # The draft has become a real ticket -- it no longer has a reason
+        # to exist. Scoped to the owner so a forged draft_id cannot
+        # delete someone else's row.
+        submitted_draft = request.form.get("draft_id", "").strip()
+        if submitted_draft.isdigit():
+            execute("DELETE FROM TicketDraft WHERE draftID = %s"
+                    "   AND userID = %s",
+                    (int(submitted_draft), session["user_id"]))
+
+        # FR-2.4: submitter receives a confirmation for their own ticket. This
+        # is the one notification that is deliberately NOT self-skipped — the
+        # submitter is the intended recipient.
+        notify(session["user_id"],
+               f"Ticket #{ticket_id} received: {title}",
+               f"We have received your {priority.lower()}-priority request "
+               f"'{title}'. "
+               + (f"It has been assigned to {assigned} and you will be "
+                  "notified as it progresses."
+                  if assigned else
+                  "It is waiting in the unassigned queue and will be routed "
+                  "to a technician shortly.")
+               + " You can track its status under My Tickets.")
 
         if assigned:
-            flash(f"Ticket #{ticket_id} created and assigned to {assigned}.", "success")
+            flash(f"Ticket #{ticket_id} created and assigned to {assigned}.",
+                  "success")
         else:
             # AF-1: valid ticket, no route — it waits in the unassigned queue.
             flash(f"Ticket #{ticket_id} created. No technician is currently "
-                  "available; it has been placed in the unassigned queue.", "warning")
+                  "available; it has been placed in the unassigned queue.",
+                  "warning")
         return redirect(url_for("tickets.view_ticket", ticket_id=ticket_id))
 
+    # Resuming a saved draft prefills the form. Attachments are not carried:
+    # a browser file input cannot be repopulated programmatically, so files
+    # are always chosen at submit time.
+    prefill = {}
+    draft_raw = (request.args.get("draft") or "").strip()
+    if draft_raw.isdigit():
+        d = _draft_or_403(int(draft_raw), session["user_id"])
+        prefill = {"draft_id": d["draftID"], "title": d["title"] or "",
+                   "description": d["description"] or "",
+                   "category_id": d["categoryID"] or "",
+                   "priority": d["priority"] or ""}
+
     return render_template("tickets/new.html", categories=categories,
-                           priorities=PRIORITIES, form={}, errors={},
+                           priorities=PRIORITIES, form=prefill, errors={},
                            max_upload_label=attachments.MAX_MB_LABEL,
                            allowed_extensions=attachments.EXTENSION_LABEL,
                            accept_attr=",".join(attachments.ALLOWED_EXTENSIONS))
 
+# ---------------------------------------------------------------------------
+# Draft tickets (TC-01 AF-3)
+#
+# A draft is unsubmitted form data belonging to one user. It is not a Ticket:
+# no status, no assignee, no SLA timer, no audit entry. It exists only until
+# the user submits it or discards it.
+# ---------------------------------------------------------------------------
+
+# Cap drafts per user so an abandoned form can't accumulate junk rows.
+MAX_DRAFTS_PER_USER = 10
+
+
+def _drafts_for(user_id):
+    return query_all(
+        "SELECT d.draftID, d.title, d.description, d.categoryID, d.priority,"
+        "       d.updatedAt, c.name AS categoryName"
+        "  FROM TicketDraft d"
+        "  LEFT JOIN Category c ON c.categoryID = d.categoryID"
+        " WHERE d.userID = %s ORDER BY d.updatedAt DESC", (user_id,))
+
+
+def _draft_or_403(draft_id, user_id):
+    """A draft is only ever visible to its owner — no staff override."""
+    d = query_one("SELECT * FROM TicketDraft WHERE draftID = %s", (draft_id,))
+    if d is None:
+        abort(404)
+    if d["userID"] != user_id:
+        abort(403)
+    return d
+
+
+@bp.post("/tickets/drafts")
+@login_required
+def save_draft():
+    """Save or update a draft. Deliberately no validation beyond length and
+    the category/priority whitelists — a draft is by definition incomplete,
+    so requiring fields here would defeat the purpose."""
+    uid = session["user_id"]
+    draft_id = request.form.get("draft_id", "").strip()
+    title = request.form.get("title", "").strip()[:150]
+    description = request.form.get("description", "").strip()
+    category_raw = request.form.get("category_id", "").strip()
+    priority = request.form.get("priority", "").strip()
+
+    category_id = int(category_raw) if category_raw.isdigit() else None
+    if category_id is not None and not query_one(
+            "SELECT 1 FROM Category WHERE categoryID = %s AND isActive = TRUE",
+            (category_id,)):
+        category_id = None
+    priority = priority if priority in PRIORITIES else None
+
+    if not any([title, description, category_id, priority]):
+        flash("Nothing to save yet — fill in at least one field.", "warning")
+        return redirect(url_for("tickets.create_ticket"))
+
+    if draft_id.isdigit():
+        _draft_or_403(int(draft_id), uid)
+        execute("UPDATE TicketDraft SET title = %s, description = %s,"
+                "  categoryID = %s, priority = %s"
+                " WHERE draftID = %s AND userID = %s",
+                (title or None, description or None, category_id, priority,
+                 int(draft_id), uid))
+    else:
+        existing = query_one("SELECT COUNT(*) AS n FROM TicketDraft"
+                             " WHERE userID = %s", (uid,))
+        if existing and existing["n"] >= MAX_DRAFTS_PER_USER:
+            flash(f"You already have {MAX_DRAFTS_PER_USER} saved drafts. "
+                  "Submit or discard one before saving another.", "error")
+            return redirect(url_for("tickets.list_tickets"))
+        execute("INSERT INTO TicketDraft (userID, title, description,"
+                "  categoryID, priority) VALUES (%s, %s, %s, %s, %s)",
+                (uid, title or None, description or None, category_id,
+                 priority))
+
+    flash("Draft saved. You can finish it from My Tickets.", "success")
+    return redirect(url_for("tickets.list_tickets"))
+
+
+@bp.post("/tickets/drafts/<int:draft_id>/delete")
+@login_required
+def delete_draft(draft_id):
+    _draft_or_403(draft_id, session["user_id"])
+    execute("DELETE FROM TicketDraft WHERE draftID = %s AND userID = %s",
+            (draft_id, session["user_id"]))
+    flash("Draft discarded.", "success")
+    return redirect(url_for("tickets.list_tickets"))
 
 # ---------------------------------------------------------------------------
 # P1.2 — Round-robin auto-assignment (FR-2.3)
@@ -435,6 +581,7 @@ def list_tickets():
                              " WHERE isActive = TRUE ORDER BY name"),
         technicians=_active_technicians() if role != "EndUser" else [],
         priorities=PRIORITIES, status_labels=STATUS_LABELS,
+        drafts=_drafts_for(uid),
     )
 
 
@@ -579,9 +726,21 @@ def _sla_info(t):
                        "  FROM SLAPolicy WHERE priority = %s", (t["priority"],))
     if policy is None:
         return None
-    due = t["createdAt"] + timedelta(minutes=policy["resolutionTargetMins"])
+    # AF-1 — the deadline is pushed out by every minute the ticket has
+    # spent blocked on the end user. Closed pause spans are banked in
+    # slaPausedMins; an open span (slaPausedAt set) is added live, which
+    # makes the due date advance in step with the clock so the remaining
+    # time shown is frozen for as long as the ticket stays paused.
+    paused_at = t.get("slaPausedAt")
+    due = (t["createdAt"]
+           + timedelta(minutes=policy["resolutionTargetMins"])
+           + timedelta(minutes=t.get("slaPausedMins") or 0))
+    if paused_at is not None:
+        due += datetime.now() - paused_at
+
     info = {"due": due, "due_label": due.strftime("%a, %b %d %Y, %I:%M %p"),
-            "breached": bool(t["slaBreached"])}
+            "breached": bool(t["slaBreached"]),
+            "paused": paused_at is not None}
     if t["status"] in _SLA_CLOSED_STATES:
         info["state"] = "closed"
         info["timer"] = "Breached" if t["slaBreached"] else "Met"
@@ -590,6 +749,10 @@ def _sla_info(t):
         if remaining.total_seconds() <= 0:
             info["state"] = "overdue"
             info["timer"] = _span(-remaining) + " overdue"
+        elif paused_at is not None:
+            # Clock held: show what is banked, not a countdown.
+            info["state"] = "paused"
+            info["timer"] = _span(remaining) + " left — paused"
         else:
             info["state"] = "ok"
             info["timer"] = _span(remaining) + " left"
@@ -605,6 +768,11 @@ def _check_and_escalate_breach(t):
     `t` in place so the current render reflects the new flag. No SLAPolicy
     row for the priority → no deadline exists, so nothing to breach."""
     if t["status"] in _SLA_CLOSED_STATES or t["slaBreached"]:
+        return
+    # A paused ticket cannot breach: the deadline moves with the clock
+    # while slaPausedAt is set. Checked explicitly as well so the
+    # guarantee does not rest on the arithmetic alone.
+    if t.get("slaPausedAt") is not None:
         return
     info = _sla_info(t)
     if info is None or info["state"] != "overdue":
@@ -728,9 +896,23 @@ def update_properties(ticket_id):
         flash("That agent is not a member of the selected group.", "error")
         return redirect(url_for("tickets.view_ticket", ticket_id=ticket_id))
 
+    # AF-4 — release to the team queue. Clearing the agent is a distinct
+    # operation, not a status edit: a ticket with no owner belongs in the
+    # unassigned queue, which the Technician list scope defines as
+    # status='New' AND assignedToUserID IS NULL. Without this coercion the
+    # ticket keeps its old status, drops out of every technician's view,
+    # and is reachable only by a Manager. Resolved/Closed tickets are
+    # exempt — releasing a finished ticket should not reopen it.
+    released = (before["assignedToUserID"] is not None and assignee is None
+                and before["status"] not in _SLA_CLOSED_STATES)
+    if released:
+        status = "New"
+        group_id = None
+
     # P1.4 (UC-02) — the server is the single source of truth for the legal
     # six-state lifecycle, whatever the UI offered.
-    if status != before["status"] and status not in TRANSITIONS[before["status"]]:
+    if (not released and status != before["status"]
+            and status not in TRANSITIONS[before["status"]]):
         flash(f"Illegal status transition: "
               f"{STATUS_LABELS[before['status']]} → {STATUS_LABELS[status]}.",
               "error")
@@ -759,11 +941,25 @@ def update_properties(ticket_id):
             and before["status"] in ("Resolved", "Closed"):
         resolved_at = None
 
+    # AF-1 — SLA pause bookkeeping, same shape as the resolvedAt rules
+    # above. Entering WaitingOnUser opens a pause span; leaving it banks
+    # the elapsed minutes and closes the span. Resolved/Closed also close
+    # any open span so a ticket never sits paused forever.
+    paused_mins = before["slaPausedMins"] or 0
+    paused_at = before["slaPausedAt"]
+    if status == "WaitingOnUser" and before["status"] != "WaitingOnUser":
+        paused_at = datetime.now()
+    elif status != "WaitingOnUser" and paused_at is not None:
+        paused_mins += max(0, int(
+            (datetime.now() - paused_at).total_seconds() // 60))
+        paused_at = None
+
     execute("UPDATE Ticket SET status=%s, priority=%s, assignedToUserID=%s,"
-            "  assignedGroupID=%s, categoryID=%s, resolvedAt=%s"
+            "  assignedGroupID=%s, categoryID=%s, resolvedAt=%s,"
+            "  slaPausedMins=%s, slaPausedAt=%s"
             " WHERE ticketID=%s",
             (status, priority, assignee, group_id, int(category_raw),
-             resolved_at, ticket_id))
+             resolved_at, paused_mins, paused_at, ticket_id))
 
     log_action(session["user_id"], "Ticket", ticket_id, "Update",
                changes=changes, ip=request.remote_addr)
@@ -772,6 +968,16 @@ def update_properties(ticket_id):
         notify(assignee, f"Ticket #{ticket_id} assigned to you",
                f"'{before['title']}' was assigned to you by "
                f"{session['name']}.")
+    elif released:
+        # Mirrors the AF-1 unassigned-queue notification in _auto_assign:
+        # a ticket with no owner is a Manager's problem to route.
+        for m in query_all("SELECT userID FROM User"
+                           " WHERE role = 'Manager' AND status = 'Active'"):
+            notify(m["userID"],
+                   f"Ticket #{ticket_id} released to the unassigned queue",
+                   f"'{before['title']}' ({before['priority']}) was "
+                   f"released by {session['name']} and is waiting for "
+                   "reassignment.")
 
     # FR-2.5 registry row "Ticket status change -> submitter". Previously
     # documented but never wired: update_properties notified the new
