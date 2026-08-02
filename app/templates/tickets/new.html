@@ -15,161 +15,219 @@
         background-color: rgba(239, 68, 68, 0.05);
     }
 
-    /* The native dropdown list renders on the browser's own light popup, but
-       <option> inherits the select's light-on-dark colour, so the rows read as
-       white-on-white until hovered. Pin both ends to theme variables so the
-       list is legible in either theme. */
+    /* Native <option> rows render on the browser's own popup surface but
+       inherit the select's light-on-dark colour, so the list reads as
+       white-on-white until hovered. Pin both ends to theme variables. */
     .form-control option,
     .form-control optgroup {
         background-color: var(--card-tint);
         color: var(--text-primary);
     }
 
-    /* Submit stays disabled until every required field has a value (EX-1). */
     .btn-primary:disabled {
         opacity: 0.5;
         cursor: not-allowed;
+    }
+
+    .draft-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 0;
+        border-top: 1px solid var(--panel-border);
     }
 </style>
 {% endblock %}
 
 {% block content %}
 {# Context: categories (active only), priorities, form (posted values on
-validation failure — EX-1), errors (field → message).
-Only fields persisted by P1.1 appear here. Impact / sub-category /
-contact-method from the Phase 3 mock are dropped until they have
-columns — a field that silently discards input is worse than no field. #}
-<div class="flex-between mb-4">
-    <h1>Submit a New Request or Incident</h1>
-    <a href="{{ url_for('main.dashboard') }}" class="btn btn-secondary" style="text-decoration: none;">Cancel</a>
-</div>
+   validation failure — EX-1), errors (field → message).
+   Only fields persisted by P1.1 appear here. Impact / sub-category /
+   contact-method from the Phase 3 mock are dropped until they have
+   columns — a field that silently discards input is worse than no field. #}
+                    <div class="flex-between mb-4">
+                        <h1>Submit a New Request or Incident</h1>
+                        <a href="{{ url_for('main.dashboard') }}" class="btn btn-secondary"
+                            style="text-decoration: none;">Cancel</a>
+                    </div>
 
-{% if errors %}
-<div class="panel"
-    style="border-left: 4px solid var(--danger-color); background: rgba(239, 68, 68, 0.1); margin-bottom: 20px; padding: 16px;">
-    <div style="color: var(--danger-color); font-weight: 700; font-size: 14px; margin-bottom: 6px;">
-        Please correct the validation errors below:</div>
-    <ul style="margin: 0; padding-left: 20px; font-size: 13px; color: var(--text-primary);">
-        {% for field, msg in errors.items() %}
-        <li><strong>{{ field | replace('_id', '') | capitalize }}:</strong>
-            {{ msg if msg is string else msg | join('; ') }}</li>
-        {% endfor %}
-    </ul>
-</div>
-{% endif %}
+                    {% if errors %}
+                    <div class="panel"
+                        style="border-left: 4px solid var(--danger-color); background: rgba(239, 68, 68, 0.1); margin-bottom: 20px; padding: 16px;">
+                        <div style="color: var(--danger-color); font-weight: 700; font-size: 14px; margin-bottom: 6px;">
+                            Please correct the validation errors below:</div>
+                        <ul style="margin: 0; padding-left: 20px; font-size: 13px; color: var(--text-primary);">
+                            {% for field, msg in errors.items() %}
+                            <li><strong>{{ field | replace('_id', '') | capitalize }}:</strong>
+                                {{ msg if msg is string else msg | join('; ') }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
 
-<form method="post" action="{{ url_for('tickets.create_ticket') }}" enctype="multipart/form-data">
-    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px;">
-        <!-- Left: request details -->
-        <div class="panel">
-            <h2
-                style="font-size: 16px; border-bottom: 1px solid var(--panel-border); padding-bottom: 12px; margin-bottom: 20px;">
-                Request Details</h2>
+                    {# Saved drafts (TC-01 AF-3). Resuming reloads this page
+                       with ?draft=<id>, which prefills every field. #}
+                    {% if drafts %}
+                    <div class="panel" style="margin-bottom: 20px; padding: 16px;">
+                        <div style="font-weight: 700; font-size: 14px;">
+                            Your Saved Drafts ({{ drafts | length }})</div>
+                        {% for d in drafts %}
+                        <div class="draft-row">
+                            <div>
+                                <a href="{{ url_for('tickets.create_ticket', draft=d.draftID) }}"
+                                    style="font-weight: 600;">{{ d.title or 'Untitled draft' }}</a>
+                                <div class="text-sm" style="color: var(--text-secondary);">
+                                    {{ d.categoryName or 'No category' }} ·
+                                    {{ d.priority or 'No priority' }} ·
+                                    saved {{ d.updatedAt.strftime('%b %d, %I:%M %p') }}</div>
+                            </div>
+                            <button type="button" class="btn btn-secondary"
+                                style="padding: 4px 12px; font-size: 13px;"
+                                onclick="document.getElementById('discard-{{ d.draftID }}').submit();">Discard</button>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% for d in drafts %}
+                    <form method="post" id="discard-{{ d.draftID }}" style="display: none;"
+                        action="{{ url_for('tickets.delete_draft', draft_id=d.draftID) }}"></form>
+                    {% endfor %}
+                    {% endif %}
 
-            <div class="form-group">
-                <label class="form-label" for="title">Summary / Title *</label>
-                <input type="text" id="title" name="title" maxlength="150"
-                    class="form-control {% if errors.get('title') %}input-error{% endif %}"
-                    placeholder="Brief description of the issue or request" value="{{ form.get('title', '') }}">
-                {% if errors.get('title') %}
-                <div class="form-error-msg">{{ errors.get('title') }}</div>
-                {% endif %}
-            </div>
+                    <form method="post" id="ticket-form"
+                        action="{{ url_for('tickets.create_ticket') }}"
+                        enctype="multipart/form-data">
+                        {# Round-trips through validation failures so a resumed
+                           draft is still deleted on successful submission. #}
+                        <input type="hidden" name="draft_id"
+                            value="{{ form.get('draft_id', '') }}">
+                        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px;">
+                            <!-- Left: request details -->
+                            <div class="panel">
+                                <h2
+                                    style="font-size: 16px; border-bottom: 1px solid var(--panel-border); padding-bottom: 12px; margin-bottom: 20px;">
+                                    Request Details</h2>
 
-            <div class="form-group">
-                <label class="form-label" for="description">Detailed Description *</label>
-                <textarea id="description" name="description" rows="8"
-                    class="form-control {% if errors.get('description') %}input-error{% endif %}"
-                    placeholder="Please provide as much detail as possible. For incidents, include steps to reproduce, error messages, and what you were doing when it occurred.">{{ form.get('description', '') }}</textarea>
-                {% if errors.get('description') %}
-                <div class="form-error-msg">{{ errors.get('description') }}</div>
-                {% endif %}
-            </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="title">Summary / Title *</label>
+                                    <input type="text" id="title" name="title" maxlength="150"
+                                        class="form-control {% if errors.get('title') %}input-error{% endif %}"
+                                        placeholder="Brief description of the issue or request"
+                                        value="{{ form.get('title', '') }}">
+                                    {% if errors.get('title') %}
+                                    <div class="form-error-msg">{{ errors.get('title') }}</div>
+                                    {% endif %}
+                                </div>
 
-            <!-- Attachments (FR-2.1) — validated server-side in
+                                <div class="form-group">
+                                    <label class="form-label" for="description">Detailed Description *</label>
+                                    <textarea id="description" name="description" rows="8"
+                                        class="form-control {% if errors.get('description') %}input-error{% endif %}"
+                                        placeholder="Please provide as much detail as possible. For incidents, include steps to reproduce, error messages, and what you were doing when it occurred.">{{ form.get('description', '') }}</textarea>
+                                    {% if errors.get('description') %}
+                                    <div class="form-error-msg">{{ errors.get('description') }}</div>
+                                    {% endif %}
+                                </div>
+
+                                <!-- Attachments (FR-2.1) — validated server-side in
                                      services/attachments.py before the ticket row is
                                      written, so a rejected file re-renders this form
                                      with everything else intact (EX-1). -->
-            <div class="form-group" style="margin-bottom: 0;">
-                <label class="form-label" for="attachments">Attachments</label>
-                <div style="border: 2px dashed var(--panel-border); border-radius: 6px; padding: 16px;">
-                    <input type="file" id="attachments" name="attachments" multiple accept="{{ accept_attr }}"
-                        class="form-control {% if errors.get('attachments') %}input-error{% endif %}"
-                        style="border: none; padding: 0;">
-                    <div class="text-sm" style="color: var(--text-secondary); margin-top: 8px;">
-                        Up to {{ max_upload_label }} per file. Allowed:
-                        {{ allowed_extensions }}.</div>
-                </div>
-                {% if errors.get('attachments') %}
-                <div class="form-error-msg">{{ errors.get('attachments') | join('; ') }}</div>
-                {% endif %}
-            </div>
-        </div>
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label class="form-label" for="attachments">Attachments</label>
+                                    <div
+                                        style="border: 2px dashed var(--panel-border); border-radius: 6px; padding: 16px;">
+                                        <input type="file" id="attachments" name="attachments" multiple
+                                            accept="{{ accept_attr }}"
+                                            class="form-control {% if errors.get('attachments') %}input-error{% endif %}"
+                                            style="border: none; padding: 0;">
+                                        <div class="text-sm" style="color: var(--text-secondary); margin-top: 8px;">
+                                            Up to {{ max_upload_label }} per file. Allowed:
+                                            {{ allowed_extensions }}.</div>
+                                    </div>
+                                    {% if errors.get('attachments') %}
+                                    <div class="form-error-msg">{{ errors.get('attachments') | join('; ') }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
 
-        <!-- Right: classification -->
-        <div class="panel" style="height: fit-content;">
-            <h2
-                style="font-size: 16px; border-bottom: 1px solid var(--panel-border); padding-bottom: 12px; margin-bottom: 20px;">
-                Classification &amp; Impact</h2>
+                            <!-- Right: classification -->
+                            <div class="panel" style="height: fit-content;">
+                                <h2
+                                    style="font-size: 16px; border-bottom: 1px solid var(--panel-border); padding-bottom: 12px; margin-bottom: 20px;">
+                                    Classification &amp; Impact</h2>
 
-            <div class="form-group">
-                <label class="form-label" for="category_id">Category *</label>
-                <select id="category_id" name="category_id"
-                    class="form-control {% if errors.get('category_id') %}input-error{% endif %}">
-                    <option value="" disabled {% if not form.get('category_id') %}selected{% endif %}>
-                        Select Category...</option>
-                    {% for cat in categories %}
-                    <option value="{{ cat.categoryID }}" {% if form.get('category_id')|string==cat.categoryID|string
-                        %}selected{% endif %}>
-                        {{ cat.name }}</option>
-                    {% endfor %}
-                </select>
-                {% if errors.get('category_id') %}
-                <div class="form-error-msg">{{ errors.get('category_id') }}</div>
-                {% endif %}
-            </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="category_id">Category *</label>
+                                    <select id="category_id" name="category_id"
+                                        class="form-control {% if errors.get('category_id') %}input-error{% endif %}">
+                                        <option value="" disabled {% if not form.get('category_id') %}selected{% endif %}>
+                                            Select Category...</option>
+                                        {% for cat in categories %}
+                                        <option value="{{ cat.categoryID }}"
+                                            {% if form.get('category_id')|string == cat.categoryID|string %}selected{% endif %}>
+                                            {{ cat.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    {% if errors.get('category_id') %}
+                                    <div class="form-error-msg">{{ errors.get('category_id') }}</div>
+                                    {% endif %}
+                                </div>
 
-            <div class="form-group">
-                <label class="form-label" for="priority">Priority *</label>
-                <select id="priority" name="priority"
-                    class="form-control {% if errors.get('priority') %}input-error{% endif %}">
-                    <option value="" disabled {% if not form.get('priority') %}selected{% endif %}>Select Priority...
-                    </option>
-                    {% for p in priorities %}
-                    <option value="{{ p }}" {% if form.get('priority')==p %}selected{% endif %}>
-                        {{ p }}
-                        {%- if p == 'Low' %} — Workaround available
-                        {%- elif p == 'Medium' %} — Affects daily work
-                        {%- elif p == 'High' %} — Severe productivity impact
-                        {%- elif p == 'Critical' %} — Business halting / VIP{% endif %}</option>
-                    {% endfor %}
-                </select>
-                {% if errors.get('priority') %}
-                <div class="form-error-msg">{{ errors.get('priority') }}</div>
-                {% endif %}
-            </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="priority">Priority *</label>
+                                    <select id="priority" name="priority"
+                                        class="form-control {% if errors.get('priority') %}input-error{% endif %}">
+                                        <option value="" disabled
+                                            {% if not form.get('priority') %}selected{% endif %}>Select Priority...</option>
+                                        {% for p in priorities %}
+                                        <option value="{{ p }}" {% if form.get('priority') == p %}selected{% endif %}>
+                                            {{ p }}
+                                            {%- if p == 'Low' %} — Workaround available
+                                            {%- elif p == 'Medium' %} — Affects daily work
+                                            {%- elif p == 'High' %} — Severe productivity impact
+                                            {%- elif p == 'Critical' %} — Business halting / VIP{% endif %}</option>
+                                        {% endfor %}
+                                    </select>
+                                    {% if errors.get('priority') %}
+                                    <div class="form-error-msg">{{ errors.get('priority') }}</div>
+                                    {% endif %}
+                                </div>
 
-            <div class="card-box-tint"
-                style="background: var(--card-tint); border: 1px solid var(--panel-border); border-radius: 8px; padding: 14px 16px; margin-bottom: 20px;">
-                <span class="text-sm" style="color: var(--text-secondary);">
-                    Your ticket is routed automatically to the next available technician for the
-                    selected category. You'll be notified when it is assigned.</span>
-            </div>
+                                <div class="card-box-tint"
+                                    style="background: var(--card-tint); border: 1px solid var(--panel-border); border-radius: 8px; padding: 14px 16px; margin-bottom: 20px;">
+                                    <span class="text-sm" style="color: var(--text-secondary);">
+                                        Your ticket is routed automatically to the next available technician for the
+                                        selected category. You'll be notified when it is assigned.</span>
+                                </div>
 
-            <button type="submit" id="submit-ticket-btn" class="btn btn-primary" disabled
-                style="width: 100%; padding: 12px; font-size: 16px;">Submit Ticket</button>
-        </div>
-    </div>
-</form>
+                                <button type="submit" id="submit-ticket-btn"
+                                    class="btn btn-primary" disabled
+                                    style="width: 100%; padding: 12px; font-size: 16px;">Submit Ticket</button>
+
+                                {# formaction reuses this form against a different
+                                   endpoint; formnovalidate skips the required-field
+                                   checks, which is the entire point of a draft. #}
+                                <button type="submit" class="btn btn-secondary"
+                                    formaction="{{ url_for('tickets.save_draft') }}"
+                                    formnovalidate
+                                    formenctype="application/x-www-form-urlencoded"
+                                    style="width: 100%; padding: 10px; margin-top: 10px;">Save as Draft</button>
+                                <div class="text-sm"
+                                    style="color: var(--text-secondary); margin-top: 8px; text-align: center;">
+                                    Drafts are saved to your account. Attachments are
+                                    added when you submit.</div>
+                            </div>
+                        </div>
+                    </form>
 
 <script>
-    // EX-1: the Submit button is greyed out until all four required fields
-    // hold a value. Server-side validation in create_ticket() is unchanged and
-    // remains the authority — this only removes the guaranteed-to-fail click.
+    // EX-1: Submit stays disabled until all four required fields hold a
+    // value. Server-side validation in create_ticket() is unchanged and
+    // remains the authority — this only removes the guaranteed-to-fail
+    // click. Save as Draft is never disabled.
     (function () {
-        var form = document.querySelector('form[action*="tickets"]');
-        if (!form) { return; }
         var btn = document.getElementById('submit-ticket-btn');
+        if (!btn) { return; }
         var required = ['title', 'description', 'category_id', 'priority']
             .map(function (id) { return document.getElementById(id); })
             .filter(Boolean);

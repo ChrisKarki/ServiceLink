@@ -279,6 +279,7 @@ def create_ticket():
 
     return render_template("tickets/new.html", categories=categories,
                            priorities=PRIORITIES, form=prefill, errors={},
+                           drafts=_drafts_for(session["user_id"]),
                            max_upload_label=attachments.MAX_MB_LABEL,
                            allowed_extensions=attachments.EXTENSION_LABEL,
                            accept_attr=",".join(attachments.ALLOWED_EXTENSIONS))
