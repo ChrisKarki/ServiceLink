@@ -13,6 +13,51 @@
 
 <body>
 
+    <!-- Page navigation loader (NFR-P2 / UC-05 EX-1) -->
+    <style>
+        .page-loader {
+            position: fixed;
+            inset: 0;
+            z-index: 10000;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            background: var(--bg-primary, rgba(255, 255, 255, 0.96));
+            opacity: 0.96;
+        }
+        .page-loader.visible { display: flex; }
+        .page-loader .spinner {
+            width: 44px;
+            height: 44px;
+            border: 4px solid var(--panel-border, #e0e0e0);
+            border-top-color: var(--accent-color, #333);
+            border-radius: 50%;
+            animation: sl-spin 0.9s linear infinite;
+            will-change: transform;
+            transform: translateZ(0);
+        }
+        @keyframes sl-spin { to { transform: translateZ(0) rotate(360deg); } }
+        .page-loader .loader-msg {
+            color: var(--text-secondary, #666);
+            font-size: 14px;
+        }
+        .page-loader .loader-slow {
+            display: none;
+            color: var(--danger-color, #b00020);
+            font-size: 13px;
+            max-width: 320px;
+            text-align: center;
+        }
+        .page-loader.slow .loader-slow { display: block; }
+    </style>
+    <div class="page-loader" id="pageLoader" aria-hidden="true">
+        <div class="spinner"></div>
+        <div class="loader-msg">Loading&hellip;</div>
+        <div class="loader-slow">Still working &mdash; this is taking longer than expected. If nothing loads shortly, refresh the page.</div>
+    </div>
+
     <div class="toast-container" id="toastContainer"></div>
 
     <header class="topbar sidebar-minimized" id="topbar">
@@ -172,6 +217,39 @@
             document.getElementById('sidebar').classList.remove('minimized');
             document.getElementById('topbar').classList.remove('sidebar-minimized');
         }
+    </script>
+    <script>
+        (function () {
+            var loader = document.getElementById('pageLoader');
+            var showTimer = null, slowTimer = null;
+
+            function showLoader() {
+                if (showTimer || loader.classList.contains('visible')) return;
+                // 300ms grace period: fast navigations never see the spinner.
+                showTimer = setTimeout(function () {
+                    loader.classList.add('visible');
+                    loader.setAttribute('aria-hidden', 'false');
+                    // After 3s total (NFR-P2 target) flag the slow-connection state.
+                    slowTimer = setTimeout(function () {
+                        loader.classList.add('slow');
+                    }, 2700);
+                }, 300);
+            }
+
+            function hideLoader() {
+                clearTimeout(showTimer); clearTimeout(slowTimer);
+                showTimer = slowTimer = null;
+                loader.classList.remove('visible', 'slow');
+                loader.setAttribute('aria-hidden', 'true');
+            }
+
+            // Any full-page navigation: sidebar onclick handlers, link clicks,
+            // and standard form submits (filters, search, pagination).
+            window.addEventListener('beforeunload', showLoader);
+
+            // Back/forward-cache restores skip the load event; reset the loader.
+            window.addEventListener('pageshow', hideLoader);
+        })();
     </script>
     <script src="{{ url_for('static', filename='js/app.js') }}"></script>
     {% with messages = get_flashed_messages(with_categories=true) %}
