@@ -50,6 +50,8 @@ All mutations go through services.audit.log_action with ip=request.remote_addr
 abort(403), matching roles_required.
 """
 
+import re
+
 from flask import (Blueprint, abort, flash, redirect, render_template,
                    request, session, url_for)
 
@@ -159,6 +161,31 @@ _CHIP_CLAUSES = {
 }
 
 
+# AF-2: every surface labels articles "KB-6", so that is what users and
+# testers type into the search box. Text search alone never matched it.
+# Accepts "KB-6", "kb 6", "KB6", or a bare "6".
+_ID_QUERY = re.compile(r"^(?:KB[-\s]?)?(\d+)$", re.IGNORECASE)
+
+
+def _id_from_query(q):
+    m = _ID_QUERY.match((q or "").strip())
+    return int(m.group(1)) if m else None
+
+
+def _search_clause(q):
+    """Shared by the list page and the JSON picker so both accept the
+    same query forms. Returns (sql_fragment, params)."""
+    frag = (" AND (a.title LIKE %s OR a.body LIKE %s OR EXISTS"
+            "      (SELECT 1 FROM ArticleTag t"
+            "        WHERE t.articleID = a.articleID AND t.tag LIKE %s)")
+    params = [f"%{q}%"] * 3
+    qid = _id_from_query(q)
+    if qid is not None:
+        frag += " OR a.articleID = %s"
+        params.append(qid)
+    return frag + ")", params
+
+
 @bp.get("/kb")
 @login_required
 def list_articles():
@@ -181,13 +208,16 @@ def list_articles():
     # newest-created (covers drafts/pending which have no publishedAt).
     order = " ORDER BY COALESCE(a.publishedAt, a.createdAt) DESC"
     if q:
-        # FR-4.2: title/body/tag search; title hits rank first (NFR-P3).
-        sql += (" AND (a.title LIKE %s OR a.body LIKE %s OR EXISTS"
-                "      (SELECT 1 FROM ArticleTag t"
-                "        WHERE t.articleID = a.articleID AND t.tag LIKE %s))")
-        params.extend([f"%{q}%"] * 3)
-        order = (" ORDER BY (a.title LIKE %s) DESC,"
+        # FR-4.2: title/body/tag/ID search; exact ID and title hits rank
+        # first (NFR-P3).
+        frag, search_params = _search_clause(q)
+        sql += frag
+        params.extend(search_params)
+        qid = _id_from_query(q)
+        order = (" ORDER BY (a.articleID = %s) DESC,"
+                 " (a.title LIKE %s) DESC,"
                  " COALESCE(a.publishedAt, a.createdAt) DESC")
+        params.append(qid if qid is not None else 0)
         params.append(f"%{q}%")
 
     rows = query_all(sql + order + " LIMIT 100", tuple(params))
@@ -215,10 +245,9 @@ def search_articles():
     scope_sql, params = _scope_clause()
     sql = _ARTICLE_SELECT + " WHERE 1=1" + scope_sql
     if q:
-        sql += (" AND (a.title LIKE %s OR a.body LIKE %s OR EXISTS"
-                "      (SELECT 1 FROM ArticleTag t"
-                "        WHERE t.articleID = a.articleID AND t.tag LIKE %s))")
-        params.extend([f"%{q}%"] * 3)
+        frag, search_params = _search_clause(q)
+        sql += frag
+        params.extend(search_params)
 
     rows = query_all(sql + " ORDER BY a.status = 'Published' DESC,"
                      " COALESCE(a.publishedAt, a.createdAt) DESC LIMIT 20",
