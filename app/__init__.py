@@ -58,6 +58,11 @@ def create_app():
     app.register_blueprint(search_bp)
     app.register_blueprint(notifications_bp)
 
+
+    @app.errorhandler(404)
+    def not_found(_e):
+        return render_template("404.html"), 404
+    
     @app.errorhandler(403)
     def forbidden(_e):
         # Friendly page for authenticated users hitting a route their role
