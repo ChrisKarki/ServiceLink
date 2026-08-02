@@ -1,0 +1,120 @@
+{# Deliberately does NOT extend base.html.
+
+   base.html renders the notification bell, which queries the Notification
+   table on every request. A 500 caused by the database being unreachable
+   would make this page raise while handling the original error, and the user
+   would land on Werkzeug's bare white page anyway. Standalone means the
+   error page renders no matter what broke underneath it. For the same reason
+   there are no url_for() calls to blueprint views and no session reads —
+   only static assets, which are served off disk. #}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>500 — Server Error · ServiceLink</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <style>
+        .err-wrap {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            font-family: 'IBM Plex Sans', system-ui, sans-serif;
+        }
+
+        .err-card {
+            width: 100%;
+            max-width: 540px;
+            text-align: center;
+            border: 1px solid var(--panel-border, #2a2f37);
+            border-radius: 12px;
+            padding: 44px 36px;
+            background: var(--card-tint, transparent);
+        }
+
+        .err-logo {
+            height: 34px;
+            margin-bottom: 24px;
+            opacity: 0.9;
+        }
+
+        .err-code {
+            font-family: 'IBM Plex Mono', ui-monospace, monospace;
+            font-size: 58px;
+            font-weight: 600;
+            line-height: 1;
+            letter-spacing: -2px;
+            color: var(--danger-color, #ef4444);
+            margin-bottom: 16px;
+        }
+
+        .err-title {
+            font-size: 21px;
+            font-weight: 700;
+            color: var(--text-primary, #e6e8eb);
+            margin-bottom: 12px;
+        }
+
+        .err-message {
+            font-size: 14px;
+            line-height: 1.65;
+            color: var(--text-secondary, #9aa3ad);
+            margin-bottom: 26px;
+        }
+
+        .err-ref {
+            font-family: 'IBM Plex Mono', ui-monospace, monospace;
+            font-size: 12px;
+            color: var(--text-secondary, #9aa3ad);
+            border: 1px solid var(--panel-border, #2a2f37);
+            border-radius: 6px;
+            padding: 10px 12px;
+            margin-bottom: 26px;
+        }
+
+        .err-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .err-actions .btn {
+            text-decoration: none;
+            padding: 10px 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="err-wrap">
+        <div class="err-card">
+            <img class="err-logo" src="{{ url_for('static', filename='assets/logo.svg') }}"
+                alt="ServiceLink">
+            <div class="err-code">500</div>
+            <div class="err-title">A serious error occurred in the backend</div>
+            <div class="err-message">
+                ServiceLink could not complete your request. This is a fault on our
+                side, not something you did wrong, and nothing you submitted has
+                been saved. Please contact the developer so it can be investigated.
+            </div>
+
+            {% if reference %}
+            <div class="err-ref">Reference: {{ reference }}</div>
+            {% endif %}
+
+            <div class="err-actions">
+                <a href="/" class="btn btn-primary">Return to ServiceLink</a>
+                <a href="javascript:location.reload();" class="btn btn-secondary">Try Again</a>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

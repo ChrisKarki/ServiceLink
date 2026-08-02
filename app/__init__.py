@@ -6,6 +6,8 @@ the existing tickets/admin stubs.
 """
 
 import os
+from datetime import datetime
+from werkzeug.exceptions import HTTPException
 from datetime import timedelta
 
 from dotenv import load_dotenv
@@ -78,5 +80,28 @@ def create_app():
         flash(f"That upload is too large. Each file must be "
               f"{attachments.MAX_MB_LABEL} or smaller.", "error")
         return redirect(request.referrer or url_for("main.dashboard")), 302
+
+    @app.errorhandler(500)
+    def server_error(e):
+        # Standalone template on purpose: base.html queries the Notification
+        # table, so rendering it here would raise again if the database is
+        # what failed. The reference is the timestamp the traceback was
+        # logged under, so a user can quote it and it can be found in
+        # journalctl without them pasting a stack trace.
+        reference = datetime.now().strftime("SL-%Y%m%d-%H%M%S")
+        app.logger.exception("Unhandled server error [%s]", reference)
+        return render_template("500.html", reference=reference), 500
+
+
+
+    @app.errorhandler(Exception)
+    def unhandled(e):
+        # Werkzeug HTTP errors (403/404/413) keep their own handlers; only
+        # genuine unhandled exceptions fall through to the 500 page. Without
+        # this, an exception raised outside a view — in a context processor,
+        # for instance — bypasses the 500 handler entirely.
+        if isinstance(e, HTTPException):
+            return e
+        return server_error(e)
 
     return app
